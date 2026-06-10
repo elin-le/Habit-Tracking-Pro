@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 .env
+shared/constants/appConstants.ts
+data/account.ts
 
 # Editor directories and files
 .vscode/*
