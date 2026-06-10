@@ -1,0 +1,31 @@
+{
+    "auth": {
+        "welcome": "Chào mừng quay lại!",
+        "phone": "Số điện thoại",
+        "password": "Mật khẩu",
+        "login": "Đăng nhập",
+        "invalid_credentials": "Số điện thoại hoặc mật khẩu không đúng",
+        "login_error": "Đăng nhập xảy ra lỗi"
+    },
+    "common": {
+        "save": "Lưu",
+        "cancel": "Hủy",
+        "delete": "Xóa",
+        "copyright": "© 2024 HabitPro · Xây dựng thói quen tốt mỗi ngày"
+    },
+    "sidebar": {
+        "dashboard": "Trang chủ",
+        "habits": "Thói quen",
+        "goals": "Mục tiêu",
+        "statistics": "Thống kê",
+        "settings": "Cài đặt"
+    },
+    "habit": {
+        "create": "Tạo thói quen",
+        "edit": "Chỉnh sửa thói quen",
+        "name": "Tên thói quen"
+    },
+    "loading": {
+        "message": "Đang tải..."
+    }
+}
