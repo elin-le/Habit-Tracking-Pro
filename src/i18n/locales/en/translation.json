@@ -18,7 +18,8 @@
         "habits": "Habits",
         "goals": "Goals",
         "statistics": "Statistics",
-        "settings": "Settings"
+        "settings": "Settings",
+        "notifications":"Notifications"
     },
     "habit": {
         "create": "Create Habit",
@@ -27,5 +28,9 @@
     },
     "loading": {
         "message": "Loading..."
+    },
+    "header":{
+        "greeting": "Welcome back",
+        "subtitle":"Every check-in moves you forward"
     }
 }

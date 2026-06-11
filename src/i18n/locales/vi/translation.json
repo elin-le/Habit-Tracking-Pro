@@ -18,7 +18,8 @@
         "habits": "Thói quen",
         "goals": "Mục tiêu",
         "statistics": "Thống kê",
-        "settings": "Cài đặt"
+        "settings": "Cài đặt",
+        "notifications": "Thông báo"
     },
     "habit": {
         "create": "Tạo thói quen",
@@ -27,5 +28,9 @@
     },
     "loading": {
         "message": "Đang tải..."
+    },
+    "header": {
+        "greeting": "Mừng bạn trở lại",
+        "subtitle":"Mỗi lần hoàn thành đều giúp bạn tiến xa hơn"
     }
 }
