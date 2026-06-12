@@ -4,10 +4,17 @@
   --text: #111827;
   --primary: #4f46e5;
 
-  /* Sidebar luôn dark */
-  --sidebar-bg: #1a1040;
-  --sidebar-text: #ffffff;
-  --sidebar-muted: #a78bfa;
+  --checkin-notstarted-bg: #fefce8;
+  --checkin-notstarted-border: #fde68a;
+
+  --checkin-progress-bg: #ffffff;
+  --checkin-progress-border: #e2e8f0;
+
+  --checkin-completed-bg: #ecfdf5;
+  --checkin-completed-border: #86efac;
+
+  --badge-bg: #f1f5f9;
+  --badge-text: #475569;
 }
 
 [data-theme="dark"] {
@@ -16,9 +23,17 @@
   --text: #f8fafc;
   --primary: #818cf8;
 
-  --sidebar-bg: #0f0a2e;
-  --sidebar-text: #ffffff;
-  --sidebar-muted: #7c6fcd;
+  --checkin-notstarted-bg: #422006;
+  --checkin-notstarted-border: #713f12;
+
+  --checkin-progress-bg: #1e293b;
+  --checkin-progress-border: #475569;
+
+  --checkin-completed-bg: #052e16;
+  --checkin-completed-border: #14532d;
+
+  --badge-bg: #334155;
+  --badge-text: #e2e8f0;
 }
 
 @font-face {
