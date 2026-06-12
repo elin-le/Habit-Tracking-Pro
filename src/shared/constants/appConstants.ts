@@ -1,6 +1,6 @@
 export const ROUTES = {
   DASHBOARD: "/dashboard",
-  HABITS: "/habits",
+  HABITS: "habits",
   GOALS: "/goals",
   STATISTICS: "/statistics",
   NOTIFICATIONS: "/notifications",
@@ -19,5 +19,5 @@ export const STORAGE_KEY = {
   USER_HABITS: "htp_current_user_habits",
   USER_HABIT_SCHEDULES: "htp_current_user_habit_schedules",
   USER_GOALS: "htp_current_user_goals",
-  USER_CHECKINS: "htp_current_user_checkins"
+  USER_CHECKINS: "htp_current_user_checkins",
 } as const;
