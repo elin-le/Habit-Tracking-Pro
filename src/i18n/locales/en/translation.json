@@ -24,7 +24,8 @@
     "habit": {
         "create": "Create Habit",
         "edit": "Edit Habit",
-        "name": "Habit Name"
+        "name": "Habit Name",
+        "no_habits": "No habits found"
     },
     "loading": {
         "message": "Loading..."
@@ -32,5 +33,16 @@
     "header":{
         "greeting": "Welcome back",
         "subtitle":"Every check-in moves you forward"
+    },
+    "status": {
+        "not_started": "Not started",
+        "in_progress": "In Progress",
+        "completed": "Completed"
+    },
+    "checkin": {
+        "today_habits": "Today's Habits",
+        "filter": "Filter",
+        "history": "History",
+        "select_date": "Choose date"
     }
 }

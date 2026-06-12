@@ -24,7 +24,8 @@
     "habit": {
         "create": "Tạo thói quen",
         "edit": "Chỉnh sửa thói quen",
-        "name": "Tên thói quen"
+        "name": "Tên thói quen",
+        "no_habits": "Không có thói quen nào"
     },
     "loading": {
         "message": "Đang tải..."
@@ -32,5 +33,17 @@
     "header": {
         "greeting": "Mừng bạn trở lại",
         "subtitle":"Mỗi lần hoàn thành đều giúp bạn tiến xa hơn"
+    },
+    "status": {
+        "not_started": "Chưa bắt đầu",
+        "in_progress": "Đang tiến hành",
+        "completed": "Đã hoàn thành"
+    },
+    "checkin": {
+        "today_habits": "Thói quen hôm nay",
+        "filter": "Lọc",
+        "history": "Lịch sử",
+        "select_date": "Chọn ngày"
+
     }
 }
