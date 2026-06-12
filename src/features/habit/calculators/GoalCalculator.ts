@@ -291,3 +291,47 @@ export const getTotalCompletionProgress = (
         100
     );
 };
+
+export const getCompletionRate = (
+    startedDate: string,
+    endDate: string,
+    checkins: CheckIn[],
+    targetPerDay: number
+): number => {
+    const summary = getDailySummary(
+        checkins,
+        targetPerDay
+    );
+
+    const today = new Date();
+
+    const effectiveEnd =
+        new Date(endDate) < today
+            ? new Date(endDate)
+            : today;
+
+    const start = new Date(startedDate);
+
+    const totalDays =
+        Math.floor(
+            (effectiveEnd.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
+        ) + 1;
+
+    if (totalDays <= 0) return 0;
+
+    const completedDays =
+        Object.entries(summary).filter(
+            ([date, value]) =>
+                value.completed &&
+                isDateInRange(
+                    date,
+                    startedDate,
+                    getDateKey(effectiveEnd)
+                )
+        ).length;
+
+    return Math.round(
+        (completedDays / totalDays) *
+        100
+    );
+};
