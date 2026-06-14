@@ -9,6 +9,8 @@ import GoalsPage from "../pages/GoalsPage";
 
 import { NotificationsPage } from "../pages/NotificationsPage";
 
+import StatisticsPage from "../pages/StatisticsPage";
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -33,10 +35,10 @@ export const router = createBrowserRouter([
         element: <GoalsPage />,
       },
 
-      //   {
-      //     path: ROUTES.STATISTICS,
-      //     element: <StatisticsPage />,
-      //   },
+      {
+        path: "statistics",
+        element: <StatisticsPage />,
+      },
 
         {
           path: "notifications",
