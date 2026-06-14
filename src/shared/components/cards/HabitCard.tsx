@@ -1,52 +1,60 @@
 import {
   MoreVertical,
   CheckCircle,
-  ChevronUp,
-  ChevronDown,
+  Calendar,
+  Plus,
+  Minus,
+  History,
 } from "lucide-react";
 import { useState } from "react";
 import { DropdownMenu } from "../common/DropdownMenu";
+import type { Habit } from "../../types/Habit";
+import { CATEGORY_ICONS, PRIORITY_COLORS } from "../../constants/appConstants";
+import { mockCategories } from "../../../data/category";
+import { useTranslation } from "react-i18next";
 
-export function HabitCard() {
+interface HabitCardProps {
+  habit: Habit;
+  onUpdate: () => void;
+}
+
+export function HabitCard({ habit, onUpdate }: HabitCardProps) {
+  const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const priorityColor = PRIORITY_COLORS[habit.priority];
+  const category = mockCategories.find((c) => c.id === habit.categoryId);
 
   return (
     <div
-      className="relative overflow-hidden rounded-2xl border p-5 shadow-sm transition-all"
+      className="relative flex h-full flex-col justify-between rounded-2xl border p-5 shadow-sm transition-all"
       style={{
         background: "var(--surface)",
         borderColor: "color-mix(in srgb, var(--primary) 25%, transparent)",
       }}
     >
-      {/* Status Stripe */}
       <div
-        className="absolute left-0 top-0 bottom-0 w-1"
-        style={{ background: "var(--primary)" }}
+        className="absolute left-0 top-1 bottom-1 w-1 rounded-l-3xl"
+        style={{ background: priorityColor }}
       />
-
-      {/* Goal Banner */}
-      <div
-        className="mb-4 flex items-center gap-2 rounded-lg border px-3 py-2 text-xs"
-        style={{
-          background: "color-mix(in srgb, #f59e0b 8%, transparent)",
-          borderColor: "color-mix(in srgb, #f59e0b 25%, transparent)",
-          color: "var(--text)",
-        }}
-      >
-        🏆 Goal Achieved!
-      </div>
 
       {/* Header */}
       <div className="mb-4 flex items-start gap-3 pl-2">
-        <span className="text-2xl">💧</span>
-        <div className="flex-1">
+        <div
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full shadow-md"
+          style={{
+            background: "color-mix(in srgb, var(--primary) 25%, transparent)",
+          }}
+        >
+          <span className="text-xl">{CATEGORY_ICONS[habit.categoryId]}</span>
+        </div>
+        <div className="flex-1 min-w-0">
           <h3
             className="truncate text-base font-medium"
             style={{ color: "var(--text)" }}
           >
-            Drink Water
+            {habit.name}
           </h3>
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-1.5">
             <span
               className="rounded-full px-2 py-1 text-xs"
               style={{
@@ -55,21 +63,33 @@ export function HabitCard() {
                 color: "var(--primary)",
               }}
             >
-              Health
+              {t(`habit_form.${category?.name}`) ?? habit.categoryId}
             </span>
             <span
-              className="rounded-full px-2 py-1 text-xs"
+              className="rounded-full px-2 py-1 text-xs capitalize"
               style={{
-                background: "color-mix(in srgb, #ef4444 12%, transparent)",
-                color: "#ef4444",
+                background: `color-mix(in srgb, ${priorityColor} 12%, transparent)`,
+                color: priorityColor,
               }}
             >
-              High
+              {t(`habit_form.${habit.priority}`)}
+            </span>
+            <span
+              className="flex items-center gap-1 rounded-md px-2.5 py-0.5 text-xs"
+              style={{
+                background: "color-mix(in srgb, var(--primary) 8%, var(--bg))",
+                color: "var(--sidebar-muted)",
+              }}
+            >
+              <Calendar size={12} />
+              {habit.frequencyType === "DAILY"
+                ? t("habit_form.DAILY")
+                : t("habit_form.DAY_OF_WEEK")}
             </span>
           </div>
         </div>
         <button
-          className="flex h-8 w-8 items-center justify-center rounded-full"
+          className="cursor-pointer flex h-8 w-8 items-center justify-center rounded-full group transition-all hover:bg-violet-500/10"
           style={{ color: "var(--sidebar-muted)" }}
           onClick={() => setMenuOpen(true)}
         >
@@ -77,67 +97,43 @@ export function HabitCard() {
         </button>
       </div>
 
-      {/* Stats */}
-      <div className="mb-4 grid grid-cols-3 gap-2 pl-2">
-        {[
-          ["🔥 Current", "15d"],
-          ["Best", "30d"],
-          ["Rate", "85%"],
-        ].map(([label, val]) => (
-          <div
-            className="rounded-lg p-3"
-            style={{
-              background: "color-mix(in srgb, var(--primary) 8%, var(--bg))",
-            }}
-          >
-            <span
-              className="text-[10px] uppercase tracking-wide"
-              style={{ color: "var(--sidebar-muted)" }}
-            >
-              {label}
-            </span>
-            <p
-              className="text-lg font-semibold"
-              style={{ color: "var(--text)" }}
-            >
-              {val}
-            </p>
-          </div>
-        ))}
-      </div>
-
       {/* Checkin */}
       <div
-        className="flex items-center gap-4 rounded-xl p-4"
+        className="rounded-md"
         style={{
           background: "color-mix(in srgb, var(--primary) 8%, var(--bg))",
         }}
       >
-        <div
-          className="flex h-14 w-14 items-center justify-center rounded-full border-4 text-sm font-semibold"
-          style={{ borderColor: "var(--primary)", color: "var(--text)" }}
-        >
-          3/5
-        </div>
-        <div className="flex-1">
+        {/* Hàng chính: ring + status + actions */}
+        <div className="flex items-center gap-3 p-3">
           <div
-            className="mb-2 flex items-center gap-2 text-sm"
-            style={{ color: "#4ade80" }}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-[3px] text-sm font-medium"
+            style={{ borderColor: "var(--primary)" }}
           >
-            <CheckCircle size={14} /> Completed today!
+            3/5
           </div>
-          <div className="flex gap-2">
+
+          <div className="min-w-0 flex-1">
+            <div
+              className="flex items-center gap-1.5 whitespace-nowrap text-sm font-medium"
+              style={{ color: "#22c55e" }}
+            >
+              <CheckCircle size={14} className="shrink-0" /> Completed today
+            </div>
+          </div>
+
+          <div className="flex shrink-0 gap-1.5">
             <button
-              className="flex h-8 w-8 items-center justify-center rounded-full border"
+              className="flex h-7 w-7 items-center justify-center rounded-full border"
               style={{
                 borderColor: "var(--sidebar-muted)",
                 color: "var(--sidebar-muted)",
               }}
             >
-              <ChevronDown size={14} />
+              <Minus size={13} />
             </button>
             <button
-              className="flex h-8 w-8 items-center justify-center rounded-full border"
+              className="flex h-7 w-7 items-center justify-center rounded-full border"
               style={{
                 borderColor: "var(--primary)",
                 background:
@@ -145,19 +141,39 @@ export function HabitCard() {
                 color: "var(--primary)",
               }}
             >
-              <ChevronUp size={14} />
+              <Plus size={13} />
             </button>
           </div>
         </div>
+
+        {/* Footer: View history */}
         <div
-          className="max-w-25 text-right text-xs italic"
-          style={{ color: "var(--sidebar-muted)" }}
+          className="border-t px-3 py-1.5"
+          style={{
+            borderColor: "color-mix(in srgb, var(--primary) 12%, transparent)",
+          }}
         >
-          Drink 2L today
+          <button
+            className="flex w-full items-center justify-center gap-1.5 rounded text-xs transition-colors"
+            style={{ color: "var(--primary)" }}
+            // onClick={() => /* open history modal */}
+          >
+            <History size={13} />
+            View check-in history
+          </button>
         </div>
       </div>
 
-      {menuOpen && <DropdownMenu onClose={() => setMenuOpen(false)} />}
+      {menuOpen && (
+        <DropdownMenu
+          onClose={() => setMenuOpen(false)}
+          status={habit.status}
+          onUpdate={() => {
+            onUpdate();
+            setMenuOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }

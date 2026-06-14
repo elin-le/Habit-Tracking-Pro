@@ -1,3 +1,6 @@
+import { cn } from "@/shared/lib/utils";
+import { Button } from "../ui/button";
+
 interface FilterChipProps {
   children: React.ReactNode;
   active?: boolean;
@@ -5,8 +8,14 @@ interface FilterChipProps {
 
 export function FilterChip({ children, active = false }: FilterChipProps) {
   return (
-    <button
-      className="rounded-full border px-3.5 py-1.5 text-sm font-medium transition-all"
+    <Button
+      variant="ghost"
+      // onClick={onClick}
+      className={cn(
+        "cursor-pointer rounded-full border px-3.5 py-1.5 text-sm font-medium transition-all",
+        "focus-visible:ring-0 focus-visible:ring-offset-0", // bỏ focus ring mặc định shadcn
+        "h-auto", // override height cố định của shadcn Button
+      )}
       style={
         active
           ? {
@@ -38,6 +47,6 @@ export function FilterChip({ children, active = false }: FilterChipProps) {
       }}
     >
       {children}
-    </button>
+    </Button>
   );
 }

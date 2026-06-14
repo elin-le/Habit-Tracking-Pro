@@ -4,7 +4,7 @@ import MainLayout from "../layouts/MainLayout";
 import AuthLayout from "../layouts/AuthLayout";
 
 import { ROUTES } from "../shared/constants/appConstants";
-import { HabitsPage } from "../pages/HabitsPage";
+import { HabitsPage } from "../features/habit/page/HabitsPage";
 
 export const router = createBrowserRouter([
   {
