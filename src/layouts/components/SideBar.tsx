@@ -2,7 +2,7 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { ROUTES } from "../../shared/constants/appConstants"
 import { useTranslation } from "react-i18next"
-
+import { NotificationBadge } from '../../features/notifications/component/NotificationBadge';
 
 
 function HomeIcon({ className = "" }: { className?: string }) {
@@ -90,7 +90,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
         { to: ROUTES.HABITS, label: t("sidebar.habits"), icon: HabitsIcon },
         { to: ROUTES.GOALS, label: t("sidebar.goals"), icon: GoalsIcon },
         { to: ROUTES.STATISTICS, label: t("sidebar.statistics"), icon: StatisticsIcon },
-        { to: ROUTES.NOTIFICATIONS, label: t("sidebar.notifications"), icon: BellIcon, badge: 3 },
+        { to: "/dashboard/notifications", label: t('sidebar.notifications'), icon: BellIcon, badge: <NotificationBadge /> },
         // { to: "/settings", label: "Settings", icon: SettingsIcon },
     ];
 

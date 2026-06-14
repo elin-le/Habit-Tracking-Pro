@@ -32,5 +32,13 @@
     "header": {
         "greeting": "Mừng bạn trở lại",
         "subtitle":"Mỗi lần hoàn thành đều giúp bạn tiến xa hơn"
+    },
+        "notifications": {
+        "title": "Thông báo",
+        "description": "Xem và quản lý các cập nhật quan trọng về mục tiêu cũng như tiến độ thói quen của bạn.",
+        "listTitle": "Danh sách thông báo",
+        "markAllRead": "Đánh dấu đọc tất cả",
+        "empty": "Không có thông báo nào.",
+        "readBtn": "Đọc"
     }
 }

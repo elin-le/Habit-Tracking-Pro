@@ -9,19 +9,22 @@ import { Toaster } from "sonner";
 
 import { seedData } from "./shared/utils/seedData";
 import { ThemeProvider } from "./context/ThemeContext";
+import { NotificationProvider } from './features/notifications/context/NotificationContext';
 
 seedData();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider >
-      <RouterProvider router={router} />
-      <Toaster
-        richColors
-        position="top-right"
-        closeButton
-        expand
-      />
+      <NotificationProvider> {/* Em Thêm thẻ notification ở đây */}
+        <RouterProvider router={router} />
+        <Toaster
+          richColors
+          position="top-right"
+          closeButton
+          expand
+        />
+      </NotificationProvider>
     </ThemeProvider>
   </StrictMode>
 )

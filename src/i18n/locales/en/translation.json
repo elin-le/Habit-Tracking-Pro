@@ -32,5 +32,15 @@
     "header":{
         "greeting": "Welcome back",
         "subtitle":"Every check-in moves you forward"
+    },
+
+    "notifications": {
+        "title": "Notifications",
+        "description": "View and manage important updates about your goals and habit progress.",
+        "listTitle": "Notification List",
+        "markAllRead": "Mark all as read",
+        "empty": "No notifications found.",
+        "readBtn": "Read"
     }
+    
 }

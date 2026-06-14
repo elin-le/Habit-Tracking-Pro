@@ -1,7 +1,9 @@
 import { MobileMenuButton } from "./SideBar";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../shared/hooks/useTheme";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { Link } from "react-router-dom"; // Thêm dòng này
+import { NotificationContext } from "../../features/notifications/context/NotificationContext"; // Thêm dòng này
 
 interface HeaderProps {
     title?: string;
@@ -68,6 +70,9 @@ export default function Header({
     const { i18n } = useTranslation();
     const { theme, toggleTheme } = useTheme();
     const [lang, setLang] = useState<"EN" | "VI">("EN");
+// THÊM DÒNG NÀY ĐỂ LẤY SỐ ĐẾM THÔNG BÁO:
+    const { unreadCount } = useContext(NotificationContext);
+
 
     const greeting = (() => {
         const h = new Date().getHours();
@@ -174,15 +179,19 @@ export default function Header({
                     <div className="w-px h-6 bg-violet-100 mx-1" />
 
                     {/* Bell */}
-                    <div className="relative">
-                        <button
-                            aria-label="Notifications"
-                            className="w-9 h-9 flex items-center justify-center rounded-xl text-violet-400 hover:bg-violet-50 hover:text-violet-600 transition-colors"
-                        >
-                            <BellIcon />
-                        </button>
-                        <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white" aria-hidden="true" />
-                    </div>
+                    <Link
+                        to="/dashboard/notifications"
+                        aria-label="Notifications"
+                        className="relative w-9 h-9 flex items-center justify-center rounded-xl text-violet-400 hover:bg-violet-50 hover:text-violet-600 transition-colors"
+                    >
+                        <BellIcon />
+                        {/* Cục badge đỏ kiểu Facebook - Chỉ hiện ra khi có thông báo */}
+                        {unreadCount > 0 && (
+                            <span className="absolute top-0 right-0 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow-sm ring-2 ring-white">
+                                {unreadCount > 99 ? '99+' : unreadCount}
+                            </span>
+                        )}
+                    </Link>
 
                     {/* New Habit */}
                     {showNewHabit && (
