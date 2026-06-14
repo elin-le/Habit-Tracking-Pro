@@ -7,6 +7,8 @@ import { ROUTES } from "../shared/constants/appConstants";
 import { HabitsPage } from "../pages/HabitsPage";
 import GoalsPage from "../pages/GoalsPage";
 
+import { NotificationsPage } from "../pages/NotificationsPage";
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -36,10 +38,10 @@ export const router = createBrowserRouter([
       //     element: <StatisticsPage />,
       //   },
 
-      //   {
-      //     path: ROUTES.NOTIFICATIONS,
-      //     element: <NotificationsPage />,
-      //   },
+        {
+          path: "notifications",
+          element: <NotificationsPage />,
+        },
 
       //   {
       //     path: ROUTES.SETTINGS,
