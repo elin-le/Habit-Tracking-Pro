@@ -4,7 +4,6 @@ import {
     Calendar,
     MoreVertical,
     CheckCircle2,
-    AlertTriangle,
     Archive,
     Edit3,
     Trash2,
@@ -35,7 +34,7 @@ export interface GoalCardProps {
             progressPercent: number;
             status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
         };
-        color?: "emerald" | "orange" | "indigo";
+        color?: "emerald" | "orange" | "indigo" | "rose";
     };
     habitName: string;
     onSelectDetail: (goal: any) => void;
@@ -67,6 +66,13 @@ const COLOR_MAP = {
         badgeText: "text-indigo-600 dark:text-indigo-400",
         progressBar: "bg-indigo-600",
         glow: "hover:shadow-indigo-500/10",
+    },
+    rose: {
+        ring: "#f43f5e",
+        badgeBg: "bg-rose-50 dark:bg-rose-950/30",
+        badgeText: "text-rose-600 dark:text-rose-400",
+        progressBar: "bg-rose-500",
+        glow: "hover:shadow-rose-500/10",
     },
 } as const;
 
@@ -238,7 +244,8 @@ const GoalCard: React.FC<GoalCardProps> = ({
 }) => {
     const { t } = useTranslation();
     const { progress, color = "indigo" } = goal;
-    const c = COLOR_MAP[color];
+    // Thêm fallback an toàn: nếu màu trong LocalStorage cũ chưa bị xoá và không có trong COLOR_MAP thì lấy màu indigo
+    const c = COLOR_MAP[color as keyof typeof COLOR_MAP] || COLOR_MAP.indigo;
 
     const isCompleted = progress.status === "COMPLETED";
     const isNotStarted = progress.status === "NOT_STARTED";

@@ -214,9 +214,9 @@ const GoalForm: React.FC<GoalFormProps> = ({ habitId, habitName, onSubmit, onCan
             </div>
 
             {/* Date fields */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-5">
                 {/* Start date */}
-                <div>
+                <div className="flex-1">
                     <label
                         htmlFor="startedDate"
                         className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 mb-2.5 block"
@@ -228,12 +228,12 @@ const GoalForm: React.FC<GoalFormProps> = ({ habitId, habitName, onSubmit, onCan
                         type="date"
                         value={startedDate}
                         onChange={(e) => setStartedDate(e.target.value)}
-                        className={INPUT_CLASS}
+                        className={`${INPUT_CLASS} appearance-none`}
                     />
                 </div>
 
                 {/* End date (optional) */}
-                <div>
+                <div className="flex-1">
                     <label
                         htmlFor="endDate"
                         className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 mb-2.5 block truncate"
@@ -253,10 +253,10 @@ const GoalForm: React.FC<GoalFormProps> = ({ habitId, habitName, onSubmit, onCan
                             clearError("endDate");
                         }}
                         aria-invalid={!!errors.endDate}
-                        className={`${INPUT_CLASS} ${errors.endDate ? "border-red-400 dark:border-red-500" : ""}`}
+                        className={`${INPUT_CLASS} appearance-none ${errors.endDate ? "border-red-400 dark:border-red-500 focus:ring-red-400/20" : ""}`}
                     />
                     {errors.endDate && (
-                        <p className="flex items-center gap-1 text-xs text-red-500">
+                        <p className="flex items-center gap-1 text-xs text-red-500 mt-1.5">
                             <AlertCircle size={11} />
                             {errors.endDate}
                         </p>

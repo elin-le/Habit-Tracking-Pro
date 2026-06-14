@@ -1,15 +1,4 @@
-export type TargeType =
-    | "STREAK"
-    | "TOTAL_COMPLETION";
-
-export type MockGoal = {
-    id: number;
-    targetValue: number;
-    targetType: TargeType;
-    habitId: number;
-    startedDate: string;
-    endDate: string;
-};
+import type { Goal } from "../../../shared/types/Goal";
 
 export interface CheckIn {
     id: string;
@@ -22,7 +11,8 @@ type DailySummary = {
     completed: boolean;
 };
 
-const getDateKey = (date: string | Date) => {
+const getDateKey = (date: string | Date | undefined | null) => {
+    if (!date) return "";
     return new Date(date).toISOString().split("T")[0];
 };
 
@@ -34,6 +24,10 @@ const isDateInRange = (
     const dateKey = getDateKey(date);
     const startKey = getDateKey(startDate);
     const endKey = getDateKey(endDate);
+
+    if (!endKey) {
+        return dateKey >= startKey;
+    }
 
     return (
         dateKey >= startKey &&
@@ -159,7 +153,7 @@ export const getLongestStreak = (
 };
 
 export const getCurrentStreakInRange = (
-    goal: MockGoal,
+    goal: Goal,
     habitCheckins: CheckIn[],
     targetPerDay: number
 ): number => {
@@ -208,12 +202,12 @@ export const getCurrentStreakInRange = (
     return streak;
 };
 export const getStreakProgress = (
-    goal: MockGoal,
+    goal: Goal,
     targetPerDay: number,
     checkins: CheckIn[]
 ): number => {
     if (
-        goal.targetType !== "STREAK" ||
+        goal.goalType !== "STREAK" ||
         goal.targetValue <= 0
     ) {
         return -1;
@@ -233,13 +227,13 @@ export const getStreakProgress = (
     );
 };
 export const getTotalCompletion = (
-    goal: MockGoal,
+    goal: Goal,
     targetPerDay: number,
     checkins: CheckIn[]
 ): number => {
     if (
-        goal.targetType !==
-        "TOTAL_COMPLETION"
+        goal.goalType !== "TOTAL_COMPLETIONS" ||
+        goal.targetValue <= 0
     ) {
         return -1;
     }
@@ -263,13 +257,12 @@ export const getTotalCompletion = (
 };
 
 export const getTotalCompletionProgress = (
-    goal: MockGoal,
+    goal: Goal,
     targetPerDay: number,
     checkins: CheckIn[]
 ): number => {
     if (
-        goal.targetType !==
-        "TOTAL_COMPLETION" ||
+        goal.goalType !== "TOTAL_COMPLETIONS" ||
         goal.targetValue <= 0
     ) {
         return -1;

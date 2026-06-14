@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useGoals, type StatusFilter, type TypeFilter } from "../shared/hooks/useGoals";
 import { ToastService } from "../routes/services/toastService";
 import { useTranslation } from "react-i18next";
 import GoalCard from "../shared/components/cards/GoalCard";
@@ -7,91 +8,17 @@ import { Target, Zap, Award, CheckCircle2, Plus, Search, SlidersHorizontal } fro
 import Button from "../shared/components/ui/Button";
 import { Modal } from "../shared/components/ui/Modal";
 import GoalForm from "../shared/components/forms/GoalForm";
-
-// Mock data 
-
-const MOCK_GOALS_DATA = [
-    {
-        id: "goal1",
-        habitName: "Uống nước",
-        goalType: "STREAK" as const,
-        targetValue: 30,
-        startedDate: "2026-05-15",
-        endDate: "2026-06-13",
-        progress: {
-            currentProgress: 30,
-            progressPercent: 100,
-            status: "COMPLETED" as const,
-        },
-        color: "emerald" as const,
-        stats: { bestStreak: 30, completionRate: 100 },
-        weeklyHistory: [
-            { day: "T2", value: 100 }, { day: "T3", value: 100 },
-            { day: "T4", value: 100 }, { day: "T5", value: 100 },
-            { day: "T6", value: 100 }, { day: "T7", value: 100 },
-            { day: "CN", value: 100 },
-        ],
-    },
-    {
-        id: "goal2",
-        habitName: "Đọc sách",
-        goalType: "STREAK" as const,
-        targetValue: 21,
-        startedDate: "2026-05-28",
-        endDate: "",
-        progress: {
-            currentProgress: 17,
-            progressPercent: 81,
-            status: "IN_PROGRESS" as const,
-        },
-        color: "orange" as const,
-        stats: { bestStreak: 17, completionRate: 81 },
-        weeklyHistory: [
-            { day: "T2", value: 100 }, { day: "T3", value: 100 },
-            { day: "T4", value: 100 }, { day: "T5", value: 0 },
-            { day: "T6", value: 100 }, { day: "T7", value: 100 },
-            { day: "CN", value: 100 },
-        ],
-    },
-    {
-        id: "goal3",
-        habitName: "Tập gym",
-        goalType: "TOTAL_COMPLETIONS" as const,
-        targetValue: 12,
-        startedDate: "2026-06-01",
-        endDate: "",
-        progress: {
-            currentProgress: 3,
-            progressPercent: 25,
-            status: "IN_PROGRESS" as const,
-        },
-        color: "indigo" as const,
-        stats: { bestStreak: 3, completionRate: 25 },
-        weeklyHistory: [
-            { day: "T2", value: 100 }, { day: "T3", value: 0 },
-            { day: "T4", value: 100 }, { day: "T5", value: 0 },
-            { day: "T6", value: 100 }, { day: "T7", value: 0 },
-            { day: "CN", value: 0 },
-        ],
-    },
-];
+import { STORAGE_KEY } from "../shared/constants/appConstants";
 
 const MOCK_HABITS_WITHOUT_GOAL = [
     { id: "habit_extra1", name: "Chạy bộ buổi sáng" },
     { id: "habit_extra2", name: "Học ngoại ngữ" },
 ];
 
-// Filter types 
-
-type StatusFilter = "ALL" | "IN_PROGRESS" | "COMPLETED" | "NOT_STARTED" | "NEAR_COMPLETION";
-type TypeFilter = "ALL" | "STREAK" | "TOTAL_COMPLETIONS";
-
 // GoalsPage 
-
 function GoalsPage() {
     const { t } = useTranslation();
 
-    const [goals, setGoals] = useState(MOCK_GOALS_DATA);
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedHabit, setSelectedHabit] = useState({ id: "", name: "" });
     const [selectedGoalDetail, setSelectedGoalDetail] = useState<any | null>(null);
@@ -99,12 +26,73 @@ function GoalsPage() {
 
     // Filters
     const [search, setSearch] = useState("");
-    const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
-    const [typeFilter, setTypeFilter] = useState<TypeFilter>("ALL");
+    const {
+        goals,
+        filteredGoals,
+        statusFilter, setStatusFilter,
+        typeFilter, setTypeFilter,
+        deleteGoal, updateGoal, createGoal, refreshGoals
+    } = useGoals();
+
+    // TODO: Xóa đoạn này đi khi ráp với mock data chính thức
+    useEffect(() => {
+        const existingGoals = localStorage.getItem(STORAGE_KEY.USER_GOALS);
+        if (!existingGoals || existingGoals === "[]") {
+            const mockHabits = [
+                { id: "habit-1", name: "Uống nước", color: "emerald", targetPerDay: 1 },
+                { id: "habit-2", name: "Đọc sách", color: "orange", targetPerDay: 1 },
+                { id: "habit-3", name: "Tập gym", color: "indigo", targetPerDay: 1 },
+                { id: "habit-4", name: "Ngồi thiền", color: "rose", targetPerDay: 1 }
+            ];
+            const mockGoals = [
+                // Đã hoàn thành (30/30)
+                { id: "goal1", habitId: "habit-1", goalType: "STREAK", targetValue: 30, startedDate: "2026-05-15", endDate: "2026-06-13" },
+                // Gần hoàn thành (18/21 = 85%)
+                { id: "goal2", habitId: "habit-2", goalType: "STREAK", targetValue: 21, startedDate: "2026-05-28", endDate: "2026-06-25" },
+                // Đang thực hiện (3/12 = 25%)
+                { id: "goal3", habitId: "habit-3", goalType: "TOTAL_COMPLETIONS", targetValue: 12, startedDate: "2026-06-01", endDate: "" },
+                // Chưa bắt đầu (0/10 = 0%)
+                { id: "goal4", habitId: "habit-4", goalType: "STREAK", targetValue: 10, startedDate: "2026-06-10", endDate: "" }
+            ];
+
+            const mockCheckins = [];
+            // Cho habit 1 hoàn thành 30 ngày liên tục (Đã hoàn thành)
+            for (let i = 0; i < 30; i++) {
+                const d = new Date("2026-05-15");
+                d.setDate(d.getDate() + i);
+                mockCheckins.push({ id: `c1-${i}`, habitId: "habit-1", checkedAt: d.toISOString().split('T')[0] });
+            }
+            // Cho habit 2 hoàn thành 18 ngày liên tục (Gần hoàn thành)
+            for (let i = 0; i < 18; i++) {
+                const d = new Date("2026-05-28");
+                d.setDate(d.getDate() + i);
+                mockCheckins.push({ id: `c2-${i}`, habitId: "habit-2", checkedAt: d.toISOString().split('T')[0] });
+            }
+            // Cho habit 3 hoàn thành 3 ngày (Đang thực hiện)
+            for (let i = 0; i < 3; i++) {
+                const d = new Date("2026-06-01");
+                d.setDate(d.getDate() + (i * 2)); // cách ngày
+                mockCheckins.push({ id: `c3-${i}`, habitId: "habit-3", checkedAt: d.toISOString().split('T')[0] });
+            }
+            // habit 4 không có checkin nào -> Chưa bắt đầu
+
+            localStorage.setItem(STORAGE_KEY.USER_HABITS, JSON.stringify(mockHabits));
+            localStorage.setItem(STORAGE_KEY.USER_GOALS, JSON.stringify(mockGoals));
+            localStorage.setItem(STORAGE_KEY.USER_CHECKINS, JSON.stringify(mockCheckins));
+
+            // Báo cho useGoals load lại data mới nhất từ LocalStorage
+            refreshGoals();
+        }
+    }, [refreshGoals]);
+
+    // Get all habits from local storage
+    const allHabits = useMemo(() => {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY.USER_HABITS) || "[]");
+    }, []);
+
     const [showFilters, setShowFilters] = useState(false);
 
     // Derived stats 
-
     const stats = useMemo(() => ({
         total: goals.length,
         inProgress: goals.filter((g) => g.progress.status === "IN_PROGRESS").length,
@@ -112,22 +100,7 @@ function GoalsPage() {
         completed: goals.filter((g) => g.progress.status === "COMPLETED").length,
     }), [goals]);
 
-    // Filtered goals 
-
-    const filteredGoals = useMemo(() => {
-        return goals.filter((g) => {
-            const matchSearch = !search
-                || g.habitName.toLowerCase().includes(search.toLowerCase());
-            const matchStatus = statusFilter === "ALL"
-                || (statusFilter === "NEAR_COMPLETION" ? g.progress.progressPercent >= 80 && g.progress.status !== "COMPLETED" : g.progress.status === statusFilter);
-            const matchType = typeFilter === "ALL"
-                || g.goalType === typeFilter;
-            return matchSearch && matchStatus && matchType;
-        });
-    }, [goals, search, statusFilter, typeFilter]);
-
     // Handlers 
-
     const handleAddGoal = (habit: { id: string; name: string }) => {
         setSelectedHabit(habit);
         setModalOpen(true);
@@ -145,7 +118,8 @@ function GoalsPage() {
                 { day: "CN", value: 0 },
             ],
         };
-        setGoals((prev) => [...prev, newGoal]);
+        createGoal(newGoal);
+        refreshGoals();
         ToastService.success(t("goals.add_success"));
         setModalOpen(false);
     };
@@ -162,21 +136,23 @@ function GoalsPage() {
     };
 
     const handleArchiveGoal = (goalId: string) => {
-        setGoals((prev) => prev.filter((g) => g.id !== goalId));
+        // TODO: Backend chưa có trạng thái ARCHIVE, tạm thời xoá luôn 
+        deleteGoal(goalId);
         ToastService.success(t("goals.archive_success"));
         handleCloseDetail();
     };
 
     const handleDeleteGoal = (goalId: string) => {
-        setGoals((prev) => prev.filter((g) => g.id !== goalId));
+        deleteGoal(goalId);
         ToastService.error(t("goals.delete_success"));
         handleCloseDetail();
     };
 
+    // TODO: bổ sung update goal 
+
     const hasActiveFilters = statusFilter !== "ALL" || typeFilter !== "ALL";
 
     // Main UI
-
     return (
         <div className="flex flex-col gap-6 pb-24 md:pb-8 text-[var(--text)] animate-in fade-in duration-300">
 
@@ -338,27 +314,33 @@ function GoalsPage() {
                 {/* Goal grid */}
                 {filteredGoals.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                        {filteredGoals.map((g) => (
-                            <GoalCard
-                                key={g.id}
-                                goal={g}
-                                habitName={g.habitName}
-                                onSelectDetail={handleSelectDetail}
-                                onEdit={() => ToastService.info(`${t("goals.edit_goal")}: ${g.habitName}`)}
-                                onArchive={() => {
-                                    setGoals((prev) => prev.filter((item) => item.id !== g.id));
-                                    ToastService.success(t("goals.archive_success"));
-                                }}
-                                onDelete={() => {
-                                    setGoals((prev) => prev.filter((item) => item.id !== g.id));
-                                    ToastService.error(t("goals.delete_success"));
-                                }}
-                            />
-                        ))}
+                        {filteredGoals.map((g) => {
+                            const habit = allHabits.find((h: any) => h.id === g.habitId);
+                            const habitName = habit ? habit.name : "Thói quen bị ẩn";
+
+                            return (
+                                <GoalCard
+                                    key={g.id}
+                                    goal={{
+                                        ...g,
+                                        color: habit?.color || "indigo"
+                                    }}
+                                    habitName={habitName}
+                                    onSelectDetail={handleSelectDetail}
+                                    onEdit={() => ToastService.info(`${t("goals.edit_goal")}: ${habitName}`)}
+                                    onArchive={() => {
+                                        handleArchiveGoal(g.id);
+                                    }}
+                                    onDelete={() => {
+                                        handleDeleteGoal(g.id);
+                                    }}
+                                />
+                            )
+                        })}
                     </div>
                 ) : (
                     /* Empty state */
-                    <div 
+                    <div
                         className="
                             flex flex-col items-center justify-center gap-3
                             py-16 px-8
