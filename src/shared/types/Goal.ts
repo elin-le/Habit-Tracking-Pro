@@ -1,6 +1,6 @@
-export type GoalType = 'streak' | 'total_completions';
+export type GoalType = 'STREAK' | 'TOTAL_COMPLETIONS';
 
-export type GoalStatus = 'not_started' | 'in_progress' | 'completed';
+export type GoalStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
 
 export interface Goal {
     id: string;

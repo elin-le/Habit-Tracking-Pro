@@ -5,6 +5,7 @@ import AuthLayout from "../layouts/AuthLayout";
 
 import { ROUTES } from "../shared/constants/appConstants";
 import { HabitsPage } from "../pages/HabitsPage";
+import GoalsPage from "../pages/GoalsPage";
 
 import { NotificationsPage } from "../pages/NotificationsPage";
 
@@ -27,10 +28,10 @@ export const router = createBrowserRouter([
         element: <HabitsPage />,
       },
 
-      //   {
-      //     path: ROUTES.GOALS,
-      //     element: <GoalsPage />,
-      //   },
+      {
+        path: ROUTES.GOALS,
+        element: <GoalsPage />,
+      },
 
       //   {
       //     path: ROUTES.STATISTICS,
