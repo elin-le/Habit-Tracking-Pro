@@ -5,6 +5,12 @@ import AuthLayout from "../layouts/AuthLayout";
 
 import { ROUTES } from "../shared/constants/appConstants";
 
+import { HabitsPage } from "../features/habit/page/HabitsPage";
+import GoalsPage from "../pages/GoalsPage";
+import { NotificationsPage } from "../pages/NotificationsPage";
+
+import StatisticsPage from "../pages/StatisticsPage";
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -18,34 +24,33 @@ export const router = createBrowserRouter([
   {
     path: ROUTES.DASHBOARD,
     element: <MainLayout />,
-    // children: [
-    //   {
-    //     path: ROUTES.HABITS,
-    //     element: <HabitsPage />,
-    //   },
+    children: [
+      {
+        path: ROUTES.HABITS,
+        element: <HabitsPage />,
+      },
 
-    //   {
-    //     path: ROUTES.GOALS,
-    //     element: <GoalsPage />,
-    //   },
+      {
+        path: ROUTES.GOALS,
+        element: <GoalsPage />,
+      },
 
-    //   {
-    //     path: ROUTES.STATISTICS,
-    //     element: <StatisticsPage />,
-    //   },
+      {
+        path: "statistics",
+        element: <StatisticsPage />,
+      },
 
-    //   {
-    //     path: ROUTES.NOTIFICATIONS,
-    //     element: <NotificationsPage />,
-    //   },
+        {
+          path: "notifications",
+          element: <NotificationsPage />,
+        },
 
-    //   {
-    //     path: ROUTES.SETTINGS,
-    //     element: <SettingsPage />,
-    //   },
-    // ],
+      //   {
+      //     path: ROUTES.SETTINGS,
+      //     element: <SettingsPage />,
+      //   },
+    ],
   },
-
 
   //   {
   //     path: "*",
