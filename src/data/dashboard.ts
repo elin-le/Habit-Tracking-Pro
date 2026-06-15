@@ -3,7 +3,7 @@ import {
     HabitStatisticsType,
     CategoryOverviewType,
     GoalProgressType,
-} from "../../features/dashboard/Dashboard.type.ts";
+} from "../features/dashboard/Dashboard.type.ts";
 
 export const SUMMARY_CARDS: SummaryCardType[] = [
     {

@@ -1,16 +1,16 @@
-import SummaryCard from "../components/SummaryCard";
-import HabitStatistics from "../components/HabitStatistics";
-import CategoryOverview from "../components/CategoryOverview";
-import GoalProgress from "../components/GoalProgress";
+import SummaryCard from "../features/dashboard/components/SummaryCard";
+import HabitStatistics from "../features/dashboard/components/HabitStatistics";
+import CategoryOverview from "../features/dashboard/components/CategoryOverview";
+import GoalProgress from "../features/dashboard/components/GoalProgress";
 
 import {
     SUMMARY_CARDS,
     HABIT_STATISTICS,
     CATEGORY_OVERVIEW,
     GOAL_PROGRESS,
-} from "../../../data/dashboard/dashboard";
+} from "../data/dashboard";
 
-import "../styles/dashboard.css";
+import "../features/dashboard/Dashboard.css";
 
 const DashboardPage = () => {
     return (
