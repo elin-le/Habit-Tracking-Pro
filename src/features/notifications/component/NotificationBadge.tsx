@@ -10,20 +10,7 @@ export const NotificationBadge = () => {
   if (unreadCount === 0) return null;
 
   return (
-    <span style={{
-      backgroundColor: '#ef4444', 
-      color: 'white',
-      borderRadius: '9999px',
-      padding: '2px 6px',
-      fontSize: '12px',
-      fontWeight: 'bold',
-      marginLeft: '8px',
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      minWidth: '18px',
-      height: '18px'
-    }}>
+    <span className="inline-flex items-center justify-center bg-red-500 text-white rounded-full text-xs font-bold px-1.5 py-0.5 ml-2 min-w-[18px] h-[18px]">
       {unreadCount}
     </span>
   );
