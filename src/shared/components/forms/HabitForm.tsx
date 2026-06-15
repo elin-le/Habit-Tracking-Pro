@@ -10,8 +10,8 @@ import type {
 import { useTranslation } from "react-i18next";
 import type { HabitSchedule } from "../../types/HabitSchedule";
 import { mockCategories } from "../../../data/category";
-import { Button } from "../ui/button";
-import { Modal } from "../ui/modal";
+import { Button } from "../ui/Button";
+import { Modal } from "../ui/Modal";
 
 // Style dùng chung cho input/select/textarea
 const inputStyle: React.CSSProperties = {
@@ -311,7 +311,7 @@ export function HabitForm({
           <Button
             variant="outline"
             onClick={onClose}
-            className="cursor-pointer"
+            className="cursor-pointer text-black dark:text-white"
           >
             {t("habit_form.btn_cancel")}
           </Button>
