@@ -22,9 +22,102 @@
         "notifications": "Thông báo"
     },
     "habit": {
-        "create": "Tạo thói quen",
-        "edit": "Chỉnh sửa thói quen",
-        "name": "Tên thói quen"
+      "create": "Tạo thói quen",
+      "edit": "Chỉnh sửa thói quen",
+      "name": "Tên thói quen",
+      "page_title": "Thói quen của tôi",
+      "active": "đang hoạt động",
+      "total": "tổng số",
+      "btn_add": "Thói quen mới",
+      "ept-1": "Chưa có thói quen nào",
+      "ept-2": "Bắt đầu xây dựng những thói quen tốt hơn ngay hôm nay",
+      "btn_create": "Tạo thói quen đầu tiên của bạn",
+      "ept-3": "Không tìm thấy thói quen phù hợp",
+      "ept-4": "Hãy thử điều chỉnh bộ lọc của bạn",
+      "search": "Tìm kiếm thói quen..."
+    },
+    "habit_form": {
+      "title1": "Thói quen mới",
+      "title2": "Chỉnh sửa thói quen",
+      "name": "Tên thói quen *",
+      "category": "Danh mục",
+      "Health": "Sức khỏe",
+      "Study": "Học tập",
+      "Work": "Công việc",
+      "Mindfulness": "Chánh niệm",
+      "Other": "Khác",
+      "priority": "Mức độ ưu tiên",
+      "LOW": "Thấp",
+      "MEDIUM": "Trung bình",
+      "HIGH": "Cao",
+      "frequency": "Tần suất",
+      "DAILY": "Hàng ngày",
+      "DAY_OF_WEEK": "Các ngày cụ thể",
+      "a-days": "Ngày thực hiện",
+      "target-p-days": "Mục tiêu mỗi ngày",
+      "status": "Trạng thái",
+      "s-1": "Đang hoạt động",
+      "s-2": "Tạm dừng",
+      "s-3": "Lưu trữ",
+      "btn_cancel": "Hủy",
+      "btn_create1": "Tạo thói quen",
+      "btn_create2": "Lưu thay đổi",
+      "val-name-1": "*Tên thói quen là bắt buộc",
+      "val-name-2": "*Tên thói quen phải có ít nhất 2 ký tự",
+      "val-name-3": "*Tên thói quen phải dưới 50 ký tự"
+    },
+    "days": {
+      "sun": "CN",
+      "mon": "T2",
+      "tue": "T3",
+      "wed": "T4",
+      "thu": "T5",
+      "fri": "T6",
+      "sat": "T7"
+    },
+    "dd-menu": {
+      "Edit": "Chỉnh sửa",
+      "SetGoal": "Đặt mục tiêu",
+      "Pause": "Tạm dừng",
+      "Resume": "Tiếp tục",
+      "Archive": "Lưu trữ",
+      "Delete": "Xóa"
+    },
+    "habit_filter": {
+      "title": "Bộ lọc",
+      "btn_clear": "Xóa tất cả",
+      "category": "Danh mục",
+      "cat-0": "Tất cả",
+      "cat-1": "Sức khỏe",
+      "cat-2": "Học tập",
+      "cat-3": "Công việc",
+      "cat-4": "Chánh niệm",
+      "cat-5": "Khác",
+      "priority": "Mức độ ưu tiên",
+      "pri-0": "Tất cả",
+      "pri-1": "Thấp",
+      "pri-2": "Trung bình",
+      "pri-3": "Cao",
+      "status": "Trạng thái",
+      "st-0": "Tất cả",
+      "st-1": "Đang hoạt động",
+      "st-2": "Tạm dừng",
+      "st-3": "Lưu trữ",
+      "frequency": "Tần suất",
+      "All": "Tất cả",
+      "Su": "CN",
+      "Mo": "T2",
+      "Tu": "T3",
+      "We": "T4",
+      "Th": "T5",
+      "Fr": "T6",
+      "Sa": "T7",
+      "filter_by": "Đang lọc theo: ",
+      "pad": "Chọn ngày"
+    },
+    "pagination": {
+      "page": "Trang",
+      "of": "trên"
     },
     "loading": {
         "message": "Đang tải..."
@@ -111,4 +204,6 @@
         "empty_hint": "Tạo thói quen và check-in mỗi ngày để xem thống kê tại đây",
         "empty_action": "Tạo thói quen ngay"
     }
+}
+
 }

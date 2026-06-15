@@ -4,9 +4,9 @@ import MainLayout from "../layouts/MainLayout";
 import AuthLayout from "../layouts/AuthLayout";
 
 import { ROUTES } from "../shared/constants/appConstants";
-import { HabitsPage } from "../pages/HabitsPage";
-import GoalsPage from "../pages/GoalsPage";
 
+import { HabitsPage } from "../features/habit/page/HabitsPage";
+import GoalsPage from "../pages/GoalsPage";
 import { NotificationsPage } from "../pages/NotificationsPage";
 
 import StatisticsPage from "../pages/StatisticsPage";
