@@ -188,7 +188,6 @@
             "encouragement": "Cố lên! Bạn đã đi được 80% chặng đường!",
             "achieved": "Tuyệt vời! Bạn đã hoàn thành mục tiêu!"
         }
-        "clear_filters": "Xoá bộ lọc"
     },
     "statistics": {
         "title": "Thống kê",
@@ -211,6 +210,4 @@
         "empty_hint": "Tạo thói quen và check-in mỗi ngày để xem thống kê tại đây",
         "empty_action": "Tạo thói quen ngay"
     }
-}
-
 }
