@@ -2,6 +2,8 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    padding: 1.5rem;
+    min-height: 100vh;
 }
 
 .dashboard-page__content {
@@ -13,28 +15,52 @@
     gap: 1.5rem;
 }
 
+/* CARD */
 .dashboard-card {
-    background-color: var(--surface-color);
+    background: var(--surface-color);
     color: var(--text-primary);
-    border: 1px solid var(--border-color);
 
-    border-radius: 1rem;
+    border: 2px solid rgba(124, 58, 237, 0.2);
+
+    border-radius: 20px;
     padding: 1.5rem;
 
-    box-shadow: var(--card-shadow);
+    box-shadow:
+        0 4px 12px rgba(237, 131, 225, 0.05),
+        0 12px 30px rgba(235, 143, 215, 0.05);
+
+    transition: all 0.3s ease;
+}
+
+.dashboard-card:hover {
+    border-color: rgb(228, 179, 237);
+    box-shadow:
+        0 8px 20px rgba(124, 58, 237, 0.15),
+        0 16px 40px rgba(124, 58, 237, 0.08);
+}
+
+.dashboard-card:hover {
+    transform: translateY(-4px);
+    box-shadow:
+        0 8px 20px rgba(124, 58, 237, 0.15),
+        0 16px 40px rgba(124, 58, 237, 0.1);
 }
 
 .dashboard-card__title {
     font-size: 1rem;
     font-weight: 600;
+    color: #64748b;
     margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
+/* PROGRESS BAR */
 .dashboard-progress {
     width: 100%;
-    height: 8px;
+    height: 10px;
 
-    background-color: var(--border-color);
+    background: #e2e8f0;
 
     border-radius: 9999px;
     overflow: hidden;
@@ -42,14 +68,31 @@
 
 .dashboard-progress__fill {
     height: 100%;
-
-    background-color: var(--primary-color);
-
     border-radius: inherit;
 
-    transition: width 0.3s ease;
+    background: linear-gradient(
+        90deg,
+        #7c3aed,
+        #a855f7
+    );
+
+    transition: width 0.4s ease;
 }
 
+/* TEXT */
 .text-secondary {
-    color: var(--text-secondary);
+    color: #64748b;
+}
+
+/* STAT NUMBER */
+.dashboard-stat-value {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.dashboard-stat-label {
+    color: #94a3b8;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
 }

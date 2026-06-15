@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { type HabitStatisticsType } from "../Dashboard.type";
 
 interface HabitStatisticsProps {
@@ -7,17 +8,19 @@ interface HabitStatisticsProps {
 const HabitStatistics = ({
     statistics,
 }: HabitStatisticsProps) => {
+    const { t } = useTranslation();
+
     const STATISTICS = [
         {
-            label: "Current Streak",
-            value: `${statistics.currentStreak} Days`,
+            label: t("dashboard.currentStreak"),
+            value: `${statistics.currentStreak} ${t("dashboard.days")}`,
         },
         {
-            label: "Longest Streak",
-            value: `${statistics.longestStreak} Days`,
+            label: t("dashboard.longestStreak"),
+            value: `${statistics.longestStreak} ${t("dashboard.days")}`,
         },
         {
-            label: "Completion Rate",
+            label: t("dashboard.completionRate"),
             value: `${statistics.completionRate}%`,
         },
     ];

@@ -5,20 +5,20 @@ import {
     type GoalProgressType
 } from "../features/dashboard/Dashboard.type.ts";
 
-export const SUMMARY_CARDS: SummaryCardType[] = [
+export const SUMMARY_CARDS = [
     {
         id: 1,
-        title: "Completed Today",
+        title: "dashboard.completedToday",
         value: 6,
     },
     {
         id: 2,
-        title: "Active Habits",
+        title: "dashboard.activeHabits",
         value: 8,
     },
     {
         id: 3,
-        title: "At Risk Habits",
+        title: "dashboard.atRiskHabits",
         value: 2,
     },
 ];

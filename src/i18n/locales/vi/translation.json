@@ -209,5 +209,27 @@
         "empty": "Chưa có dữ liệu để thống kê",
         "empty_hint": "Tạo thói quen và check-in mỗi ngày để xem thống kê tại đây",
         "empty_action": "Tạo thói quen ngay"
+    },
+    "dashboard": {
+      "completedToday": "Hoàn thành hôm nay",
+      "activeHabits": "Thói quen đang theo dõi",
+      "atRiskHabits": "Thói quen có nguy cơ bỏ dở",
+
+      "currentStreak": "Chuỗi hiện tại",
+      "longestStreak": "Chuỗi dài nhất",
+      "completionRate": "Tỷ lệ hoàn thành",
+
+      "categoryOverview": "Tổng quan danh mục",
+      "goalProgress": "Tiến độ mục tiêu",
+
+      "health": "Sức khỏe",
+      "learning": "Học tập",
+      "productivity": "Năng suất",
+
+      "goalReadBooks": "Đọc 15 cuốn sách trong tháng",
+      "goalWorkout": "Tập luyện 20 lần trong tháng",
+      "goalDrinkWater": "Uống 2L nước mỗi ngày",
+
+      "days": "Ngày"
     }
 }
