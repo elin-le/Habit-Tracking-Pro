@@ -89,7 +89,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
         { to: ROUTES.DASHBOARD, label: t("sidebar.dashboard"), icon: HomeIcon },
         { to: ROUTES.HABITS, label: t("sidebar.habits"), icon: HabitsIcon },
         { to: ROUTES.GOALS, label: t("sidebar.goals"), icon: GoalsIcon },
-        { to: ROUTES.STATISTICS, label: t("sidebar.statistics"), icon: StatisticsIcon },
+        { to: "/dashboard/statistics", label: t("sidebar.statistics"), icon: StatisticsIcon },
         { to: "/dashboard/notifications", label: t('sidebar.notifications'), icon: BellIcon, badge: <NotificationBadge /> },
         // { to: "/settings", label: "Settings", icon: SettingsIcon },
     ];
