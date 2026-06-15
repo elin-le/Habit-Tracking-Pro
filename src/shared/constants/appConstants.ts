@@ -3,7 +3,7 @@ import type { DaysOfWeek } from "../types/HabitSchedule";
 export const ROUTES = {
   DASHBOARD: "/dashboard",
   HABITS: "habits",
-  GOALS: "/goals",
+  GOALS: "goals",
   STATISTICS: "/statistics",
   NOTIFICATIONS: "/notifications",
   SETTINGS: "/settings",

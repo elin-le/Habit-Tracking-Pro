@@ -1,10 +1,12 @@
 import { MobileMenuButton } from "./SideBar";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../shared/hooks/useTheme";
-import { useState } from "react";
 import { HabitForm } from "../../shared/components/forms/HabitForm";
 import type { Habit } from "../../shared/types/Habit";
 import type { HabitSchedule } from "../../shared/types/HabitSchedule";
+import { useState, useContext } from "react";
+import { Link } from "react-router-dom"; // Thêm dòng này
+import { NotificationContext } from "../../features/notifications/context/NotificationContext"; // Thêm dòng này
 
 interface HeaderProps {
   title?: string;
@@ -110,6 +112,9 @@ export default function Header({
   const { theme, toggleTheme } = useTheme();
   const [lang, setLang] = useState<"EN" | "VI">("EN");
 
+  // THÊM DÒNG NÀY ĐỂ LẤY SỐ ĐẾM THÔNG BÁO:
+  const { unreadCount } = useContext(NotificationContext);
+
   const greeting = (() => {
     const h = new Date().getHours();
     if (h < 12) return "Good morning";
@@ -206,7 +211,7 @@ export default function Header({
             onClick={toggleTheme}
             aria-label="Toggle dark mode"
             className={[
-              "relative w-13 h-7 rounded-full transition-colors duration-300 overflow-hidden",
+              "relative w-[52px] h-7 rounded-full transition-colors duration-300 overflow-hidden",
               theme === "light" ? "bg-violet-600" : "bg-violet-100",
             ].join(" ")}
           >
@@ -229,19 +234,20 @@ export default function Header({
           <div className="w-px h-6 bg-violet-100 mx-1" />
 
           {/* Bell */}
-          <div className="relative">
-            <button
-              aria-label="Notifications"
-              className="w-9 h-9 flex items-center justify-center rounded-xl text-violet-400 hover:bg-violet-50 hover:text-violet-600 transition-colors"
-            >
-              <BellIcon />
-            </button>
-            <span
-              className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"
-              aria-hidden="true"
-            />
-          </div>
-          <button />
+          <Link
+            to="/dashboard/notifications"
+            aria-label="Notifications"
+            className="relative w-9 h-9 flex items-center justify-center rounded-xl text-violet-400 hover:bg-violet-50 hover:text-violet-600 transition-colors"
+          >
+            <BellIcon />
+            {/* Cục badge đỏ kiểu Facebook - Chỉ hiện ra khi có thông báo */}
+            {unreadCount > 0 && (
+              <span className="absolute top-0 right-0 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow-sm ring-2 ring-white">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
+          </Link>
+
           {/* New Habit */}
           <button
             className="cursor-pointer flex items-center gap-1.5 bg-violet-600 hover:bg-violet-700 active:bg-violet-800 text-white font-medium rounded-xl transition-colors px-4 h-9 text-sm"
@@ -250,16 +256,15 @@ export default function Header({
             <PlusIcon />
             {t("habit.btn_add")}
           </button>
+          {showAddForm && (
+            <HabitForm
+              onClose={() => setShowAddForm(false)}
+              onSubmit={createHabit}
+              onSubmitSchedules={createHabitSchedules}
+            />
+          )}
         </div>
       </div>
-
-      {showAddForm && (
-        <HabitForm
-          onClose={() => setShowAddForm(false)}
-          onSubmit={createHabit}
-          onSubmitSchedules={createHabitSchedules}
-        />
-      )}
     </header>
   );
 }
