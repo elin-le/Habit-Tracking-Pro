@@ -21,10 +21,103 @@
         "settings": "Settings",
         "notifications":"Notifications"
     },
-    "habit": {
-        "create": "Create Habit",
-        "edit": "Edit Habit",
-        "name": "Habit Name"
+  "habit": {
+      "create": "Create Habit",
+      "edit": "Edit Habit",
+      "name": "Habit Name",
+      "page_title": "My Habits",
+      "active": "active",
+      "total": "total",
+      "btn_add": "New Habit",
+      "ept-1": "No habits yet",
+      "ept-2": "Start building better habits today",
+      "btn_create": "Create your first habit",
+      "ept-3": "No matching habits",
+      "ept-4": "Try adjusting your filters",
+      "search": "Search habits..."
+    },
+    "habit_form": {
+      "title1": "New Habit",
+      "title2": "Edit Habit",
+      "name": "Habit Name * ",
+      "category": "Category",
+      "Health": "Health",
+      "Study": "Study",
+      "Work": "Work",
+      "Mindfulness": "Mindfulness",
+      "Other": "Other",
+      "priority": "Priority",
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "frequency": "Frequency",
+      "DAILY": "Daily",
+      "DAY_OF_WEEK": "Specific Days",
+      "a-days": "Active Days",
+      "target-p-days": "Target per Day",
+      "status": "Status",
+      "s-1": "Active",
+      "s-2": "Paused",
+      "s-3": "Archived",
+      "btn_cancel": "Cancel",
+      "btn_create1": "Create Habit",
+      "btn_create2": "Save Changes",
+      "val-name-1": "*Habit name is required",
+      "val-name-2": "*Habit name must be at least 2 characters",
+      "val-name-3": "*Habit name must be under 50 characters"
+    },
+    "days": {
+      "sun": "Sun",
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat"
+    },
+    "dd-menu": {
+      "Edit": "Edit",
+      "SetGoal": "Set Goal",
+      "Pause": "Pause",
+      "Resume": "Resume",
+      "Archive": "Archive",
+      "Delete": "Delete"
+    },
+    "habit_filter": {
+      "title": "Filters",
+      "btn_clear": "Clear all",
+      "category": "Category",
+      "cat-0": "All",
+      "cat-1": "Health",
+      "cat-2": "Study",
+      "cat-3": "Work",
+      "cat-4": "Mindfulness",
+      "cat-5": "Other",
+      "priority": "Priority",
+      "pri-0": "All",
+      "pri-1": "Low",
+      "pri-2": "Medium",
+      "pri-3": "High",
+      "status": "Status",
+      "st-0": "All",
+      "st-1": "Active",
+      "st-2": "Paused",
+      "st-3": "Archived",
+      "frequency": "Frequency",
+      "All": "All",
+      "Su": "Su",
+      "Mo": "Mo",
+      "Tu": "Tu",
+      "We": "We",
+      "Th": "Th",
+      "Fr": "Fr",
+      "Sa": "Sa",
+      "filter_by": "Filtering by: ",
+      "pad": "Pick a date"
+    },
+    "pagination": {
+      "page": "Page",
+      "of": "of"
     },
     "loading": {
         "message": "Loading..."
@@ -95,6 +188,29 @@
             "encouragement": "Keep it up! You've reached 80% of your goal!",
             "achieved": "Excellent! You've completed your goal!"
         }
+        "clear_filters": "Clear filters"
+    },
+    "statistics": {
+        "title": "Statistics",
+        "subtitle": "Track your streaks and progress",
+        "overview": "Overview",
+        "completed_today": "Completed today",
+        "active_habits": "Active habits",
+        "at_risk": "At-risk habits",
+        "per_habit": "Per-habit statistics",
+        "current_streak": "Current streak",
+        "longest_streak": "Longest streak",
+        "total_completions": "Total completions",
+        "completion_rate": "Completion rate",
+        "last_7_days": "Last 7 days",
+        "days": "days",
+        "risk_safe": "Safe",
+        "risk_warning": "Warning",
+        "risk_at_risk": "At risk",
+        "empty": "No statistics yet",
+        "empty_hint": "Create habits and check in to see your stats here",
+        "empty_action": "Create your habit"
     }
+}
     
 }
