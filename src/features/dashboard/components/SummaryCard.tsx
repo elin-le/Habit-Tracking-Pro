@@ -1,6 +1,11 @@
 import { useTranslation } from "react-i18next";
+import { type SummaryCardType } from "../Dashboard.type.ts";
 
-const SummaryCard = ({ summaryCards }) => {
+interface SummaryCardProps {
+    summaryCards: SummaryCardType[];
+}
+
+const SummaryCard = ({ summaryCards }: SummaryCardProps) => {
     const { t } = useTranslation();
 
     return (
@@ -22,3 +27,5 @@ const SummaryCard = ({ summaryCards }) => {
         </div>
     );
 };
+
+export default SummaryCard;

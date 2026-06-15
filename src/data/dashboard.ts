@@ -5,7 +5,7 @@ import {
     type GoalProgressType
 } from "../features/dashboard/Dashboard.type.ts";
 
-export const SUMMARY_CARDS = [
+export const SUMMARY_CARDS: SummaryCardType[] = [
     {
         id: 1,
         title: "dashboard.completedToday",
