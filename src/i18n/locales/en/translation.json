@@ -181,6 +181,13 @@
         "empty_title": "No goals found",
         "empty_hint": "Add a goal to a habit below to get started",
         "empty_filter_hint": "No goals match your current filters",
+        "clear_filters": "Clear filters",
+        "milestones": {
+            "start": "First step!",
+            "halfway": "Good start! Halfway there!",
+            "encouragement": "Keep it up! You've reached 80% of your goal!",
+            "achieved": "Excellent! You've completed your goal!"
+        }
         "clear_filters": "Clear filters"
     },
     "statistics": {

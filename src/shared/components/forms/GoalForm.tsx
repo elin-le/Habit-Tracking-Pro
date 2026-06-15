@@ -229,6 +229,56 @@ const GoalForm: React.FC<GoalFormProps> = ({
         )}
       </div>
 
+            {/* Date fields */}
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-5">
+                {/* Start date */}
+                <div className="flex-1">
+                    <label
+                        htmlFor="startedDate"
+                        className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 mb-2.5 block"
+                    >
+                        {t("goals.started_date")}
+                    </label>
+                    <input
+                        id="startedDate"
+                        type="date"
+                        value={startedDate}
+                        onChange={(e) => setStartedDate(e.target.value)}
+                        className={`${INPUT_CLASS} appearance-none`}
+                    />
+                </div>
+
+                {/* End date (optional) */}
+                <div className="flex-1">
+                    <label
+                        htmlFor="endDate"
+                        className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 mb-2.5 block truncate"
+                    >
+                        {t("goals.end_date")}
+                        <span className="ml-1 font-normal text-xs text-slate-400 dark:text-slate-500">
+                            ({t("goals.optional")})
+                        </span>
+                    </label>
+                    <input
+                        id="endDate"
+                        type="date"
+                        value={endDate}
+                        min={startedDate}
+                        onChange={(e) => {
+                            setEndDate(e.target.value);
+                            clearError("endDate");
+                        }}
+                        aria-invalid={!!errors.endDate}
+                        className={`${INPUT_CLASS} appearance-none ${errors.endDate ? "border-red-400 dark:border-red-500 focus:ring-red-400/20" : ""}`}
+                    />
+                    {errors.endDate && (
+                        <p className="flex items-center gap-1 text-xs text-red-500 mt-1.5">
+                            <AlertCircle size={11} />
+                            {errors.endDate}
+                        </p>
+                    )}
+                </div>
+            </div>
       {/* Date fields */}
       <div className="grid grid-cols-2 gap-4">
         {/* Start date */}

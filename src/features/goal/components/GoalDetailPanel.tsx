@@ -14,6 +14,7 @@ import {
     Sparkles,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { MilestoneCard } from "../../../shared/components/cards/MilestoneCard.tsx";
 
 // Types 
 
@@ -238,7 +239,7 @@ const GoalDetailPanel: React.FC<GoalDetailPanelProps> = ({
                     )}
 
                     {/* Main progress card */}
-                    <div 
+                    <div
                         className="
                             flex items-center gap-6 px-6 py-6 rounded-3xl
                             border
@@ -302,7 +303,7 @@ const GoalDetailPanel: React.FC<GoalDetailPanelProps> = ({
                             ">
                                 {t("goals.weekly_performance")}
                             </h3>
-                            <div 
+                            <div
                                 className="
                                     p-6 rounded-3xl border
                                 "
@@ -361,7 +362,7 @@ const GoalDetailPanel: React.FC<GoalDetailPanelProps> = ({
                     )}
 
                     {/* Date info */}
-                    <div 
+                    <div
                         className="
                             flex flex-col gap-3 px-5 py-5 rounded-2xl
                             border
@@ -396,7 +397,7 @@ const GoalDetailPanel: React.FC<GoalDetailPanelProps> = ({
                 </div>
 
                 {/* Footer actions */}
-                <div 
+                <div
                     className="
                         flex gap-3 px-6 py-5
                         border-t
@@ -441,6 +442,10 @@ const GoalDetailPanel: React.FC<GoalDetailPanelProps> = ({
                     </button>
                 </div>
             </div>
+            <MilestoneCard
+                milestones={display.progress.milestones || []}
+                habitColor={display.color}
+            />
         </>
     );
 };
@@ -452,7 +457,7 @@ const StatCard: React.FC<{
     label: string;
     value: string;
 }> = ({ icon, label, value }) => (
-    <div 
+    <div
         className="
             flex flex-col justify-between gap-3 p-4 sm:p-5 rounded-2xl
             border
