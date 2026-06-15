@@ -188,7 +188,6 @@
             "encouragement": "Keep it up! You've reached 80% of your goal!",
             "achieved": "Excellent! You've completed your goal!"
         }
-        "clear_filters": "Clear filters"
     },
     "statistics": {
         "title": "Statistics",
@@ -211,6 +210,4 @@
         "empty_hint": "Create habits and check in to see your stats here",
         "empty_action": "Create your habit"
     }
-}
-    
 }
