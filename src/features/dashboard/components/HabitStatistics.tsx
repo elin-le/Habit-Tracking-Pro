@@ -1,4 +1,4 @@
-import { HabitStatisticsType } from "../Dashboard.type";
+import { type HabitStatisticsType } from "../Dashboard.type";
 
 interface HabitStatisticsProps {
     statistics: HabitStatisticsType;

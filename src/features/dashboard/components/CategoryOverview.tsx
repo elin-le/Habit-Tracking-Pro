@@ -1,4 +1,4 @@
-import { CategoryOverviewType } from "../Dashboard.type";
+import { type CategoryOverviewType } from "../Dashboard.type";
 
 interface CategoryOverviewProps {
     categories: CategoryOverviewType[];

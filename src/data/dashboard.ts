@@ -1,8 +1,8 @@
 import {
-    SummaryCardType,
-    HabitStatisticsType,
-    CategoryOverviewType,
-    GoalProgressType,
+    type SummaryCardType,
+    type HabitStatisticsType,
+    type CategoryOverviewType,
+    type GoalProgressType
 } from "../features/dashboard/Dashboard.type.ts";
 
 export const SUMMARY_CARDS: SummaryCardType[] = [

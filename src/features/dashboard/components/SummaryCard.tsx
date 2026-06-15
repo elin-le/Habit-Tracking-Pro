@@ -1,4 +1,4 @@
-import { SummaryCardType } from "../Dashboard.type";
+import { type SummaryCardType } from "../Dashboard.type";
 
 interface SummaryCardProps {
     summaryCards: SummaryCardType[];

@@ -1,4 +1,4 @@
-import { GoalProgressType } from "../Dashboard.type";
+import { type GoalProgressType } from "../Dashboard.type";
 
 interface GoalProgressProps {
     goals: GoalProgressType[];
