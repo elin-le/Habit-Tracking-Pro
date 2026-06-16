@@ -14,7 +14,7 @@ export const NotificationsPage = () => {
   return (
     <div className="animate-in flex flex-col gap-6">
       {/* Header giống hệt trang Habits */}
-      <div className="flex flex-wrap items-start justify-between gap-3">
+      {/* <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-4xl font-light" style={{ color: 'var(--text)' }}>
             {t('notifications.title')}
@@ -23,7 +23,7 @@ export const NotificationsPage = () => {
             {t('notifications.description')}
           </p>
         </div>
-      </div>
+      </div> */}
 
       {/* Bộ lọc phân loại thông báo */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

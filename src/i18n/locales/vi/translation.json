@@ -241,5 +241,22 @@
       "title": "Nguy cơ đứt chuỗi",
       "message": "Cẩn thận! Bạn sắp làm đứt chuỗi {{habitName}} {{streakCount}} ngày rồi."
     }
+  },
+  "dashboard": {
+    "completedToday": "Hoàn thành hôm nay",
+    "activeHabits": "Thói quen đang theo dõi",
+    "atRiskHabits": "Thói quen có nguy cơ bỏ dở",
+    "currentStreak": "Chuỗi hiện tại",
+    "longestStreak": "Chuỗi dài nhất",
+    "completionRate": "Tỷ lệ hoàn thành",
+    "categoryOverview": "Tổng quan danh mục",
+    "goalProgress": "Tiến độ mục tiêu",
+    "health": "Sức khỏe",
+    "learning": "Học tập",
+    "productivity": "Năng suất",
+    "goalReadBooks": "Đọc sách 30p mỗi ngày",
+    "goalWorkout": "Tập thể dục 20 lần mỗi tháng",
+    "goalDrinkWater": "Uống đủ 2L nước mỗi ngày",
+    "days": "Days"
   }
 }
