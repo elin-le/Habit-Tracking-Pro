@@ -24,7 +24,7 @@ seedCategories();
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider >
-      <NotificationProvider> {/* Em Thêm thẻ notification ở đây */}
+      <NotificationProvider> 
         <RouterProvider router={router} />
         <Toaster
           richColors

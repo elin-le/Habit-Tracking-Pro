@@ -11,6 +11,8 @@ import { NotificationsPage } from "../pages/NotificationsPage";
 
 import StatisticsPage from "../pages/StatisticsPage";
 
+import DashboardPage from "../pages/DashboardPage";
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -26,6 +28,11 @@ export const router = createBrowserRouter([
     element: <MainLayout />,
     children: [
       {
+        path: ROUTES.DASHBOARD,
+        element: <DashboardPage />,
+      },
+
+      {
         path: ROUTES.HABITS,
         element: <HabitsPage />,
       },
@@ -40,15 +47,10 @@ export const router = createBrowserRouter([
         element: <StatisticsPage />,
       },
 
-        {
-          path: "notifications",
-          element: <NotificationsPage />,
-        },
-
-      //   {
-      //     path: ROUTES.SETTINGS,
-      //     element: <SettingsPage />,
-      //   },
+      {
+        path: "notifications",
+        element: <NotificationsPage />,
+      },
     ],
   },
 
