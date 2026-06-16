@@ -17,21 +17,21 @@ export function HabitHistoryPage() {
   const navigate = useNavigate();
   const { habitId } = useParams<{ habitId: string }>();
   const { habits } = useOutletContext<LayoutContext>();
-  
+
   // tìm thói quen hiện tại theo ID
   const habit = habits.find((h) => h.id === habitId);
   const category = useMemo(() => {
     if (!habit) return null;
     return mockCategories.find((c) => c.id === habit.categoryId);
   }, [habit]);
-  
-  const { checkIns, getHistoryByHabitId } = useCheckIns();  
+
+  const { checkIns, getHistoryByHabitId } = useCheckIns();
   // lấy toàn bộ lịch sử check-in của habit này và sắp xếp ngày mới nhất lên đầu
   const historyRecords = useMemo(() => {
     if (!habitId) return [];
     return getHistoryByHabitId(habitId);
-    }, [habitId, checkIns]);
- 
+  }, [habitId, checkIns]);
+
   if (!habit) {
     return (
       <div className="p-6 text-center">
@@ -56,11 +56,11 @@ export function HabitHistoryPage() {
       </button>
 
       {/* header */}
-      <div 
-        className="mb-8 flex items-start gap-4 rounded-2xl border p-6 shadow-sm" 
-        style={{ 
-          background: "var(--surface)", 
-          borderColor: "color-mix(in srgb, var(--primary) 15%, transparent)" 
+      <div
+        className="mb-8 flex items-start gap-4 rounded-2xl border p-6 shadow-sm"
+        style={{
+          background: "var(--surface)",
+          borderColor: "color-mix(in srgb, var(--primary) 15%, transparent)"
         }}
       >
         {/* icon cate */}
@@ -78,7 +78,7 @@ export function HabitHistoryPage() {
           <h1 className="text-2xl font-medium mb-2 truncate" style={{ color: "var(--text)" }}>
             {habit.name}
           </h1>
-          
+
           <div className="flex flex-wrap items-center gap-2 mb-3">
             {/* category */}
             <span
@@ -114,7 +114,7 @@ export function HabitHistoryPage() {
 
       {/* Danh sách lịch sử hiển thị Timeline */}
       <h2 className="text-lg font-medium mb-4" style={{ color: "var(--text)" }}>{t("checkin.history")}</h2>
-      
+
       {historyRecords.length === 0 ? (
         <div className="rounded-xl border border-dashed p-10 text-center text-sm" style={{ color: "var(--sidebar-muted)" }}>
           {t("checkin.no")}
@@ -123,7 +123,7 @@ export function HabitHistoryPage() {
         <div className="relative border-l pl-4 ml-2 flex flex-col gap-6" style={{ borderColor: "color-mix(in srgb, var(--primary) 20%, transparent)" }}>
           {historyRecords.map((record: any) => {
             const isTargetMet = record.completionCount >= habit.targetPerDay;
-            
+
             return (
               <div key={record.id} className="relative flex items-center justify-between">
                 {/* line cho đẹp */}
@@ -151,11 +151,11 @@ export function HabitHistoryPage() {
                 </div>
 
                 {/* số lượng hoàn thành */}
-                <div className="rounded-full px-3 py-1 text-xs font-semibold" 
-                     style={{ 
-                       background: isTargetMet ? "rgba(34, 197, 94, 0.1)" : "rgba(245, 158, 11, 0.1)",
-                       color: isTargetMet ? "#22c55e" : "#f59e0b"
-                     }}>
+                <div className="rounded-full px-3 py-1 text-xs font-semibold"
+                  style={{
+                    background: isTargetMet ? "rgba(34, 197, 94, 0.1)" : "rgba(245, 158, 11, 0.1)",
+                    color: isTargetMet ? "#22c55e" : "#f59e0b"
+                  }}>
                   {record.completionCount} / {habit.targetPerDay}
                 </div>
               </div>

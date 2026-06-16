@@ -1,8 +1,5 @@
 {
-  "checkin": {
-    "history": "Lịch sử check-in",
-    "no": "Không có lịch sử check-in."
-  },
+ 
 
   "auth": {
     "welcome": "Chào mừng quay lại!",
@@ -291,5 +288,9 @@
     "goalWorkout": "Tập thể dục 20 lần mỗi tháng",
     "goalDrinkWater": "Uống đủ 2L nước mỗi ngày",
     "days": "Days"
+  },
+   "checkin": {
+    "history": "Lịch sử check-in",
+    "no": "Không có lịch sử check-in."
   }
 }
