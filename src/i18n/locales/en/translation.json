@@ -1,26 +1,26 @@
 {
-    "auth": {
-        "welcome": "Welcome Back!",
-        "phone": "Phone Number",
-        "password": "Password",
-        "login": "Login",
-        "invalid_credentials": "Invalid phone number or password",
-        "login_error": "Login encountered an error"
-    },
-    "common": {
-        "save": "Save",
-        "cancel": "Cancel",
-        "delete": "Delete",
-        "copyright": "© 2024 HabitPro · Building better habits every day"
-    },
-    "sidebar": {
-        "dashboard": "Dashboard",
-        "habits": "Habits",
-        "goals": "Goals",
-        "statistics": "Statistics",
-        "settings": "Settings",
-        "notifications":"Notifications"
-    },
+  "auth": {
+    "welcome": "Welcome Back!",
+    "phone": "Phone Number",
+    "password": "Password",
+    "login": "Login",
+    "invalid_credentials": "Invalid phone number or password",
+    "login_error": "Login encountered an error"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "copyright": "© 2024 HabitPro · Building better habits every day"
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "habits": "Habits",
+    "goals": "Goals",
+    "statistics": "Statistics",
+    "settings": "Settings",
+    "notifications": "Notifications"
+  },
   "habit": {
       "create": "Create Habit",
       "edit": "Edit Habit",
@@ -232,4 +232,26 @@
 
         "days": "Days"
     }
+  },
+  "statistics": {
+    "title": "Statistics",
+    "subtitle": "Track your streaks and progress",
+    "overview": "Overview",
+    "completed_today": "Completed today",
+    "active_habits": "Active habits",
+    "at_risk": "At-risk habits",
+    "per_habit": "Per-habit statistics",
+    "current_streak": "Current streak",
+    "longest_streak": "Longest streak",
+    "total_completions": "Total completions",
+    "completion_rate": "Completion rate",
+    "last_7_days": "Last 7 days",
+    "days": "days",
+    "risk_safe": "Safe",
+    "risk_warning": "Warning",
+    "risk_at_risk": "At risk",
+    "empty": "No statistics yet",
+    "empty_hint": "Create habits and check in to see your stats here",
+    "empty_action": "Create your habit"
+  }
 }
