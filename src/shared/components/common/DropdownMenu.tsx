@@ -1,42 +1,99 @@
-import { Archive, Edit2, Pause, Play, Target, Trash2 } from "lucide-react";
+import type { HabitStatus } from "@/shared/types/Habit";
+import {
+  Archive,
+  ArchiveRestore,
+  Edit2,
+  Pause,
+  Play,
+  Target,
+  Trash2,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
 interface DropdownMenuProps {
+  habitName: string;
   status: string;
   onClose: () => void;
   onUpdate: () => void;
+  onUpdateStatus: (status: HabitStatus) => void;
+  onDelete: () => void;
 }
 
-export function DropdownMenu({ onClose, status, onUpdate }: DropdownMenuProps) {
+export function DropdownMenu({
+  habitName,
+  status,
+  onClose,
+  onUpdate,
+  onUpdateStatus,
+  onDelete,
+}: DropdownMenuProps) {
   const { t } = useTranslation();
+
+  const handleUpdateStatus = (newStatus: HabitStatus) => {
+    onUpdateStatus(newStatus);
+    onClose();
+    const messages: Record<HabitStatus, string> = {
+      PAUSED: `"${habitName}" ${t("habit_toast.toast-1")}`,
+      ACTIVE: `"${habitName}" ${t("habit_toast.toast-2")}`,
+      ARCHIVED: `"${habitName}" ${t("habit_toast.toast-3")}`,
+    };
+    toast.success(messages[newStatus]);
+  };
+
   const items = [
-    {
-      icon: <Edit2 size={14} />,
-      label: "Edit",
-      action: onUpdate,
-    },
-    {
-      icon: <Target size={14} />,
-      label: "SetGoal",
-      action: () => console.log("Set Goal clicked"),
-    },
-    {
-      icon: status === "ACTIVE" ? <Pause size={14} /> : <Play size={14} />,
-      label: status === "ACTIVE" ? "Pause" : "Resume",
-      action:
-        status === "ACTIVE"
-          ? () => console.log("Pause clicked")
-          : () => console.log("Resume clicked"),
-    },
-    {
-      icon: <Archive size={14} />,
-      label: "Archive",
-      action: () => console.log("Archive clicked"),
-    },
+    ...(status !== "ARCHIVED"
+      ? [{ icon: <Edit2 size={14} />, label: "Edit", action: onUpdate }]
+      : []),
+
+    ...(status === "ACTIVE"
+      ? [
+          {
+            icon: <Target size={14} />,
+            label: "Set Goal",
+            action: () => console.log("Set Goal"),
+          },
+        ]
+      : []),
+
+    ...(status === "ACTIVE"
+      ? [
+          {
+            icon: <Pause size={14} />,
+            label: "Pause",
+            action: () => handleUpdateStatus("PAUSED"),
+          },
+          {
+            icon: <Archive size={14} />,
+            label: "Archive",
+            action: () => handleUpdateStatus("ARCHIVED"),
+          },
+        ]
+      : status === "PAUSED"
+        ? [
+            {
+              icon: <Play size={14} />,
+              label: "Resume",
+              action: () => handleUpdateStatus("ACTIVE"),
+            },
+            {
+              icon: <Archive size={14} />,
+              label: "Archive",
+              action: () => handleUpdateStatus("ARCHIVED"),
+            },
+          ]
+        : [
+            {
+              icon: <ArchiveRestore size={14} />,
+              label: "Unarchive",
+              action: () => handleUpdateStatus("ACTIVE"),
+            },
+          ]),
+
     {
       icon: <Trash2 size={14} />,
       label: "Delete",
-      action: () => console.log("Delete clicked"),
+      action: onDelete,
       danger: true,
     },
   ];

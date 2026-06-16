@@ -276,7 +276,9 @@
     "btn_create": "Tạo thói quen đầu tiên của bạn",
     "ept-3": "Không tìm thấy thói quen phù hợp",
     "ept-4": "Hãy thử điều chỉnh bộ lọc của bạn",
-    "search": "Tìm kiếm thói quen..."
+    "search": "Tìm kiếm thói quen...",
+    "ept-5": "Không tìm thấy kết quả",
+    "ept-6": "Hãy thử từ khóa khác"
   },
   "habit_form": {
     "title1": "Thói quen mới",
@@ -306,7 +308,8 @@
     "btn_create2": "Lưu thay đổi",
     "val-name-1": "*Tên thói quen là bắt buộc",
     "val-name-2": "*Tên thói quen phải có ít nhất 2 ký tự",
-    "val-name-3": "*Tên thói quen phải dưới 50 ký tự"
+    "val-name-3": "*Tên thói quen phải dưới 50 ký tự",
+    "paused-hint": "*Thói quen đang tạm dừng. Hãy tiếp tục (Resume) để chỉnh sửa tần suất và mục tiêu mỗi ngày."
   },
   "days": {
     "sun": "CN",
@@ -319,10 +322,11 @@
   },
   "dd-menu": {
     "Edit": "Chỉnh sửa",
-    "SetGoal": "Đặt mục tiêu",
+    "Set Goal": "Đặt mục tiêu",
     "Pause": "Tạm dừng",
     "Resume": "Tiếp tục",
     "Archive": "Lưu trữ",
+    "Unarchive": "Hủy lưu trữ",
     "Delete": "Xóa"
   },
   "habit_filter": {
@@ -355,7 +359,31 @@
     "Fr": "T6",
     "Sa": "T7",
     "filter_by": "Đang lọc theo: ",
-    "pad": "Chọn ngày"
+    "pad": "Chọn ngày",
+    "SUNDAY": "Chủ nhật",
+    "MONDAY": "Thứ hai",
+    "TUESDAY": "Thứ ba",
+    "WEDNESDAY": "Thứ tư",
+    "THURSDAY": "Thứ năm",
+    "FRIDAY": "Thứ sáu",
+    "SATURDAY": "Thứ bảy"
+  },
+  "habit_card": {
+    "mess": "Thói quen này ",
+    "paused": "tạm dừng",
+    "archived": "đã được lưu trữ"
+  },
+  "habit_toast": {
+    "toast-1": " đã bị tạm dừng",
+    "toast-2": " đã được tiếp tục",
+    "toast-3": " đã được lưu trữ"
+  },
+  "habit_a-dialog": {
+    "title": "Xóa Thói quen",
+    "content-1": "Bạn có chắc chắn muốn xóa không?",
+    "content-2": "Hành động này không thể hoàn tác.",
+    "btn_1": "Hủy",
+    "btn_2": "Xóa"
   },
   "pagination": {
     "page": "Trang",

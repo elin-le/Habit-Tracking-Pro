@@ -12,6 +12,7 @@ import type { HabitSchedule } from "../../types/HabitSchedule";
 import { mockCategories } from "../../../data/category";
 import { Button } from "../ui/Button";
 import { Modal } from "../ui/Modal";
+import { toast } from "sonner";
 
 // Style dùng chung cho input/select/textarea
 const inputStyle: React.CSSProperties = {
@@ -25,6 +26,7 @@ const labelStyle: React.CSSProperties = { color: "var(--sidebar-muted)" };
 
 interface HabitFormProps {
   initial?: Partial<Habit>;
+  initialSchedules?: HabitSchedule[];
   onClose: () => void;
   onSubmit: (data: Habit) => void;
   onSubmitSchedules: (schedules: HabitSchedule[]) => void;
@@ -32,16 +34,23 @@ interface HabitFormProps {
 
 export function HabitForm({
   initial,
+  initialSchedules,
   onClose,
   onSubmit,
   onSubmitSchedules,
 }: HabitFormProps) {
   const { t } = useTranslation();
 
-  console.log(initial?.id);
+  const isPaused = initial?.status === "PAUSED";
 
   const [nameError, setNameError] = useState("");
-  const [activeDays, setActiveDays] = useState<number[]>([]);
+  const [activeDays, setActiveDays] = useState<number[]>(() => {
+    if (!initialSchedules) return [];
+    // convert DayOfWeek string → index
+    return initialSchedules
+      .map((s) => DAY_OF_WEEK_MAP.indexOf(s.dayOfWeek))
+      .filter((i) => i !== -1);
+  });
   const [form, setForm] = useState({
     name: initial?.name ?? "",
     categoryId: initial?.categoryId ?? "cat_health",
@@ -76,8 +85,8 @@ export function HabitForm({
 
     const newHabit: Habit = {
       ...form,
-      id: crypto.randomUUID(),
-      userId: "user-1",
+      id: initial?.id ?? crypto.randomUUID(),
+      userId: initial?.userId ?? "user-1",
     };
 
     onSubmit(newHabit);
@@ -90,6 +99,14 @@ export function HabitForm({
       }));
 
       onSubmitSchedules(schedules);
+    } else {
+      onSubmitSchedules([]);
+    }
+
+    if (initial?.id) {
+      toast.success(`"${newHabit.name}" has been updated`);
+    } else {
+      toast.success(`"${newHabit.name}" has been created`);
     }
 
     onClose();
@@ -152,7 +169,7 @@ export function HabitForm({
               {t("habit_form.category")}
             </label>
             <select
-              className="w-full rounded-xl border px-4 py-3"
+              className="w-full rounded-xl border px-4 py-3 cursor-pointer"
               style={inputStyle}
               value={form.categoryId}
               onChange={(e) =>
@@ -172,7 +189,7 @@ export function HabitForm({
               {t("habit_form.priority")}
             </label>
             <select
-              className="w-full rounded-xl border px-4 py-3"
+              className="w-full rounded-xl border px-4 py-3 cursor-pointer"
               style={inputStyle}
               value={form.priority}
               onChange={(e) =>
@@ -181,21 +198,32 @@ export function HabitForm({
             >
               <option value="LOW">{t("habit_form.LOW")}</option>
               <option value="MEDIUM">{t("habit_form.MEDIUM")}</option>
-              <option value="HIGHT">{t("habit_form.HIGH")}</option>
+              <option value="HIGH">{t("habit_form.HIGH")}</option>
             </select>
           </div>
         </div>
 
         {/* Frequency */}
         <div>
+          {isPaused && (
+            <p
+              className="mt-1 text-xs"
+              style={{ color: "oklch(44.2% 0.017 285.786)" }}
+            >
+              {t("habit_form.paused-hint")}
+            </p>
+          )}
           <label className={labelClass} style={labelStyle}>
             {t("habit_form.frequency")}
           </label>
           <div className="flex gap-2 ">
             <button
               type="button"
-              onClick={() => setForm({ ...form, frequencyType: "DAILY" })}
-              className="flex-1 rounded-xl border px-4 py-2.5 text-sm font-medium cursor-pointer"
+              onClick={() =>
+                !isPaused && setForm({ ...form, frequencyType: "DAILY" })
+              }
+              disabled={isPaused}
+              className="flex-1 rounded-xl border px-4 py-2.5 text-sm font-medium cursor-pointer disabled:cursor-not-allowed"
               style={
                 form.frequencyType === "DAILY"
                   ? {
@@ -212,8 +240,11 @@ export function HabitForm({
 
             <button
               type="button"
-              onClick={() => setForm({ ...form, frequencyType: "DAY_OF_WEEK" })}
-              className="flex-1 rounded-xl border px-4 py-2.5 text-sm font-medium cursor-pointer"
+              onClick={() =>
+                !isPaused && setForm({ ...form, frequencyType: "DAY_OF_WEEK" })
+              }
+              disabled={isPaused}
+              className="flex-1 rounded-xl border px-4 py-2.5 text-sm font-medium cursor-pointer disabled:cursor-not-allowed"
               style={
                 form.frequencyType === "DAY_OF_WEEK"
                   ? {
@@ -244,8 +275,9 @@ export function HabitForm({
                 <button
                   key={day}
                   type="button"
-                  onClick={() => toggleDay(index)}
-                  className="flex h-10 w-10 items-center justify-center rounded-full border text-xs font-semibold transition hover:scale-105 cursor-pointer"
+                  onClick={() => !isPaused && toggleDay(index)}
+                  disabled={isPaused}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border text-xs font-semibold transition hover:scale-105 cursor-pointer disabled:cursor-not-allowed"
                   style={
                     activeDays.includes(index)
                       ? {
@@ -272,38 +304,42 @@ export function HabitForm({
             <input
               type="number"
               min={1}
+              disabled={isPaused}
               value={form.targetPerDay}
               onChange={(e) =>
+                !isPaused &&
                 setForm({
                   ...form,
                   targetPerDay: Number(e.target.value) || 1,
                 })
               }
-              className="w-full rounded-xl border px-4 py-3"
+              className="w-full rounded-xl border px-4 py-3 disabled:cursor-not-allowed"
               style={inputStyle}
             />
           </div>
 
-          <div>
-            <label className={labelClass} style={labelStyle}>
-              {t("habit_form.status")}
-            </label>
-            <select
-              value={form.status}
-              onChange={(e) =>
-                setForm((f) => ({
-                  ...f,
-                  status: e.target.value as HabitStatus,
-                }))
-              }
-              className="w-full rounded-xl border px-4 py-3"
-              style={inputStyle}
-            >
-              <option value="ACTIVE">{t("habit_form.s-1")}</option>
-              <option value="PAUSED">{t("habit_form.s-2")}</option>
-              <option value="ARCHIVED">{t("habit_form.s-3")}</option>
-            </select>
-          </div>
+          {!initial?.id && (
+            <div>
+              <label className={labelClass} style={labelStyle}>
+                {t("habit_form.status")}
+              </label>
+              <select
+                value={form.status}
+                onChange={(e) =>
+                  setForm((f) => ({
+                    ...f,
+                    status: e.target.value as HabitStatus,
+                  }))
+                }
+                className="w-full rounded-xl border px-4 py-3"
+                style={inputStyle}
+              >
+                <option value="ACTIVE">{t("habit_form.s-1")}</option>
+                <option value="PAUSED">{t("habit_form.s-2")}</option>
+                <option value="ARCHIVED">{t("habit_form.s-3")}</option>
+              </select>
+            </div>
+          )}
         </div>
 
         {/* Footer */}

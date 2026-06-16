@@ -37,9 +37,12 @@ export default function MainLayout() {
               habits: habitData.habits,
               createHabit: habitData.createHabit,
               updateHabit: habitData.updateHabit,
+              deleteHabit: habitData.deleteHabit,
               habitSchedules: habitSchedule.habitSchedules,
-              replaceHabitSchedules: habitSchedule.replaceHabitSchedules,
               createHabitSchedules: habitSchedule.createHabitSchedules,
+              replaceHabitSchedules: habitSchedule.replaceHabitSchedules,
+              deleteHabitSchedulesByHabitId:
+                habitSchedule.deleteHabitSchedulesByHabitId,
               showAddForm,
               setShowAddForm,
             }}
