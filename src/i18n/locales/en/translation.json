@@ -287,5 +287,9 @@
     "goalWorkout": "Practice 20 times per month",
     "goalDrinkWater": "Drink 2L water per day",
     "days": "Days"
+  },
+  "checkin":{
+    "history":"Check-in History",
+    "no":"Empty"
   }
 }
