@@ -43,12 +43,12 @@ export const router = createBrowserRouter([
       },
 
       {
-        path: ROUTES.STATISTICS,
+        path: "statistics",
         element: <StatisticsPage />,
       },
 
       {
-        path: ROUTES.NOTIFICATIONS,
+        path: "notifications",
         element: <NotificationsPage />,
       },
     ],
