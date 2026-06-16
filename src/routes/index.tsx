@@ -56,11 +56,6 @@ export const router = createBrowserRouter([
         path: "notifications",
         element: <NotificationsPage />,
       },
-
-      //   {
-      //     path: ROUTES.SETTINGS,
-      //     element: <SettingsPage />,
-      //   },
     ],
   },
 

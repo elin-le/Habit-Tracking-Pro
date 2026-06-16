@@ -6,8 +6,6 @@ export const ROUTES = {
   GOALS: "goals",
   STATISTICS: "/statistics",
   NOTIFICATIONS: "/notifications",
-  SETTINGS: "/settings",
-
   AUTH: "/auth",
   LOGIN: "/auth/login",
   REGISTER: "/auth/register",
