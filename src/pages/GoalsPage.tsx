@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useGoals, type StatusFilter, type TypeFilter } from "../shared/hooks/useGoals";
 import { ToastService } from "../routes/services/toastService";
 import { useTranslation } from "react-i18next";
 import GoalCard from "../shared/components/cards/GoalCard";
@@ -12,94 +13,55 @@ import {
     Search,
     SlidersHorizontal,
 } from "lucide-react";
-
 import GoalForm from "../shared/components/forms/GoalForm";
-import { Modal } from "@/shared/components/ui/modal";
-import { Button } from "@/shared/components/ui/button";
+import { STORAGE_KEY } from "../shared/constants/appConstants";
+import { Modal } from "../shared/components/ui/modal";
+import { Button } from "../shared/components/ui/button";
 
-// Mock data
+// GoalsPage 
+function GoalsPage() {
+    const { t } = useTranslation();
 
-const MOCK_GOALS_DATA = [
-    {
-        id: "goal1",
-        habitName: "Uống nước",
-        goalType: "STREAK" as const,
-        targetValue: 30,
-        startedDate: "2026-05-15",
-        endDate: "2026-06-13",
-        progress: {
-            currentProgress: 30,
-            progressPercent: 100,
-            status: "COMPLETED" as const,
-        },
-        color: "emerald" as const,
-        stats: { bestStreak: 30, completionRate: 100 },
-        weeklyHistory: [
-            { day: "T2", value: 100 },
-            { day: "T3", value: 100 },
-            { day: "T4", value: 100 },
-            { day: "T5", value: 100 },
-            { day: "T6", value: 100 },
-            { day: "T7", value: 100 },
-            { day: "CN", value: 100 },
-        ],
-    },
-    {
-        id: "goal2",
-        habitName: "Đọc sách",
-        goalType: "STREAK" as const,
-        targetValue: 21,
-        startedDate: "2026-05-28",
-        endDate: "",
-        progress: {
-            currentProgress: 17,
-            progressPercent: 81,
-            status: "IN_PROGRESS" as const,
-        },
-        color: "orange" as const,
-        stats: { bestStreak: 17, completionRate: 81 },
-        weeklyHistory: [
-            { day: "T2", value: 100 },
-            { day: "T3", value: 100 },
-            { day: "T4", value: 100 },
-            { day: "T5", value: 0 },
-            { day: "T6", value: 100 },
-            { day: "T7", value: 100 },
-            { day: "CN", value: 100 },
-        ],
-    },
-    {
-        id: "goal3",
-        habitName: "Tập gym",
-        goalType: "TOTAL_COMPLETIONS" as const,
-        targetValue: 12,
-        startedDate: "2026-06-01",
-        endDate: "",
-        progress: {
-            currentProgress: 3,
-            progressPercent: 25,
-            status: "IN_PROGRESS" as const,
-        },
-        color: "indigo" as const,
-        stats: { bestStreak: 3, completionRate: 25 },
-        weeklyHistory: [
-            { day: "T2", value: 100 },
-            { day: "T3", value: 0 },
-            { day: "T4", value: 100 },
-            { day: "T5", value: 0 },
-            { day: "T6", value: 100 },
-            { day: "T7", value: 0 },
-            { day: "CN", value: 0 },
-        ],
-    },
-];
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedHabit, setSelectedHabit] = useState({ id: "", name: "" });
+    const [selectedGoalDetail, setSelectedGoalDetail] = useState<any | null>(null);
+    const [panelOpen, setPanelOpen] = useState(false);
 
-const MOCK_HABITS_WITHOUT_GOAL = [
-    { id: "habit_extra1", name: "Chạy bộ buổi sáng" },
-    { id: "habit_extra2", name: "Học ngoại ngữ" },
-];
+    // Filters
+    const [search, setSearch] = useState("");
+    const {
+        goals,
+        filteredGoals,
+        statusFilter, setStatusFilter,
+        typeFilter, setTypeFilter,
+        deleteGoal, createGoal, refreshGoals
+    } = useGoals();
 
-// Filter types
+    // Get all habits from local storage
+    const allHabits = useMemo(() => {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY.USER_HABITS) || "[]");
+    }, []);
+
+    const habitsWithoutGoal = useMemo(() => {
+        const activeGoalHabitIds = new Set(goals.filter(g => g.progress.status === "NOT_STARTED" || g.progress.status === "IN_PROGRESS").map((g) => g.habitId));
+        return allHabits.filter((h: any) => !activeGoalHabitIds.has(h.id));
+    }, [allHabits, goals]);
+
+    const [showFilters, setShowFilters] = useState(false);
+
+    // Derived stats 
+    const stats = useMemo(() => ({
+        total: goals.length,
+        inProgress: goals.filter((g) => g.progress.status === "IN_PROGRESS").length,
+        near: goals.filter((g) => g.progress.progressPercent >= 80 && g.progress.status !== "COMPLETED").length,
+        completed: goals.filter((g) => g.progress.status === "COMPLETED").length,
+    }), [goals]);
+
+    // Handlers 
+    const handleAddGoal = (habit: { id: string; name: string }) => {
+        setSelectedHabit(habit);
+        setModalOpen(true);
+    };
 
 type StatusFilter =
   | "ALL"
@@ -111,77 +73,23 @@ type TypeFilter = "ALL" | "STREAK" | "TOTAL_COMPLETIONS";
 
 // GoalsPage
 
-function GoalsPage() {
-  const { t } = useTranslation();
+    const handleCloseDetail = () => {
+        setPanelOpen(false);
+        // Clear goal data AFTER slide-out animation completes
+        setTimeout(() => setSelectedGoalDetail(null), 450);
+    };
 
-  const [goals, setGoals] = useState(MOCK_GOALS_DATA);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedHabit, setSelectedHabit] = useState({ id: "", name: "" });
-  const [selectedGoalDetail, setSelectedGoalDetail] = useState<any | null>(
-    null,
-  );
-  const [panelOpen, setPanelOpen] = useState(false);
+    const handleArchiveGoal = (goalId: string) => {
+        // TODO: chưa có trạng thái ARCHIVE, tạm thời xoá luôn 
+        deleteGoal(goalId);
+        ToastService.success(t("goals.archive_success"));
+        handleCloseDetail();
+    };
 
-  // Filters
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
-  const [typeFilter, setTypeFilter] = useState<TypeFilter>("ALL");
-  const [showFilters, setShowFilters] = useState(false);
-
-  // Derived stats
-
-  const stats = useMemo(
-    () => ({
-      total: goals.length,
-      inProgress: goals.filter((g) => g.progress.status === "IN_PROGRESS")
-        .length,
-      near: goals.filter(
-        (g) =>
-          g.progress.progressPercent >= 80 && g.progress.status !== "COMPLETED",
-      ).length,
-      completed: goals.filter((g) => g.progress.status === "COMPLETED").length,
-    }),
-    [goals],
-  );
-
-  // Filtered goals
-
-  const filteredGoals = useMemo(() => {
-    return goals.filter((g) => {
-      const matchSearch =
-        !search || g.habitName.toLowerCase().includes(search.toLowerCase());
-      const matchStatus =
-        statusFilter === "ALL" ||
-        (statusFilter === "NEAR_COMPLETION"
-          ? g.progress.progressPercent >= 80 &&
-            g.progress.status !== "COMPLETED"
-          : g.progress.status === statusFilter);
-      const matchType = typeFilter === "ALL" || g.goalType === typeFilter;
-      return matchSearch && matchStatus && matchType;
-    });
-  }, [goals, search, statusFilter, typeFilter]);
-
-  // Handlers
-
-  const handleAddGoal = (habit: { id: string; name: string }) => {
-    setSelectedHabit(habit);
-    setModalOpen(true);
-  };
-
-  const handleFormSubmit = (formData: any) => {
-    const newGoal = {
-      ...formData,
-      color: "indigo" as const,
-      stats: { bestStreak: 0, completionRate: 0 },
-      weeklyHistory: [
-        { day: "T2", value: 0 },
-        { day: "T3", value: 0 },
-        { day: "T4", value: 0 },
-        { day: "T5", value: 0 },
-        { day: "T6", value: 0 },
-        { day: "T7", value: 0 },
-        { day: "CN", value: 0 },
-      ],
+    const handleDeleteGoal = (goalId: string) => {
+        deleteGoal(goalId);
+        ToastService.error(t("goals.delete_success"));
+        handleCloseDetail();
     };
     setGoals((prev) => [...prev, newGoal]);
     ToastService.success(t("goals.add_success"));
@@ -470,11 +378,11 @@ function GoalsPage() {
             </section>
 
             {/* Habits without goal */}
-            {MOCK_HABITS_WITHOUT_GOAL.length > 0 && (
+            {habitsWithoutGoal.length > 0 && (
                 <section className="flex flex-col gap-4 mt-8">
                     <h2 className="text-lg font-bold">{t("goals.no_goal")}</h2>
                     <div className="flex flex-col gap-2.5">
-                        {MOCK_HABITS_WITHOUT_GOAL.map((habit) => (
+                        {habitsWithoutGoal.map((habit) => (
                             <div
                                 key={habit.id}
                                 className="
