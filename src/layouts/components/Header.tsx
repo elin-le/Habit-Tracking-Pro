@@ -5,8 +5,8 @@ import { HabitForm } from "../../shared/components/forms/HabitForm";
 import type { Habit } from "../../shared/types/Habit";
 import type { HabitSchedule } from "../../shared/types/HabitSchedule";
 import { useState, useContext } from "react";
-import { Link } from "react-router-dom"; // Thêm dòng này
-import { NotificationContext } from "../../features/notifications/context/NotificationContext"; // Thêm dòng này
+import { Link } from "react-router-dom";
+import { NotificationContext } from "../../features/notifications/context/NotificationContext";
 
 interface HeaderProps {
   title?: string;
@@ -20,6 +20,8 @@ interface HeaderProps {
   setShowAddForm: (v: boolean) => void;
   createHabit: (habit: Habit) => void;
   createHabitSchedules: (s: HabitSchedule[]) => void;
+  userName?: string;
+  avatarUrl?: string;
 }
 
 const PERIODS = [
@@ -95,6 +97,20 @@ function MoonIcon() {
   );
 }
 
+// Avatar nhỏ dùng ảnh nếu có, không thì hiện chữ cái đầu của tên
+function AvatarBadge({ name, src }: { name: string; src?: string }) {
+  const initial = name.trim().charAt(0).toUpperCase() || "?";
+  return (
+    <div className="w-11 h-11 shrink-0 rounded-full overflow-hidden bg-gradient-to-br from-violet-500 to-violet-700 shadow-sm ring-2 ring-white/60 flex items-center justify-center text-white font-bold text-base select-none">
+      {src ? (
+        <img src={src} alt={name} className="w-full h-full object-cover" />
+      ) : (
+        initial
+      )}
+    </div>
+  );
+}
+
 export default function Header({
   title,
   subtitle,
@@ -107,12 +123,13 @@ export default function Header({
   setShowAddForm,
   createHabit,
   createHabitSchedules,
+  userName = "Alex",
+  avatarUrl,
 }: HeaderProps) {
   const { t, i18n } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const [lang, setLang] = useState<"EN" | "VI">("EN");
 
-  // THÊM DÒNG NÀY ĐỂ LẤY SỐ ĐẾM THÔNG BÁO:
   const { unreadCount } = useContext(NotificationContext);
 
   const greeting = (() => {
@@ -122,24 +139,77 @@ export default function Header({
     return "Good evening";
   })();
 
+  const toggleLang = () => {
+    const newLang = lang === "EN" ? "VI" : "EN";
+    setLang(newLang);
+    i18n.changeLanguage(newLang.toLowerCase());
+  };
+
   return (
     <header
       style={{ background: "var(--surface)", color: "var(--text)" }}
       className="sticky top-0 z-30"
     >
       {/* MOBILE header  (< md) */}
-      <div className="flex md:hidden items-center justify-start px-5 pt-8 pb-3">
-        {/* Left: Menu button + greeting */}
-        <div className="flex items-center gap-3">
-          <MobileMenuButton onClick={onMenuOpen ?? (() => {})} />
-          <div>
-            <p className="text-sm text-violet-400 font-medium">
-              {subtitle ?? "Keep going, you're doing great!"}
+      <div className="flex md:hidden items-center justify-between gap-3 px-5 pt-8 pb-3">
+        {/* Left: Avatar + greeting */}
+        <div className="flex items-center gap-3 min-w-0">
+          <AvatarBadge name={title ?? userName} src={avatarUrl} />
+          <div className="min-w-0">
+            <p className="text-xs text-violet-400 font-medium truncate">
+              {subtitle ?? `${greeting},`}
             </p>
-            <h1 className="text-2xl font-bold mt-0.5">
-              {title ?? `${greeting}, Alex! 👋`}
+            <h1 className="text-lg font-bold leading-tight truncate">
+              {title ?? userName} 👋
             </h1>
           </div>
+        </div>
+
+        {/* Right: quick toggles, nổi hẳn lên so với nền để không bị lẫn vào body khi light mode */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Language toggle */}
+          <button
+            onClick={toggleLang}
+            aria-label="Toggle language"
+            className="flex items-center gap-1 h-8 px-2.5 rounded-lg bg-violet-50 shadow-sm ring-1 ring-violet-100 text-violet-500 text-[11px] font-semibold tracking-wide select-none"
+          >
+            <span
+              className={lang === "EN" ? "text-violet-700" : "text-violet-300"}
+            >
+              EN
+            </span>
+            <span className="text-violet-200 font-normal">|</span>
+            <span
+              className={lang === "VI" ? "text-violet-700" : "text-violet-300"}
+            >
+              VI
+            </span>
+          </button>
+
+          {/* Dark/Light toggle */}
+          <button
+            onClick={toggleTheme}
+            aria-label="Toggle dark mode"
+            className={[
+              "relative w-10 h-6 rounded-full shadow-sm transition-colors duration-300 overflow-hidden",
+              theme === "light" ? "bg-violet-600" : "bg-violet-100",
+            ].join(" ")}
+          >
+            <span className="absolute left-1 top-1/2 -translate-y-1/2 text-yellow-400">
+              <SunIcon />
+            </span>
+            <span className="absolute right-1 top-1/2 -translate-y-1/2 text-violet-400">
+              <MoonIcon />
+            </span>
+            <span
+              className={[
+                "absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-md flex items-center justify-center transition-transform duration-300",
+                theme === "light" ? "translate-x-4" : "translate-x-0",
+              ].join(" ")}
+            >
+              {theme === "light" ? <MoonIcon /> : <SunIcon />}
+            </span>
+          </button>
         </div>
       </div>
 
@@ -147,7 +217,7 @@ export default function Header({
                 DESKTOP header  (≥ md)
             ════════════════════════════════ */}
       <div className="hidden md:flex items-center gap-3 shadow-sm px-6 lg:px-7 py-4">
-        <MobileMenuButton onClick={onMenuOpen ?? (() => {})} />
+        <MobileMenuButton onClick={onMenuOpen ?? (() => { })} />
 
         {/* Title */}
         <div className="flex-1 min-w-0">
@@ -185,11 +255,7 @@ export default function Header({
 
           {/* Language toggle */}
           <button
-            onClick={() => {
-              const newLang = lang === "EN" ? "VI" : "EN";
-              setLang(newLang);
-              i18n.changeLanguage(newLang.toLowerCase());
-            }}
+            onClick={toggleLang}
             aria-label="Toggle language"
             className="flex items-center gap-1 h-9 px-2.5 rounded-xl border text-violet-500 hover:bg-violet-50 hover:border-violet-200 transition-all text-xs font-semibold tracking-wide select-none"
           >

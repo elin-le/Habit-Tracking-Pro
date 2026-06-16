@@ -12,6 +12,7 @@ import {
   seedHabits,
   seedHabitSchedules,
   seedCategories,
+  seedGoals
 } from "./shared/utils/seedData";
 import { ThemeProvider } from "./context/ThemeContext";
 import { NotificationProvider } from './features/notifications/context/NotificationContext';
@@ -20,11 +21,11 @@ seedData();
 seedHabits();
 seedHabitSchedules();
 seedCategories();
-
+seedGoals();
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider >
-      <NotificationProvider> {/* Em Thêm thẻ notification ở đây */}
+      <NotificationProvider> 
         <RouterProvider router={router} />
         <Toaster
           richColors

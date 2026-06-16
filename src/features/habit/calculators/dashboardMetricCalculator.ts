@@ -1,7 +1,8 @@
 import type { HabitRisk } from "./riskDetector";
-import type { MockGoal, CheckIn } from "./goalCalculator";
-import { getCurrentStreak, getLongestStreak, getCompletionRate, getStreakProgress, getTotalCompletionProgress } from "./goalCalculator";
+import type { CheckIn } from "./GoalCalculator";
+import { getCurrentStreak, getLongestStreak, getCompletionRate, getStreakProgress, getTotalCompletionProgress } from "./GoalCalculator";
 import { getHabitRisk } from "./riskDetector"
+import type { Goal } from "../../../shared/types/Goal"
 
 export type HabitDashboardMetrics = {
     currentStreak: number;
@@ -12,7 +13,7 @@ export type HabitDashboardMetrics = {
 };
 
 export const getHabitDashboardMetrics = (
-    goal: MockGoal,
+    goal: Goal,
     checkins: CheckIn[],
     targetPerDay: number
 ): HabitDashboardMetrics => {

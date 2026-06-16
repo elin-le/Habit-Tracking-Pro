@@ -1,24 +1,18 @@
 import React, { useState } from "react";
-import { AlertCircle, Flame, Target } from "lucide-react";
-
+import type { TargetType } from "../../types/Goal";
+import { AlertCircle, Flame, Target, Calendar } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Button } from "../ui/button";
+import { Button } from "../ui/Button";
+import "./GoalForm.css";
 
 // Types
 
 export interface GoalFormData {
-  id: string;
   habitId: string;
-  habitName: string;
-  goalType: "STREAK" | "TOTAL_COMPLETIONS";
+  targetType: TargetType;
   targetValue: number;
   startedDate: string;
   endDate?: string;
-  progress: {
-    currentProgress: number;
-    progressPercent: number;
-    status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
-  };
 }
 
 interface GoalFormProps {
@@ -33,44 +27,42 @@ interface FormErrors {
   endDate?: string;
 }
 
-// Input base class
-
-// Tailwind class string reused across all inputs — dark mode aware
-const INPUT_CLASS = `
-    w-full h-12 px-4 rounded-2xl text-sm font-medium
-    border border-slate-200 dark:border-slate-700/60
-    bg-white dark:bg-slate-800/60
-    text-slate-800 dark:text-slate-100
-    placeholder:text-slate-400 dark:placeholder:text-slate-500
-    outline-none
-    focus:border-[var(--primary)] focus:ring-4 focus:ring-[var(--primary)]/10
-    transition-all duration-200
-`;
+const GOAL_TYPES = [
+  {
+    value: "STREAK" as const,
+    icon: Flame,
+    labelKey: "goals.type_streak",
+    descKey: "goals.type_streak_desc",
+  },
+  {
+    value: "TOTAL_COMPLETIONS" as const,
+    icon: Target,
+    labelKey: "goals.type_total",
+    descKey: "goals.type_total_desc",
+  },
+];
 
 // GoalForm
-
-const GoalForm: React.FC<GoalFormProps> = ({
-  habitId,
-  habitName,
-  onSubmit,
-  onCancel,
-}) => {
+const GoalForm: React.FC<GoalFormProps> = ({ habitId, habitName, onSubmit, onCancel }) => {
   const { t } = useTranslation();
 
-  const [goalType, setGoalType] = useState<"STREAK" | "TOTAL_COMPLETIONS">(
-    "STREAK",
-  );
+  const [targetType, setTargetType] = useState<TargetType>("STREAK");
   const [targetValue, setTargetValue] = useState("");
-  const [startedDate, setStartedDate] = useState(
-    new Date().toISOString().split("T")[0],
-  );
+  const [startedDate, setStartedDate] = useState(new Date().toISOString().split("T")[0]);
   const [endDate, setEndDate] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const unit = goalType === "STREAK" ? t("goals.days") : t("goals.times");
+  const isStreak = targetType === "STREAK";
+
+  const handleTargetTypeChange = (type: TargetType) => {
+    setTargetType(type);
+    if (type === "STREAK") {
+      setEndDate("");
+      setErrors((prev) => ({ ...prev, endDate: undefined }));
+    }
+  };
 
   // Validation
-
   const validate = (): boolean => {
     const next: FormErrors = {};
     const num = Number(targetValue);
@@ -78,7 +70,7 @@ const GoalForm: React.FC<GoalFormProps> = ({
     if (!targetValue || isNaN(num) || num <= 0) {
       next.targetValue = t("goals.error_target_required");
     }
-    if (endDate && endDate < startedDate) {
+    if (!isStreak && endDate && endDate < startedDate) {
       next.endDate = t("goals.error_end_before_start");
     }
 
@@ -86,36 +78,23 @@ const GoalForm: React.FC<GoalFormProps> = ({
     return Object.keys(next).length === 0;
   };
 
-  // Submit
+  // Clear errors on change
+  const clearError = (key: keyof FormErrors) =>
+    setErrors((prev) => ({ ...prev, [key]: undefined }));
 
+  // Submit
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
-    const num = Number(targetValue);
-
-    if (onSubmit) {
-      onSubmit({
-        id: "goal_" + Math.random().toString(36).slice(2, 11),
-        habitId,
-        habitName,
-        goalType,
-        targetValue: num,
-        startedDate,
-        endDate: endDate || undefined,
-        progress: {
-          currentProgress: 0,
-          progressPercent: 0,
-          status: "NOT_STARTED",
-        },
-      });
-    }
+    onSubmit?.({
+      habitId,
+      targetType,
+      targetValue: Number(targetValue),
+      startedDate,
+      ...(isStreak ? {} : endDate && { endDate }),
+    });
   };
-
-  // Clear errors on change
-
-  const clearError = (key: keyof FormErrors) =>
-    setErrors((prev) => ({ ...prev, [key]: undefined }));
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6" noValidate>
@@ -147,39 +126,28 @@ const GoalForm: React.FC<GoalFormProps> = ({
           {t("goals.goal_type")}
         </legend>
         <div className="grid grid-cols-2 gap-3">
-          {(["STREAK", "TOTAL_COMPLETIONS"] as const).map((type) => {
-            const active = goalType === type;
+          {GOAL_TYPES.map(({ value, icon: Icon, labelKey, descKey }) => {
+            const active = targetType === value;
             return (
               <button
-                key={type}
+                key={value}
                 type="button"
-                onClick={() => setGoalType(type)}
+                onClick={() => handleTargetTypeChange(value)}
                 aria-pressed={active}
                 className={`
                                     flex flex-col items-center gap-1.5
                                     py-4 px-2 rounded-2xl border-2
                                     transition-all duration-200 cursor-pointer text-center
-                                    ${
-                                      active
-                                        ? "border-[var(--primary)] bg-[var(--primary)]/5 text-[var(--primary)] shadow-sm"
-                                        : "border-slate-100 dark:border-slate-700/60 text-slate-500 dark:text-slate-400 hover:border-slate-200 dark:hover:border-slate-600 hover:bg-slate-50/50 dark:hover:bg-slate-800/30"
-                                    }
+                                    ${active
+                    ? "border-[var(--primary)] bg-[var(--primary)]/5 text-[var(--primary)] shadow-sm"
+                    : "border-slate-100 dark:border-slate-700/60 text-slate-500 dark:text-slate-400 hover:border-slate-200 dark:hover:border-slate-600 hover:bg-slate-50/50 dark:hover:bg-slate-800/30"
+                  }
                                 `}
               >
-                {type === "STREAK" ? (
-                  <Flame size={24} strokeWidth={2} />
-                ) : (
-                  <Target size={24} strokeWidth={2} />
-                )}
-                <span className="font-bold text-base mt-1.5">
-                  {type === "STREAK"
-                    ? t("goals.type_streak")
-                    : t("goals.type_total")}
-                </span>
-                <span className="text-[11px] tracking-tight opacity-75 leading-tight px-0">
-                  {type === "STREAK"
-                    ? t("goals.type_streak_desc")
-                    : t("goals.type_total_desc")}
+                <Icon size={24} strokeWidth={2} />
+                <span className="font-bold text-base mt-1.5">{t(labelKey)}</span>
+                <span className="text-[11px] tracking-tight opacity-75 leading-tight">
+                  {t(descKey)}
                 </span>
               </button>
             );
@@ -212,10 +180,9 @@ const GoalForm: React.FC<GoalFormProps> = ({
             aria-describedby={
               errors.targetValue ? "targetValue-error" : undefined
             }
-            className={`${INPUT_CLASS} pr-14 ${errors.targetValue ? "border-red-400 dark:border-red-500 focus:ring-red-400/20" : ""}`}
-          />
+            className={`goal-input pl-4 pr-20 no-spin-buttons ${errors.targetValue ? "goal-input-error" : ""}`} />
           <span className="absolute right-4 text-sm font-medium text-slate-400 dark:text-slate-500 pointer-events-none">
-            {unit}
+            {t(isStreak ? "goals.days" : "goals.times")}
           </span>
         </div>
         {errors.targetValue && (
@@ -229,106 +196,58 @@ const GoalForm: React.FC<GoalFormProps> = ({
         )}
       </div>
 
-            {/* Date fields */}
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-5">
-                {/* Start date */}
-                <div className="flex-1">
-                    <label
-                        htmlFor="startedDate"
-                        className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 mb-2.5 block"
-                    >
-                        {t("goals.started_date")}
-                    </label>
-                    <input
-                        id="startedDate"
-                        type="date"
-                        value={startedDate}
-                        onChange={(e) => setStartedDate(e.target.value)}
-                        className={`${INPUT_CLASS} appearance-none`}
-                    />
-                </div>
-
-                {/* End date (optional) */}
-                <div className="flex-1">
-                    <label
-                        htmlFor="endDate"
-                        className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 mb-2.5 block truncate"
-                    >
-                        {t("goals.end_date")}
-                        <span className="ml-1 font-normal text-xs text-slate-400 dark:text-slate-500">
-                            ({t("goals.optional")})
-                        </span>
-                    </label>
-                    <input
-                        id="endDate"
-                        type="date"
-                        value={endDate}
-                        min={startedDate}
-                        onChange={(e) => {
-                            setEndDate(e.target.value);
-                            clearError("endDate");
-                        }}
-                        aria-invalid={!!errors.endDate}
-                        className={`${INPUT_CLASS} appearance-none ${errors.endDate ? "border-red-400 dark:border-red-500 focus:ring-red-400/20" : ""}`}
-                    />
-                    {errors.endDate && (
-                        <p className="flex items-center gap-1 text-xs text-red-500 mt-1.5">
-                            <AlertCircle size={11} />
-                            {errors.endDate}
-                        </p>
-                    )}
-                </div>
-            </div>
       {/* Date fields */}
-      <div className="grid grid-cols-2 gap-4">
-        {/* Start date */}
-        <div>
-          <label
-            htmlFor="startedDate"
-            className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 mb-2.5 block"
-          >
-            {t("goals.started_date")}
-          </label>
+      <div>
+        <label
+          htmlFor="startedDate"
+          className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 mb-2.5 block"
+        >
+          {t("goals.started_date")}
+        </label>
+        <div className="relative flex items-center">
+          <Calendar size={16} className="absolute left-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
           <input
             id="startedDate"
             type="date"
             value={startedDate}
             onChange={(e) => setStartedDate(e.target.value)}
-            className={INPUT_CLASS}
+            className="goal-input pl-10 pr-4 appearance-none"
           />
         </div>
+      </div>
 
-        {/* End date (optional) */}
+      {!isStreak && (
         <div>
           <label
             htmlFor="endDate"
-            className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 mb-2.5 block truncate"
+            className="text-[13px] font-semibold text-slate-700 dark:text-slate-300 mb-2.5 flex items-center gap-1"
           >
             {t("goals.end_date")}
-            <span className="ml-1 font-normal text-xs text-slate-400 dark:text-slate-500">
+            <span className="font-normal text-xs text-slate-400 dark:text-slate-500">
               ({t("goals.optional")})
             </span>
           </label>
-          <input
-            id="endDate"
-            type="date"
-            value={endDate}
-            min={startedDate}
-            onChange={(e) => {
-              setEndDate(e.target.value);
-              clearError("endDate");
-            }}
-            aria-invalid={!!errors.endDate}
-            className={`${INPUT_CLASS} ${errors.endDate ? "border-red-400 dark:border-red-500" : ""}`}
-          />
+          <div className="relative flex items-center">
+            <Calendar size={16} className="absolute left-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
+            <input
+              id="endDate"
+              type="date"
+              value={endDate}
+              min={startedDate}
+              onChange={(e) => { setEndDate(e.target.value); clearError("endDate"); }}
+              aria-invalid={!!errors.endDate}
+              aria-describedby={errors.endDate ? "endDate-error" : undefined}
+              className={`goal-input pl-10 pr-4 appearance-none ${errors.endDate ? "goal-input-error" : ""}`}
+            />
+          </div>
           {errors.endDate && (
-            <p className="flex items-center gap-1 text-xs text-red-500">
+            <p id="endDate-error" className="flex items-center gap-1 text-xs text-red-500 mt-1.5">
               <AlertCircle size={11} />
               {errors.endDate}
             </p>
           )}
         </div>
-      </div>
+      )}
 
       {/* Actions */}
       <div className="flex gap-3 justify-end pt-2">
@@ -344,7 +263,7 @@ const GoalForm: React.FC<GoalFormProps> = ({
           {t("goals.create_goal")}
         </Button>
       </div>
-    </form>
+    </form >
   );
 };
 
