@@ -1,4 +1,4 @@
-export type GoalType = 'STREAK' | 'TOTAL_COMPLETIONS';
+export type TargetType = 'STREAK' | 'TOTAL_COMPLETIONS';
 
 export type GoalStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
 
@@ -11,7 +11,7 @@ export interface Milestone {
 export interface Goal {
     id: string;
     habitId: string;
-    goalType: GoalType;
+    targetType: TargetType;
     targetValue: number;
     startedDate: string;
     endDate: string;
