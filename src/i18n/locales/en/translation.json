@@ -277,7 +277,7 @@
     "atRiskHabits": "At Risk Habits",
     "currentStreak": "Current Streak",
     "longestStreak": "Longest Streak",
-    "completionRate": "Completion Rate",
+    "completionRate": "Completion rate over the past 7 days",
     "categoryOverview": "Category Overview",
     "goalProgress": "Goal Progress",
     "health": "Health",
