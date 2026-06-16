@@ -26,4 +26,12 @@ export interface GoalDerived {
 
 export interface GoalWithDerived extends Goal {
     progress: GoalDerived;
+    stats?: {
+        bestStreak: number;
+        completionRate: number;
+    };
+    weeklyHistory?: {
+        day: string;
+        value: number;
+    }[];
 }

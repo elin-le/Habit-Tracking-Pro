@@ -171,7 +171,7 @@
     "streak": "Streak",
     "total_completions": "Completions",
     "days": "days",
-    "times": "times",
+    "sessions": "sessions",
     "detail_title": "Goal details",
     "current_progress": "Current progress",
     "best_streak": "Best streak",
@@ -190,11 +190,13 @@
     "not_started": "Not Started",
     "done": "Done!",
     "overdue": "Overdue",
+    "left": "left",
     "target": "Target",
     "filter": "Filter",
     "filter_status": "Status",
     "filter_type": "Type",
     "filter_all": "All",
+    "hidden_habit": "Hidden habit",
     "type_streak": "Streak",
     "type_streak_desc": "Maintain habit consistently",
     "type_total": "Total",
@@ -285,8 +287,8 @@
     "productivity": "Productivity",
     "days": "Days"
   },
-  "checkin":{
-    "history":"Check-in History",
-    "no":"Empty"
+  "checkin": {
+    "history": "Check-in History",
+    "no": "Empty"
   }
 }

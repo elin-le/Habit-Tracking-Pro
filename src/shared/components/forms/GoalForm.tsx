@@ -3,6 +3,7 @@ import type { TargetType } from "../../types/Goal";
 import { AlertCircle, Flame, Target, Calendar } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "../ui/Button";
+import { getGoalTheme } from "../../utils/goalTheme";
 import "./GoalForm.css";
 
 // Types
@@ -18,6 +19,7 @@ export interface GoalFormData {
 interface GoalFormProps {
   habitId: string;
   habitName: string;
+  initialData?: Partial<GoalFormData>;
   onSubmit?: (data: GoalFormData) => void;
   onCancel?: () => void;
 }
@@ -43,13 +45,26 @@ const GOAL_TYPES = [
 ];
 
 // GoalForm
-const GoalForm: React.FC<GoalFormProps> = ({ habitId, habitName, onSubmit, onCancel }) => {
+const GoalForm: React.FC<GoalFormProps> = ({
+  habitId,
+  habitName,
+  initialData,
+  onSubmit,
+  onCancel,
+}) => {
   const { t } = useTranslation();
 
-  const [targetType, setTargetType] = useState<TargetType>("STREAK");
-  const [targetValue, setTargetValue] = useState("");
-  const [startedDate, setStartedDate] = useState(new Date().toISOString().split("T")[0]);
-  const [endDate, setEndDate] = useState("");
+  const [targetType, setTargetType] = useState<TargetType>(
+    initialData?.targetType || "STREAK"
+  );
+  const currentTheme = getGoalTheme(targetType);
+  const [targetValue, setTargetValue] = useState(
+    initialData?.targetValue?.toString() || ""
+  );
+  const [startedDate, setStartedDate] = useState(
+    initialData?.startedDate || new Date().toISOString().split("T")[0]
+  );
+  const [endDate, setEndDate] = useState(initialData?.endDate || "");
   const [errors, setErrors] = useState<FormErrors>({});
 
   const isStreak = targetType === "STREAK";
@@ -100,21 +115,26 @@ const GoalForm: React.FC<GoalFormProps> = ({ habitId, habitName, onSubmit, onCan
     <form onSubmit={handleSubmit} className="flex flex-col gap-6" noValidate>
       {/* Habit badge */}
       <div
-        className="
-                flex items-center gap-3 w-full
-                bg-indigo-50/50 dark:bg-indigo-950/20
-                border border-indigo-100/50 dark:border-indigo-800/30
-                rounded-2xl p-3
-            "
+        className={`
+          flex items-center gap-4 p-4 rounded-2xl mb-6
+          border border-slate-100 dark:border-slate-800/60
+          ${currentTheme.badgeBg}
+        `}
       >
-        <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center text-indigo-500 shadow-sm shrink-0">
+        <div
+          className={`w-10 h-10 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center shadow-sm shrink-0 ${currentTheme.badgeText}`}
+        >
           <Target size={18} />
         </div>
         <div className="flex flex-col">
-          <span className="text-[11px] font-medium text-indigo-400 uppercase tracking-wider leading-none mb-1">
+          <span
+            className={`text-[11px] font-medium uppercase tracking-wider leading-none mb-1 ${currentTheme.badgeText} opacity-80`}
+          >
             {t("goals.form_for")}
           </span>
-          <span className="text-sm font-bold text-indigo-700 dark:text-indigo-300 leading-none">
+          <span
+            className={`text-sm font-bold leading-none ${currentTheme.badgeText}`}
+          >
             {habitName}
           </span>
         </div>
@@ -128,24 +148,30 @@ const GoalForm: React.FC<GoalFormProps> = ({ habitId, habitName, onSubmit, onCan
         <div className="grid grid-cols-2 gap-3">
           {GOAL_TYPES.map(({ value, icon: Icon, labelKey, descKey }) => {
             const active = targetType === value;
+            const itemTheme = getGoalTheme(value); // Lấy theme riêng của STREAK hoặc TOTAL
+
             return (
               <button
                 key={value}
                 type="button"
                 onClick={() => handleTargetTypeChange(value)}
                 aria-pressed={active}
+                style={{ borderColor: active ? itemTheme.hex : undefined }}
                 className={`
-                                    flex flex-col items-center gap-1.5
-                                    py-4 px-2 rounded-2xl border-2
-                                    transition-all duration-200 cursor-pointer text-center
-                                    ${active
-                    ? "border-[var(--primary)] bg-[var(--primary)]/5 text-[var(--primary)] shadow-sm"
-                    : "border-slate-100 dark:border-slate-700/60 text-slate-500 dark:text-slate-400 hover:border-slate-200 dark:hover:border-slate-600 hover:bg-slate-50/50 dark:hover:bg-slate-800/30"
-                  }
-                                `}
+                    flex flex-col items-center gap-1.5
+                    py-4 px-2 rounded-2xl border-2
+                    transition-all duration-200 cursor-pointer text-center
+                    ${
+                      active
+                        ? `${itemTheme.badgeBg} ${itemTheme.badgeText} shadow-sm`
+                        : "border-slate-100 dark:border-slate-700/60 text-slate-500 dark:text-slate-400 hover:border-slate-200 dark:hover:border-slate-600 hover:bg-slate-50/50 dark:hover:bg-slate-800/30"
+                    }
+                `}
               >
                 <Icon size={24} strokeWidth={2} />
-                <span className="font-bold text-base mt-1.5">{t(labelKey)}</span>
+                <span className="font-bold text-base mt-1.5">
+                  {t(labelKey)}
+                </span>
                 <span className="text-[11px] tracking-tight opacity-75 leading-tight">
                   {t(descKey)}
                 </span>
@@ -180,9 +206,14 @@ const GoalForm: React.FC<GoalFormProps> = ({ habitId, habitName, onSubmit, onCan
             aria-describedby={
               errors.targetValue ? "targetValue-error" : undefined
             }
-            className={`goal-input pl-4 pr-20 no-spin-buttons ${errors.targetValue ? "goal-input-error" : ""}`} />
+            className={`
+              goal-input pl-4 pr-20 no-spin-buttons 
+              ${currentTheme.inputFocus}
+              ${errors.targetValue ? "goal-input-error" : ""}
+            `}
+          />
           <span className="absolute right-4 text-sm font-medium text-slate-400 dark:text-slate-500 pointer-events-none">
-            {t(isStreak ? "goals.days" : "goals.times")}
+            {t(isStreak ? "goals.days" : "goals.sessions")}
           </span>
         </div>
         {errors.targetValue && (
@@ -205,7 +236,10 @@ const GoalForm: React.FC<GoalFormProps> = ({ habitId, habitName, onSubmit, onCan
           {t("goals.started_date")}
         </label>
         <div className="relative flex items-center">
-          <Calendar size={16} className="absolute left-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
+          <Calendar
+            size={16}
+            className="absolute left-4 text-slate-400 dark:text-slate-500 pointer-events-none"
+          />
           <input
             id="startedDate"
             type="date"
@@ -228,20 +262,29 @@ const GoalForm: React.FC<GoalFormProps> = ({ habitId, habitName, onSubmit, onCan
             </span>
           </label>
           <div className="relative flex items-center">
-            <Calendar size={16} className="absolute left-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
+            <Calendar
+              size={16}
+              className="absolute left-4 text-slate-400 dark:text-slate-500 pointer-events-none"
+            />
             <input
               id="endDate"
               type="date"
               value={endDate}
               min={startedDate}
-              onChange={(e) => { setEndDate(e.target.value); clearError("endDate"); }}
+              onChange={(e) => {
+                setEndDate(e.target.value);
+                clearError("endDate");
+              }}
               aria-invalid={!!errors.endDate}
               aria-describedby={errors.endDate ? "endDate-error" : undefined}
               className={`goal-input pl-10 pr-4 appearance-none ${errors.endDate ? "goal-input-error" : ""}`}
             />
           </div>
           {errors.endDate && (
-            <p id="endDate-error" className="flex items-center gap-1 text-xs text-red-500 mt-1.5">
+            <p
+              id="endDate-error"
+              className="flex items-center gap-1 text-xs text-red-500 mt-1.5"
+            >
               <AlertCircle size={11} />
               {errors.endDate}
             </p>
@@ -259,11 +302,15 @@ const GoalForm: React.FC<GoalFormProps> = ({ habitId, habitName, onSubmit, onCan
         >
           {t("goals.cancel")}
         </Button>
-        <Button variant="default" size="default" type="submit">
-          {t("goals.create_goal")}
+        <Button
+          type="submit"
+          className="flex-1 text-white border-transparent"
+          style={{ backgroundColor: currentTheme.hex }}
+        >
+          {initialData ? t("goals.edit_goal") : t("goals.create_goal")}
         </Button>
       </div>
-    </form >
+    </form>
   );
 };
 
