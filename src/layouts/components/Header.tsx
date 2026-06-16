@@ -5,8 +5,8 @@ import { HabitForm } from "../../shared/components/forms/HabitForm";
 import type { Habit } from "../../shared/types/Habit";
 import type { HabitSchedule } from "../../shared/types/HabitSchedule";
 import { useState, useContext } from "react";
-import { Link } from "react-router-dom"; // Thêm dòng này
-import { NotificationContext } from "../../features/notifications/context/NotificationContext"; // Thêm dòng này
+import { Link } from "react-router-dom"; 
+import { NotificationContext } from "../../features/notifications/context/NotificationContext"; 
 
 interface HeaderProps {
   title?: string;

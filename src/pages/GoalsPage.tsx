@@ -63,28 +63,15 @@ function GoalsPage() {
         setModalOpen(true);
     };
 
-    const handleFormSubmit = (formData: any) => {
-        const newGoal = {
-            ...formData,
-            color: "indigo" as const,
-            stats: { bestStreak: 0, completionRate: 0 },
-            weeklyHistory: [
-                { day: "T2", value: 0 }, { day: "T3", value: 0 },
-                { day: "T4", value: 0 }, { day: "T5", value: 0 },
-                { day: "T6", value: 0 }, { day: "T7", value: 0 },
-                { day: "CN", value: 0 },
-            ],
-        };
-        createGoal(newGoal);
-        refreshGoals();
-        ToastService.success(t("goals.add_success"));
-        setModalOpen(false);
-    };
+type StatusFilter =
+  | "ALL"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "NOT_STARTED"
+  | "NEAR_COMPLETION";
+type TypeFilter = "ALL" | "STREAK" | "TOTAL_COMPLETIONS";
 
-    const handleSelectDetail = (goal: any) => {
-        setSelectedGoalDetail(goal);
-        setPanelOpen(true);
-    };
+// GoalsPage
 
     const handleCloseDetail = () => {
         setPanelOpen(false);
@@ -104,90 +91,122 @@ function GoalsPage() {
         ToastService.error(t("goals.delete_success"));
         handleCloseDetail();
     };
+    setGoals((prev) => [...prev, newGoal]);
+    ToastService.success(t("goals.add_success"));
+    setModalOpen(false);
+  };
 
-    // TODO: bổ sung update goal 
+  const handleSelectDetail = (goal: any) => {
+    setSelectedGoalDetail(goal);
+    setPanelOpen(true);
+  };
 
-    const hasActiveFilters = statusFilter !== "ALL" || typeFilter !== "ALL";
+  const handleCloseDetail = () => {
+    setPanelOpen(false);
+    // Clear goal data AFTER slide-out animation completes
+    setTimeout(() => setSelectedGoalDetail(null), 450);
+  };
 
-    // Main UI
-    return (
-        <div className="flex flex-col gap-6 pb-24 md:pb-8 text-[var(--text)] animate-in fade-in duration-300">
+  const handleArchiveGoal = (goalId: string) => {
+    setGoals((prev) => prev.filter((g) => g.id !== goalId));
+    ToastService.success(t("goals.archive_success"));
+    handleCloseDetail();
+  };
 
-            {/* Page header  */}
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl sm:text-4xl font-light tracking-tight">
-                        {t("goals.title")}
-                    </h1>
-                    <p className="mt-1 text-sm opacity-60">
-                        {t("goals.subtitle")}
-                    </p>
-                </div>
-            </div>
+  const handleDeleteGoal = (goalId: string) => {
+    setGoals((prev) => prev.filter((g) => g.id !== goalId));
+    ToastService.error(t("goals.delete_success"));
+    handleCloseDetail();
+  };
 
-            {/* Summary cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <SummaryCard
-                    icon={<Target size={18} />}
-                    label={t("goals.tracking")}
-                    value={stats.total}
-                    iconClass="text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30"
-                    onClick={() => setStatusFilter("ALL")}
-                    active={statusFilter === "ALL"}
-                />
-                <SummaryCard
-                    icon={<Zap size={18} />}
-                    label={t("goals.in_progress")}
-                    value={stats.inProgress}
-                    iconClass="text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30"
-                    onClick={() => setStatusFilter(statusFilter === "IN_PROGRESS" ? "ALL" : "IN_PROGRESS")}
-                    active={statusFilter === "IN_PROGRESS"}
-                />
-                <SummaryCard
-                    icon={<Award size={18} />}
-                    label={t("goals.near_completion")}
-                    value={stats.near}
-                    iconClass="text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/30"
-                    onClick={() => setStatusFilter(statusFilter === "NEAR_COMPLETION" ? "ALL" : "NEAR_COMPLETION")}
-                    active={statusFilter === "NEAR_COMPLETION"}
-                />
-                <SummaryCard
-                    icon={<CheckCircle2 size={18} />}
-                    label={t("goals.completed")}
-                    value={stats.completed}
-                    iconClass="text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30"
-                    onClick={() => setStatusFilter(statusFilter === "COMPLETED" ? "ALL" : "COMPLETED")}
-                    active={statusFilter === "COMPLETED"}
-                />
-            </div>
+  const hasActiveFilters = statusFilter !== "ALL" || typeFilter !== "ALL";
 
-            {/* Goals section */}
-            <section className="flex flex-col gap-5 mt-6">
-                {/* Search + filter toolbar */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <h2 className="text-base font-bold">
-                        {t("goals.tracking")}
-                        {filteredGoals.length !== goals.length && (
-                            <span className="ml-2 text-sm font-normal opacity-60">
-                                ({filteredGoals.length} / {goals.length})
-                            </span>
-                        )}
-                    </h2>
+  // Main UI
 
-                    <div className="flex items-center gap-2">
-                        {/* Search */}
-                        <div className="relative flex-1 sm:flex-none sm:w-56">
-                            <Search
-                                size={14}
-                                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                            />
-                            <input
-                                type="text"
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                placeholder={t("goals.search_placeholder")}
-                                className="
+  return (
+    <div className="flex flex-col gap-6 pb-24 md:pb-8 text-[var(--text)] animate-in fade-in duration-300">
+      {/* Page header  */}
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-light tracking-tight">
+            {t("goals.title")}
+          </h1>
+          <p className="mt-1 text-sm opacity-60">{t("goals.subtitle")}</p>
+        </div>
+      </div>
 
+      {/* Summary cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <SummaryCard
+          icon={<Target size={18} />}
+          label={t("goals.tracking")}
+          value={stats.total}
+          iconClass="text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30"
+          onClick={() => setStatusFilter("ALL")}
+          active={statusFilter === "ALL"}
+        />
+        <SummaryCard
+          icon={<Zap size={18} />}
+          label={t("goals.in_progress")}
+          value={stats.inProgress}
+          iconClass="text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30"
+          onClick={() =>
+            setStatusFilter(
+              statusFilter === "IN_PROGRESS" ? "ALL" : "IN_PROGRESS",
+            )
+          }
+          active={statusFilter === "IN_PROGRESS"}
+        />
+        <SummaryCard
+          icon={<Award size={18} />}
+          label={t("goals.near_completion")}
+          value={stats.near}
+          iconClass="text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/30"
+          onClick={() =>
+            setStatusFilter(
+              statusFilter === "NEAR_COMPLETION" ? "ALL" : "NEAR_COMPLETION",
+            )
+          }
+          active={statusFilter === "NEAR_COMPLETION"}
+        />
+        <SummaryCard
+          icon={<CheckCircle2 size={18} />}
+          label={t("goals.completed")}
+          value={stats.completed}
+          iconClass="text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30"
+          onClick={() =>
+            setStatusFilter(statusFilter === "COMPLETED" ? "ALL" : "COMPLETED")
+          }
+          active={statusFilter === "COMPLETED"}
+        />
+      </div>
+
+      {/* Goals section */}
+      <section className="flex flex-col gap-5 mt-6">
+        {/* Search + filter toolbar */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <h2 className="text-base font-bold">
+            {t("goals.tracking")}
+            {filteredGoals.length !== goals.length && (
+              <span className="ml-2 text-sm font-normal opacity-60">
+                ({filteredGoals.length} / {goals.length})
+              </span>
+            )}
+          </h2>
+
+          <div className="flex items-center gap-2">
+            {/* Search */}
+            <div className="relative flex-1 sm:flex-none sm:w-56">
+              <Search
+                size={14}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+              />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t("goals.search_placeholder")}
+                className="
                                     h-9 w-full pl-9 pr-4
                                     rounded-full
                                     border border-slate-200 dark:border-slate-700
@@ -227,80 +246,92 @@ function GoalsPage() {
                     </div>
                 </div>
 
-                {/* Filter chips — animated */}
-                {showFilters && (
-                    <div className="flex flex-col sm:flex-row flex-wrap gap-x-8 gap-y-4 pb-2 animate-in slide-in-from-top-2 fade-in duration-200 mt-2">
-                        {/* Status filters */}
-                        <div className="flex items-center flex-wrap gap-2.5">
-                            <span className="text-sm font-bold opacity-60 mr-1">
-                                {t("goals.filter_status")}:
-                            </span>
-                            {(["ALL", "IN_PROGRESS", "NEAR_COMPLETION", "COMPLETED", "NOT_STARTED"] as StatusFilter[]).map((s) => (
-                                <FilterChip
-                                    key={s}
-                                    active={statusFilter === s}
-                                    onClick={() => setStatusFilter(s)}
-                                >
-                                    {s === "ALL" ? t("goals.filter_all")
-                                        : s === "IN_PROGRESS" ? t("goals.in_progress")
-                                            : s === "NEAR_COMPLETION" ? t("goals.near_completion")
-                                                : s === "COMPLETED" ? t("goals.completed")
-                                                    : t("goals.not_started")}
-                                </FilterChip>
-                            ))}
-                        </div>
+        {/* Filter chips — animated */}
+        {showFilters && (
+          <div className="flex flex-col sm:flex-row flex-wrap gap-x-8 gap-y-4 pb-2 animate-in slide-in-from-top-2 fade-in duration-200 mt-2">
+            {/* Status filters */}
+            <div className="flex items-center flex-wrap gap-2.5">
+              <span className="text-sm font-bold opacity-60 mr-1">
+                {t("goals.filter_status")}:
+              </span>
+              {(
+                [
+                  "ALL",
+                  "IN_PROGRESS",
+                  "NEAR_COMPLETION",
+                  "COMPLETED",
+                  "NOT_STARTED",
+                ] as StatusFilter[]
+              ).map((s) => (
+                <FilterChip
+                  key={s}
+                  active={statusFilter === s}
+                  onClick={() => setStatusFilter(s)}
+                >
+                  {s === "ALL"
+                    ? t("goals.filter_all")
+                    : s === "IN_PROGRESS"
+                      ? t("goals.in_progress")
+                      : s === "NEAR_COMPLETION"
+                        ? t("goals.near_completion")
+                        : s === "COMPLETED"
+                          ? t("goals.completed")
+                          : t("goals.not_started")}
+                </FilterChip>
+              ))}
+            </div>
 
-                        {/* Type filters */}
-                        <div className="flex items-center flex-wrap gap-2.5">
-                            <span className="text-sm font-bold opacity-60 mr-1">
-                                {t("goals.filter_type")}:
-                            </span>
-                            {(["ALL", "STREAK", "TOTAL_COMPLETIONS"] as TypeFilter[]).map((ty) => (
-                                <FilterChip
-                                    key={ty}
-                                    active={typeFilter === ty}
-                                    onClick={() => setTypeFilter(ty)}
-                                >
-                                    {ty === "ALL" ? t("goals.filter_all")
-                                        : ty === "STREAK" ? t("goals.type_streak")
-                                            : t("goals.type_total")}
-                                </FilterChip>
-                            ))}
-                        </div>
-                    </div>
-                )}
+            {/* Type filters */}
+            <div className="flex items-center flex-wrap gap-2.5">
+              <span className="text-sm font-bold opacity-60 mr-1">
+                {t("goals.filter_type")}:
+              </span>
+              {(["ALL", "STREAK", "TOTAL_COMPLETIONS"] as TypeFilter[]).map(
+                (ty) => (
+                  <FilterChip
+                    key={ty}
+                    active={typeFilter === ty}
+                    onClick={() => setTypeFilter(ty)}
+                  >
+                    {ty === "ALL"
+                      ? t("goals.filter_all")
+                      : ty === "STREAK"
+                        ? t("goals.type_streak")
+                        : t("goals.type_total")}
+                  </FilterChip>
+                ),
+              )}
+            </div>
+          </div>
+        )}
 
-                {/* Goal grid */}
-                {filteredGoals.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                        {filteredGoals.map((g) => {
-                            const habit = allHabits.find((h: any) => h.id === g.habitId);
-                            const habitName = habit ? habit.name : "Thói quen bị ẩn";
-
-                            return (
-                                <GoalCard
-                                    key={g.id}
-                                    goal={{
-                                        ...g,
-                                        color: habit?.color || "indigo"
-                                    }}
-                                    habitName={habitName}
-                                    onSelectDetail={handleSelectDetail}
-                                    onEdit={() => ToastService.info(`${t("goals.edit_goal")}: ${habitName}`)}
-                                    onArchive={() => {
-                                        handleArchiveGoal(g.id);
-                                    }}
-                                    onDelete={() => {
-                                        handleDeleteGoal(g.id);
-                                    }}
-                                />
-                            )
-                        })}
-                    </div>
-                ) : (
-                    /* Empty state */
-                    <div
-                        className="
+        {/* Goal grid */}
+        {filteredGoals.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {filteredGoals.map((g) => (
+              <GoalCard
+                key={g.id}
+                goal={g}
+                habitName={g.habitName}
+                onSelectDetail={handleSelectDetail}
+                onEdit={() =>
+                  ToastService.info(`${t("goals.edit_goal")}: ${g.habitName}`)
+                }
+                onArchive={() => {
+                  setGoals((prev) => prev.filter((item) => item.id !== g.id));
+                  ToastService.success(t("goals.archive_success"));
+                }}
+                onDelete={() => {
+                  setGoals((prev) => prev.filter((item) => item.id !== g.id));
+                  ToastService.error(t("goals.delete_success"));
+                }}
+              />
+            ))}
+          </div>
+        ) : (
+          /* Empty state */
+          <div
+            className="
                             flex flex-col items-center justify-center gap-3
                             py-16 px-8
                             rounded-3xl border

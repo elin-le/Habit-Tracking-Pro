@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PAGINATION_ELLIPSIS } from "../../constants/appConstants";
-import { Button } from "../ui/button";
+import { Button } from "../ui/Button";
 import { useTranslation } from "react-i18next";
 interface PaginationProps {
   currentPage: number;
@@ -26,7 +26,7 @@ export function Pagination({
         <Button
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="flex h-9 w-9 items-center justify-center rounded-lg border transition-all disabled:opacity-40"
+          className="cursor-pointer flex h-9 w-9 items-center justify-center rounded-lg border transition-all disabled:opacity-40"
           style={{
             borderColor: "color-mix(in srgb, var(--primary) 15%, transparent)",
             color: "var(--sidebar-muted)",
@@ -58,7 +58,7 @@ export function Pagination({
             <Button
               key={page}
               onClick={() => handlePageChange(page as number)}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-medium transition-all"
+              className="cursor-pointer flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-medium transition-all"
               style={
                 currentPage === page
                   ? {
@@ -98,7 +98,7 @@ export function Pagination({
         <Button
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="flex h-9 w-9 items-center justify-center rounded-lg border transition-all disabled:opacity-40"
+          className="cursor-pointer flex h-9 w-9 items-center justify-center rounded-lg border transition-all disabled:opacity-40"
           style={{
             borderColor: "color-mix(in srgb, var(--primary) 15%, transparent)",
             color: "var(--sidebar-muted)",
