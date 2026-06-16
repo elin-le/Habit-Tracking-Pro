@@ -1,13 +1,14 @@
 export interface SummaryCardType {
     id: number;
     title: string;
-    value: number;
+    value?: number;
+    completed?: number;
+    total?: number;
 }
 
 export interface HabitStatisticsType {
-    currentStreak: number;
-    longestStreak: number;
-    completionRate: number;
+    day: string;
+    rate: number;
 }
 
 export interface CategoryOverviewType {

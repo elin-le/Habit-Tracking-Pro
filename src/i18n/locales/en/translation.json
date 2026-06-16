@@ -222,9 +222,6 @@
     "health": "Health",
     "learning": "Learning",
     "productivity": "Productivity",
-    "goalReadBooks": "Read Book",
-    "goalWorkout": "Practice 20 times per month",
-    "goalDrinkWater": "Drink 2L water per day",
     "days": "Days"
   },
   "notifications":{
