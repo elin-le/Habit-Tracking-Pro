@@ -2,6 +2,8 @@ import { NavLink } from "react-router-dom";
 import { ROUTES } from "../../shared/constants/appConstants"
 import { useTranslation } from "react-i18next"
 import { NotificationBadge } from '../../features/notifications/component/NotificationBadge';
+import type { User } from "../../shared/types/User"
+import { STORAGE_KEY } from "../../shared/constants/appConstants"
 
 
 function HomeIcon({ className = "" }: { className?: string }) {
@@ -74,14 +76,15 @@ interface SidebarProps {
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {
     const { t } = useTranslation();
-
+    const currentUser = JSON.parse(
+        localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "{}"
+    ) as User;
     const NAV_ITEMS = [
         { to: ROUTES.DASHBOARD, label: t("sidebar.dashboard"), icon: HomeIcon },
         { to: ROUTES.HABITS, label: t("sidebar.habits"), icon: HabitsIcon },
         { to: ROUTES.GOALS, label: t("sidebar.goals"), icon: GoalsIcon },
         { to: "/dashboard/statistics", label: t("sidebar.statistics"), icon: StatisticsIcon },
         { to: "/dashboard/notifications", label: t('sidebar.notifications'), icon: BellIcon, badge: <NotificationBadge /> },
-        // { to: "/settings", label: "Settings", icon: SettingsIcon },
     ];
 
 
@@ -89,10 +92,12 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
         <div className="flex flex-col h-full px-3 py-6">
             {/* Logo */}
             <div className="flex items-center gap-3 px-2 mb-8">
-                <div className="w-9 h-9 bg-violet-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
-                    </svg>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center flex-shrink-0">
+                    <img
+                        src="/favicon.svg"
+                        alt="Habit Tracking Pro"
+                        className="w-full h-full object-contain"
+                    />
                 </div>
                 <span className="text-lg font-semibold text-white tracking-tight">HabitPro</span>
                 {/* Close button - mobile only */}
@@ -137,12 +142,16 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
 
             {/* User Profile */}
             <div className="flex items-center gap-3 p-3 rounded-xl border border-white/10 mt-4">
-                <div className="w-9 h-9 rounded-full bg-violet-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
-                    AJ
+                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden shrink-0 bg-violet-600">
+                    <img
+                        src={currentUser.avt}
+                        alt={currentUser.username}
+                        className="w-full h-full object-cover"
+                    />
                 </div>
                 <div className="overflow-hidden">
-                    <p className="text-sm font-medium text-white truncate leading-tight">Alex Johnson</p>
-                    <p className="text-xs text-violet-400 truncate leading-tight">alex@email.com</p>
+                    <p className="text-sm font-medium text-white truncate leading-tight">{currentUser.username}</p>
+                    <p className="text-xs text-violet-400 truncate leading-tight">{currentUser.phone}</p>
                 </div>
             </div>
         </div>

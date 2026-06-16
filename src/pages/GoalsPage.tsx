@@ -17,6 +17,7 @@ import GoalForm from "../shared/components/forms/GoalForm";
 import { STORAGE_KEY } from "../shared/constants/appConstants";
 import { Modal } from "../shared/components/ui/Modal";
 import { Button } from "../shared/components/ui/Button";
+import type { Habit } from "../shared/types/Habit";
 
 // GoalsPage 
 function GoalsPage() {
@@ -39,12 +40,12 @@ function GoalsPage() {
 
     // Get all habits from local storage
     const allHabits = useMemo(() => {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY.USER_HABITS) || "[]");
+        return JSON.parse(localStorage.getItem(STORAGE_KEY.USER_HABITS) || "[]") as Habit[];
     }, []);
 
     const habitsWithoutGoal = useMemo(() => {
         const activeGoalHabitIds = new Set(goals.filter(g => g.progress.status === "NOT_STARTED" || g.progress.status === "IN_PROGRESS").map((g) => g.habitId));
-        return allHabits.filter((h: any) => !activeGoalHabitIds.has(h.id));
+        return allHabits.filter((h: Habit) => !activeGoalHabitIds.has(h.id));
     }, [allHabits, goals]);
 
     const [showFilters, setShowFilters] = useState(false);
@@ -282,7 +283,7 @@ function GoalsPage() {
                                     key={g.id}
                                     goal={{
                                         ...g,
-                                        color: habit?.color || "indigo"
+                                        color: "indigo"
                                     }}
                                     habitName={habitName}
                                     onSelectDetail={handleSelectDetail}

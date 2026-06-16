@@ -15,23 +15,37 @@ import "../features/dashboard/Dashboard.css";
 const DashboardPage = () => {
     return (
         <div className="dashboard-page">
-            <SummaryCard
-                summaryCards={SUMMARY_CARDS}
-            />
 
-            <HabitStatistics
-                statistics={HABIT_STATISTICS}
-            />
-
-            <div className="dashboard-page__content">
-                <CategoryOverview
-                    categories={CATEGORY_OVERVIEW}
+            {/* Summary */}
+            <section className="dashboard-summary">
+                <SummaryCard
+                    summaryCards={SUMMARY_CARDS}
                 />
+            </section>
 
-                <GoalProgress
-                    goals={GOAL_PROGRESS}
-                />
-            </div>
+            {/* Main Content */}
+            <section className="dashboard-grid">
+
+                <div className="dashboard-grid__category">
+                    <CategoryOverview
+                        categories={CATEGORY_OVERVIEW}
+                    />
+                </div>
+
+                <div className="dashboard-grid__statistics">
+                    <HabitStatistics
+                        statistics={HABIT_STATISTICS}
+                    />
+                </div>
+
+                <div className="dashboard-grid__goals">
+                    <GoalProgress
+                        goals={GOAL_PROGRESS}
+                    />
+                </div>
+
+            </section>
+
         </div>
     );
 };

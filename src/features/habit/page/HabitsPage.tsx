@@ -5,18 +5,27 @@ import { usePagination } from "../../../shared/hooks/usePagination";
 import { Pagination } from "../../../shared/components/common/Pagination";
 import { useTranslation } from "react-i18next";
 import { useOutletContext } from "react-router-dom";
-import type { Habit } from "../../../shared/types/Habit";
-import type { HabitSchedule } from "../../../shared/types/HabitSchedule";
+import type { Habit, HabitStatus, Priority } from "../../../shared/types/Habit";
+import type {
+  DaysOfWeek,
+  HabitSchedule,
+} from "../../../shared/types/HabitSchedule";
 import { HabitForm } from "../../../shared/components/forms/HabitForm";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { DAY_OF_WEEK_MAP } from "@/shared/constants/appConstants";
+import { useDebounce } from "@/shared/hooks/useDebounce";
+import type { Category } from "@/shared/types/Category";
 
 type LayoutContext = {
   habits: Habit[];
   createHabit: (habit: Habit) => void;
   updateHabit: (habit: Habit) => void;
+  deleteHabit: (habitId: string) => void;
   habitSchedules: HabitSchedule[];
   createHabitSchedules: (s: HabitSchedule[]) => void;
   replaceHabitSchedules: (habitId: string, s: HabitSchedule[]) => void;
+  deleteHabitSchedulesByHabitId: (habitId: string) => void;
+  categories: Category[];
   showAddForm: boolean;
   setShowAddForm: (v: boolean) => void;
 };
@@ -26,25 +35,94 @@ export function HabitsPage() {
   const {
     habits,
     showAddForm,
+    habitSchedules,
+    categories,
     createHabit,
     createHabitSchedules,
     setShowAddForm,
     updateHabit,
     replaceHabitSchedules,
+    deleteHabit,
+    deleteHabitSchedulesByHabitId,
   } = useOutletContext<LayoutContext>();
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
+  const [updatingHabit, setUpdatingHabit] = useState<Habit | null>(null);
+
+  const [filterCategory, setFilterCategory] = useState<string | null>(null);
+  const [filterPriority, setFilterPriority] = useState<Priority | null>(null);
+  const [filterStatus, setFilterStatus] = useState<HabitStatus | null>(
+    "ACTIVE",
+  );
+  const [frequencyFilter, setFrequencyFilter] = useState<DaysOfWeek | null>(
+    DAY_OF_WEEK_MAP[new Date().getDay()],
+  );
+
+  const handleClearAll = () => {
+    setFilterCategory(null);
+    setFilterPriority(null);
+    setFilterStatus("ACTIVE");
+    setFrequencyFilter(DAY_OF_WEEK_MAP[new Date().getDay()]);
+  };
+
+  const isScheduledOnDow = (habit: Habit, dow: DaysOfWeek) => {
+    if (habit.frequencyType === "DAILY") return true;
+    return habitSchedules.some(
+      (s) => s.habitId === habit.id && s.dayOfWeek === dow,
+    );
+  };
+
+  const filteredHabits = useMemo(() => {
+    return habits.filter((habit) => {
+      const statusOk = filterStatus
+        ? habit.status === filterStatus
+        : habit.status === "ACTIVE";
+
+      const categoryOk = !filterCategory || habit.categoryId === filterCategory;
+
+      const priorityOk = !filterPriority || habit.priority === filterPriority;
+
+      let scheduleOk = true;
+      if (statusOk && habit.status === "ACTIVE" && frequencyFilter) {
+        scheduleOk = isScheduledOnDow(habit, frequencyFilter);
+      }
+
+      // console.log(habit.name, {
+      //   statusOk,
+      //   categoryOk,
+      //   priorityOk,
+      //   scheduleOk,
+      //   status: habit.status,
+      // });
+
+      return statusOk && categoryOk && priorityOk && scheduleOk;
+    });
+  }, [
+    habits,
+    habitSchedules,
+    filterCategory,
+    filterPriority,
+    filterStatus,
+    frequencyFilter,
+  ]);
+
+  // console.log(filterCategory);
+  // console.log(filterPriority);
+  // console.log(filterStatus);
+  // console.log(frequencyFilter);
 
   const {
     currentPage,
     totalPages,
     paginatedItems,
-    // filteredItems,
+    filteredItems,
     getPageNumbers,
     handlePageChange,
-  } = usePagination(habits, "", (habit, query) =>
+  } = usePagination(filteredHabits, debouncedSearchQuery, (habit, query) =>
     habit.name.toLowerCase().includes(query.toLowerCase()),
   );
-
-  const [updatingHabit, setUpdatingHabit] = useState<Habit | null>(null);
 
   return (
     <div className="animate-in">
@@ -72,6 +150,8 @@ export function HabitsPage() {
         />
         <input
           type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={t("habit.search")}
           className="w-full rounded-lg border py-2 pl-9 pr-3 text-sm outline-none transition-all
       focus:ring-2"
@@ -85,11 +165,22 @@ export function HabitsPage() {
 
       {/* Filter */}
       <div className="mb-5">
-        <HabitFilter />
+        <HabitFilter
+          categories={categories}
+          selectedCategory={filterCategory}
+          onCategoryChange={setFilterCategory}
+          selectedPriority={filterPriority}
+          onPriorityChange={setFilterPriority}
+          selectedStatus={filterStatus}
+          onStatusChange={setFilterStatus}
+          frequencyFilter={frequencyFilter}
+          onFrequencyChange={setFrequencyFilter}
+          onClearAll={handleClearAll}
+        />
       </div>
 
       {/* Empty State */}
-      {habits.length === 0 ? (
+      {filteredItems.length === 0 ? (
         <div
           className="rounded-xl border px-5 py-16 text-center"
           style={{
@@ -108,20 +199,30 @@ export function HabitsPage() {
             className="mb-2 text-2xl font-light"
             style={{ color: "var(--text)" }}
           >
-            {t("habit.ept-1")}
+            {habits.length === 0
+              ? `${t("habit.ept-1")}`
+              : searchQuery
+                ? `${t("habit.ept-5")}`
+                : `${t("habit.ept-3")}`}
           </h3>
 
           <p className="mb-5 text-sm" style={{ color: "var(--sidebar-muted)" }}>
-            {t("habit.ept-2")}
+            {habits.length === 0
+              ? `${t("habit.ept-2")}`
+              : searchQuery
+                ? `${t("habit.ept-6")}`
+                : `${t("habit.ept-4")}`}
           </p>
 
-          <button
-            className="rounded-lg px-4 py-2 text-sm font-medium transition-all"
-            style={{ background: "var(--primary)", color: "var(--bg)" }}
-            onClick={() => setShowAddForm(true)}
-          >
-            {t("habit.btn_create")}
-          </button>
+          {habits.length === 0 && (
+            <button
+              className="rounded-lg px-4 py-2 text-sm font-medium transition-all"
+              style={{ background: "var(--primary)", color: "var(--bg)" }}
+              onClick={() => setShowAddForm(true)}
+            >
+              {t("habit.btn_create")}
+            </button>
+          )}
         </div>
       ) : (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -130,6 +231,12 @@ export function HabitsPage() {
               key={habit.id}
               habit={habit}
               onUpdate={() => setUpdatingHabit(habit)}
+              onUpdateStatus={(status) => updateHabit({ ...habit, status })}
+              onDelete={() => {
+                deleteHabit(habit.id);
+                deleteHabitSchedulesByHabitId(habit.id);
+              }}
+              categories={categories}
             />
           ))}
         </div>
@@ -147,17 +254,22 @@ export function HabitsPage() {
           onClose={() => setShowAddForm(false)}
           onSubmit={createHabit}
           onSubmitSchedules={createHabitSchedules}
+          categories={categories}
         />
       )}
 
       {updatingHabit && (
         <HabitForm
           initial={updatingHabit}
+          initialSchedules={habitSchedules.filter(
+            (s) => s.habitId === updatingHabit.id,
+          )}
           onClose={() => setUpdatingHabit(null)}
           onSubmit={updateHabit}
           onSubmitSchedules={(schedules) =>
             replaceHabitSchedules(updatingHabit.id, schedules)
           }
+          categories={categories}
         />
       )}
     </div>

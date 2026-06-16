@@ -7,6 +7,9 @@ import type { HabitSchedule } from "../../shared/types/HabitSchedule";
 import { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import { NotificationContext } from "../../features/notifications/context/NotificationContext";
+import type { Category } from "../../shared/types/Category"
+import type { User } from "../../shared/types/User"
+import { STORAGE_KEY } from "../../shared/constants/appConstants"
 
 interface HeaderProps {
   title?: string;
@@ -129,7 +132,8 @@ export default function Header({
   const { t, i18n } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const [lang, setLang] = useState<"EN" | "VI">("EN");
-
+  const categories = JSON.parse(localStorage.getItem(STORAGE_KEY.CATEGORYS) || "[]") as Category[];
+  const currentUser = JSON.parse(localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "{}") as User;
   const { unreadCount } = useContext(NotificationContext);
 
   const greeting = (() => {
@@ -154,13 +158,13 @@ export default function Header({
       <div className="flex md:hidden items-center justify-between gap-3 px-5 pt-8 pb-3">
         {/* Left: Avatar + greeting */}
         <div className="flex items-center gap-3 min-w-0">
-          <AvatarBadge name={title ?? userName} src={avatarUrl} />
+          <AvatarBadge name={currentUser.username} src={currentUser.avt} />
           <div className="min-w-0">
             <p className="text-xs text-violet-400 font-medium truncate">
               {subtitle ?? `${greeting},`}
             </p>
             <h1 className="text-lg font-bold leading-tight truncate">
-              {title ?? userName} 👋
+              {title + " " + currentUser.username}
             </h1>
           </div>
         </div>
@@ -222,7 +226,7 @@ export default function Header({
         {/* Title */}
         <div className="flex-1 min-w-0">
           <h1 className="text-3xl font-bold leading-tight truncate">
-            {title ?? `${greeting}!`}
+            {title + " " + currentUser.username}
           </h1>
           <p className="text-base text-violet-400 mt-1 leading-tight truncate">
             {subtitle ?? "Here's your progress overview"}
@@ -327,6 +331,7 @@ export default function Header({
               onClose={() => setShowAddForm(false)}
               onSubmit={createHabit}
               onSubmitSchedules={createHabitSchedules}
+              categories={categories}
             />
           )}
         </div>

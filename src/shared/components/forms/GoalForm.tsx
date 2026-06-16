@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import type { TargetType } from "../../types/Goal";
 import { AlertCircle, Flame, Target, Calendar } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Button } from "../ui/button";
+import { Button } from "../ui/Button";
 import "./GoalForm.css";
 
 // Types

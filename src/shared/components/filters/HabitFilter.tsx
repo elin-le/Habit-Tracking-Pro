@@ -2,28 +2,64 @@ import { CalendarIcon, SlidersHorizontal } from "lucide-react";
 import { FilterChip } from "../common/FilterChip";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { format } from "date-fns";
-import { useState } from "react";
 import { Calendar } from "../ui/calendar";
-import { Button } from "../ui/button";
-import { DAYS } from "@/shared/constants/appConstants";
+import { Button } from "../ui/Button";
+import { DAY_OF_WEEK_MAP, DAYS } from "@/shared/constants/appConstants";
 import { cn } from "@/shared/lib/utils";
 import { useTranslation } from "react-i18next";
 import { enUS, vi } from "date-fns/locale";
+import type { HabitStatus, Priority } from "@/shared/types/Habit";
+import type { DaysOfWeek } from "@/shared/types/HabitSchedule";
+import { useState } from "react";
+import type { Category } from "@/shared/types/Category";
 
-export function HabitFilter() {
+interface HabitFilterProps {
+  categories: Category[];
+  selectedCategory: string | null;
+  onCategoryChange: (id: string | null) => void;
+  selectedPriority: Priority | null;
+  onPriorityChange: (p: Priority | null) => void;
+  selectedStatus: HabitStatus | null;
+  onStatusChange: (s: HabitStatus | null) => void;
+  frequencyFilter: DaysOfWeek | null;
+  onFrequencyChange: (v: DaysOfWeek | null) => void;
+  onClearAll: () => void;
+}
+
+export function HabitFilter({
+  categories,
+  selectedCategory,
+  onCategoryChange,
+  selectedPriority,
+  onPriorityChange,
+  selectedStatus,
+  onStatusChange,
+  frequencyFilter,
+  onFrequencyChange,
+  onClearAll,
+}: HabitFilterProps) {
   const { t, i18n } = useTranslation();
   const locale = i18n.language === "vi" ? vi : enUS;
 
-  const [selectedDays, setSelectedDays] = useState<number[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
-  const [date, setDate] = useState<Date>();
+  const [calendarDate, setCalendarDate] = useState<Date | undefined>();
 
-  const toggleDay = (day: number) => {
-    setSelectedDate(undefined);
-    setSelectedDays((prev) =>
-      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
-    );
+  const handleWeekdayClick = (dayIndex: number) => {
+    const dow = DAY_OF_WEEK_MAP[dayIndex];
+    setCalendarDate(undefined); // bỏ chọn calendar khi chọn weekday chip
+    onFrequencyChange(frequencyFilter === dow ? null : dow);
   };
+
+  const handleDateSelect = (date: Date | undefined) => {
+    if (!date) return;
+    setCalendarDate(date);
+    onFrequencyChange(DAY_OF_WEEK_MAP[date.getDay()]); // convert ngay thành DaysOfWeek
+  };
+
+  const activeFilterCount =
+    (selectedCategory ? 1 : 0) +
+    (selectedPriority ? 1 : 0) +
+    (selectedStatus === "ACTIVE" ? 0 : 1) +
+    (frequencyFilter === DAY_OF_WEEK_MAP[new Date().getDay()] ? 0 : 1);
 
   return (
     <div
@@ -44,12 +80,14 @@ export function HabitFilter() {
           {t("habit_filter.title")}
         </span>
 
-        <span
-          className="rounded-full px-2 py-0.5 text-[10px] font-bold text-white"
-          style={{ background: "var(--primary)" }}
-        >
-          3
-        </span>
+        {activeFilterCount > 0 && (
+          <span
+            className="rounded-full px-2 py-0.5 text-[10px] font-bold text-white"
+            style={{ background: "var(--primary)" }}
+          >
+            {activeFilterCount}
+          </span>
+        )}
 
         <button
           className="ml-auto text-xs font-medium transition-colors cursor-pointer"
@@ -58,6 +96,7 @@ export function HabitFilter() {
           }}
           onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.8")}
           onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+          onClick={onClearAll}
         >
           {t("habit_filter.btn_clear")}
         </button>
@@ -73,12 +112,21 @@ export function HabitFilter() {
             {t("habit_filter.category")}
           </p>
           <div className="flex flex-wrap gap-2">
-            <FilterChip active>{t("habit_filter.cat-0")}</FilterChip>
-            <FilterChip>{t("habit_filter.cat-1")}</FilterChip>
-            <FilterChip>{t("habit_filter.cat-2")}</FilterChip>
-            <FilterChip>{t("habit_filter.cat-3")}</FilterChip>
-            <FilterChip>{t("habit_filter.cat-4")}</FilterChip>
-            <FilterChip>{t("habit_filter.cat-5")}</FilterChip>
+            <FilterChip
+              active={!selectedCategory}
+              onClick={() => onCategoryChange(null)}
+            >
+              {t("habit_filter.cat-0")}
+            </FilterChip>
+            {categories.map((cat) => (
+              <FilterChip
+                key={cat.id}
+                active={selectedCategory === cat.id}
+                onClick={() => onCategoryChange(cat.id)}
+              >
+                {t(`habit_form.${cat.name}`)}
+              </FilterChip>
+            ))}
           </div>
         </div>
 
@@ -91,10 +139,30 @@ export function HabitFilter() {
             {t("habit_filter.priority")}
           </p>
           <div className="flex flex-wrap gap-2">
-            <FilterChip active>{t("habit_filter.pri-0")}</FilterChip>
-            <FilterChip>{t("habit_filter.pri-1")}</FilterChip>
-            <FilterChip>{t("habit_filter.pri-2")}</FilterChip>
-            <FilterChip>{t("habit_filter.pri-3")}</FilterChip>
+            <FilterChip
+              active={!selectedPriority}
+              onClick={() => onPriorityChange(null)}
+            >
+              {t("habit_filter.pri-0")}
+            </FilterChip>
+            <FilterChip
+              active={selectedPriority === "LOW"}
+              onClick={() => onPriorityChange("LOW")}
+            >
+              {t("habit_filter.pri-1")}
+            </FilterChip>
+            <FilterChip
+              active={selectedPriority === "MEDIUM"}
+              onClick={() => onPriorityChange("MEDIUM")}
+            >
+              {t("habit_filter.pri-2")}
+            </FilterChip>
+            <FilterChip
+              active={selectedPriority === "HIGH"}
+              onClick={() => onPriorityChange("HIGH")}
+            >
+              {t("habit_filter.pri-3")}
+            </FilterChip>
           </div>
         </div>
 
@@ -107,10 +175,30 @@ export function HabitFilter() {
             {t("habit_filter.status")}
           </p>
           <div className="flex flex-wrap gap-2">
-            <FilterChip active>{t("habit_filter.st-0")}</FilterChip>
-            <FilterChip>{t("habit_filter.st-1")}</FilterChip>
-            <FilterChip>{t("habit_filter.st-2")}</FilterChip>
-            <FilterChip>{t("habit_filter.st-3")}</FilterChip>
+            <FilterChip
+              active={!selectedStatus}
+              onClick={() => onStatusChange(null)}
+            >
+              {t("habit_filter.st-0")}
+            </FilterChip>
+            <FilterChip
+              active={selectedStatus === "ACTIVE"}
+              onClick={() => onStatusChange("ACTIVE")}
+            >
+              {t("habit_filter.st-1")}
+            </FilterChip>
+            <FilterChip
+              active={selectedStatus === "PAUSED"}
+              onClick={() => onStatusChange("PAUSED")}
+            >
+              {t("habit_filter.st-2")}
+            </FilterChip>
+            <FilterChip
+              active={selectedStatus === "ARCHIVED"}
+              onClick={() => onStatusChange("ARCHIVED")}
+            >
+              {t("habit_filter.st-3")}
+            </FilterChip>
           </div>
         </div>
 
@@ -124,86 +212,27 @@ export function HabitFilter() {
           </p>
 
           <div className="flex flex-wrap items-center gap-1.5">
-            {DAYS.map((day) => {
-              const isSelected = selectedDays.includes(day.key);
-              return <FilterChip>{t(`habit_filter.${day.label}`)}</FilterChip>;
-            })}
-
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="ghost"
-                  // onClick={onClick}
-                  className={cn(
-                    "cursor-pointer rounded-full border px-3.5 py-1.5 text-sm font-medium transition-all",
-                    "focus-visible:ring-0 focus-visible:ring-offset-0",
-                    "h-auto",
-                  )}
-                  style={
-                    date
-                      ? {
-                          background: "var(--primary)",
-                          borderColor: "var(--primary)",
-                          color: "#fff",
-                          boxShadow:
-                            "0 0 0 2px color-mix(in srgb, var(--primary) 18%, transparent)",
-                        }
-                      : {
-                          background: "transparent",
-                          borderColor:
-                            "color-mix(in srgb, var(--primary) 18%, transparent)",
-                          color: "var(--sidebar-muted)",
-                        }
-                  }
-                  onMouseEnter={(e) => {
-                    if (!date) {
-                      e.currentTarget.style.color = "var(--text)";
-                      e.currentTarget.style.background =
-                        "color-mix(in srgb, var(--primary) 8%, transparent)";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!date) {
-                      e.currentTarget.style.color = "var(--sidebar-muted)";
-                      e.currentTarget.style.background = "transparent";
-                    }
-                  }}
-                >
-                  <CalendarIcon size={14} />
-                  {date
-                    ? format(date, "dd/MM/yyyy")
-                    : `${t("habit_filter.pad")}`}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                className="w-auto p-0 shadow-xl border-0"
-                align="start"
-                sideOffset={4}
-                style={{
-                  boxShadow:
-                    "0 8px 32px -4px rgba(0,0,0,0.18), 0 2px 8px -2px rgba(0,0,0,0.1)",
-                  borderRadius: "12px",
-                  overflow: "hidden",
-                }}
-              >
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  locale={locale}
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          {selectedDate && (
-            <p
-              className="mt-2 text-xs"
-              style={{ color: "var(--sidebar-muted)" }}
+            <FilterChip
+              active={!frequencyFilter && !calendarDate}
+              onClick={() => {
+                onFrequencyChange(null);
+                setCalendarDate(undefined);
+              }}
             >
-              {t("habit_filter.filter_by")} {format(selectedDate, "PPP")}
-            </p>
-          )}
+              {t("habit_filter.All")}
+            </FilterChip>
+
+            {DAYS.map((day) => (
+              <FilterChip
+                key={day.key}
+                active={frequencyFilter === DAY_OF_WEEK_MAP[day.key]}
+                onClick={() => handleWeekdayClick(day.key)}
+              >
+                {t(`habit_filter.${day.label}`)}
+              </FilterChip>
+            ))}
+
+          </div>
         </div>
       </div>
     </div>
