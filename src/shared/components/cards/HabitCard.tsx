@@ -5,22 +5,42 @@ import {
   Plus,
   Minus,
   History,
+  Trash2,
 } from "lucide-react";
 import { useState } from "react";
 import { DropdownMenu } from "../common/DropdownMenu";
-import type { Habit } from "../../types/Habit";
+import type { Habit, HabitStatus } from "../../types/Habit";
 import { CATEGORY_ICONS, PRIORITY_COLORS } from "../../constants/appConstants";
 import { mockCategories } from "../../../data/category";
 import { useTranslation } from "react-i18next";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../ui/alert-dialog";
+import { toast } from "sonner";
 
 interface HabitCardProps {
   habit: Habit;
   onUpdate: () => void;
+  onUpdateStatus: (status: HabitStatus) => void;
+  onDelete: () => void;
 }
 
-export function HabitCard({ habit, onUpdate }: HabitCardProps) {
+export function HabitCard({
+  habit,
+  onUpdate,
+  onUpdateStatus,
+  onDelete,
+}: HabitCardProps) {
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const priorityColor = PRIORITY_COLORS[habit.priority];
   const category = mockCategories.find((c) => c.id === habit.categoryId);
 
@@ -98,6 +118,7 @@ export function HabitCard({ habit, onUpdate }: HabitCardProps) {
       </div>
 
       {/* Checkin */}
+
       <div
         className="rounded-md"
         style={{
@@ -105,46 +126,64 @@ export function HabitCard({ habit, onUpdate }: HabitCardProps) {
         }}
       >
         {/* Hàng chính: ring + status + actions */}
-        <div className="flex items-center gap-3 p-3">
-          <div
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-[3px] text-sm font-medium"
-            style={{ borderColor: "var(--primary)" }}
-          >
-            3/5
-          </div>
-
-          <div className="min-w-0 flex-1">
+        {habit.status === "ACTIVE" ? (
+          <div className="flex items-center gap-3 p-3">
             <div
-              className="flex items-center gap-1.5 whitespace-nowrap text-sm font-medium"
-              style={{ color: "#22c55e" }}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-[3px] text-sm font-medium"
+              style={{ borderColor: "var(--primary)" }}
             >
-              <CheckCircle size={14} className="shrink-0" /> Completed today
+              3/5
+            </div>
+
+            <div className="min-w-0 flex-1">
+              <div
+                className="flex items-center gap-1.5 whitespace-nowrap text-sm font-medium"
+                style={{ color: "#22c55e" }}
+              >
+                <CheckCircle size={14} className="shrink-0" /> Completed today
+              </div>
+            </div>
+
+            <div className="flex shrink-0 gap-1.5">
+              <button
+                className="flex h-7 w-7 items-center justify-center rounded-full border"
+                style={{
+                  borderColor: "var(--sidebar-muted)",
+                  color: "var(--sidebar-muted)",
+                }}
+              >
+                <Minus size={13} />
+              </button>
+              <button
+                className="flex h-7 w-7 items-center justify-center rounded-full border"
+                style={{
+                  borderColor: "var(--primary)",
+                  background:
+                    "color-mix(in srgb, var(--primary) 12%, transparent)",
+                  color: "var(--primary)",
+                }}
+              >
+                <Plus size={13} />
+              </button>
             </div>
           </div>
-
-          <div className="flex shrink-0 gap-1.5">
-            <button
-              className="flex h-7 w-7 items-center justify-center rounded-full border"
-              style={{
-                borderColor: "var(--sidebar-muted)",
-                color: "var(--sidebar-muted)",
-              }}
-            >
-              <Minus size={13} />
-            </button>
-            <button
-              className="flex h-7 w-7 items-center justify-center rounded-full border"
-              style={{
-                borderColor: "var(--primary)",
-                background:
-                  "color-mix(in srgb, var(--primary) 12%, transparent)",
-                color: "var(--primary)",
-              }}
-            >
-              <Plus size={13} />
-            </button>
+        ) : (
+          <div
+            style={{
+              background: "var(--bg-deep)",
+              borderRadius: "var(--radius-sm)",
+              padding: "10px 12px",
+              fontSize: 12,
+              color: "var(--text-muted)",
+              textAlign: "center",
+              fontStyle: "italic",
+            }}
+          >
+            {t("habit_card.mess")}{" "}
+            {t(`habit_card.${habit.status.toLowerCase()}`)}
+            {" !"}
           </div>
-        </div>
+        )}
 
         {/* Footer: View history */}
         <div
@@ -166,14 +205,111 @@ export function HabitCard({ habit, onUpdate }: HabitCardProps) {
 
       {menuOpen && (
         <DropdownMenu
+          habitName={habit.name}
           onClose={() => setMenuOpen(false)}
           status={habit.status}
           onUpdate={() => {
             onUpdate();
             setMenuOpen(false);
           }}
+          onUpdateStatus={(status) => {
+            onUpdateStatus(status);
+            setMenuOpen(false);
+          }}
+          onDelete={() => {
+            setMenuOpen(false);
+            setDeleteDialogOpen(true);
+          }}
         />
       )}
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent
+          className="max-w-sm rounded-3xl border shadow-2xl"
+          style={{
+            background: "var(--surface)",
+            borderColor: "color-mix(in srgb, var(--primary) 25%, transparent)",
+            boxShadow:
+              "0 20px 60px color-mix(in srgb, var(--primary) 15%, transparent)",
+          }}
+        >
+          <AlertDialogHeader className="items-center text-center">
+            <div
+              className="mb-4 flex h-16 w-16 items-center justify-center rounded-full"
+              style={{
+                background: "color-mix(in srgb, #ef4444 12%, transparent)",
+              }}
+            >
+              <Trash2 size={28} className="text-red-500" />
+            </div>
+
+            <AlertDialogTitle
+              className="text-2xl font-semibold"
+              style={{ color: "var(--text)" }}
+            >
+              {t("habit_a-dialog.title")}
+            </AlertDialogTitle>
+
+            <AlertDialogDescription
+              className="mt-2 text-sm leading-relaxed"
+              style={{ color: "var(--sidebar-muted)" }}
+            >
+              {t("habit_a-dialog.content-1")}
+              <span
+                className="mx-1 font-semibold"
+                style={{ color: "var(--text)" }}
+              >
+                "{habit.name}"
+              </span>
+              ?<br />
+              {t("habit_a-dialog.content-2")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter className="mt-3 gap-2">
+            <AlertDialogCancel
+              className="cursor-pointer rounded-xl transition-all duration-200"
+              style={{
+                borderColor:
+                  "color-mix(in srgb, var(--primary) 20%, transparent)",
+                background:
+                  "color-mix(in srgb, var(--primary) 4%, transparent)",
+                color: "var(--text)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background =
+                  "color-mix(in srgb, var(--primary) 10%, transparent)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background =
+                  "color-mix(in srgb, var(--primary) 4%, transparent)";
+              }}
+            >
+              {t("habit_a-dialog.btn_1")}
+            </AlertDialogCancel>
+
+            <AlertDialogAction
+              className="cursor-pointer rounded-xl border-0 text-white transition-all duration-200"
+              style={{
+                background: "linear-gradient(135deg, #ef4444, #dc2626)",
+                boxShadow: "0 8px 24px rgba(239,68,68,0.25)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = "0.9";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = "1";
+              }}
+              onClick={() => {
+                onDelete();
+                toast.error(`"${habit.name}" has been deleted`);
+              }}
+            >
+              {t("habit_a-dialog.btn_2")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
