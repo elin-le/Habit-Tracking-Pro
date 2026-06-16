@@ -14,8 +14,6 @@ import {
 import { useTranslation } from "react-i18next";
 import { MilestoneCard } from "../../../shared/components/cards/MilestoneCard.tsx";
 
-// Types 
-
 interface GoalDetailPanelProps {
     goal: any | null;
     habitName: string;
@@ -25,16 +23,11 @@ interface GoalDetailPanelProps {
     onDelete?: (goalId: string) => void;
 }
 
-// Color config 
-
-// Inline styles for bar chart to avoid Tailwind purge on dynamic classes
 const BAR_COLORS: Record<string, string> = {
     emerald: "#10b981",
     orange: "#f97316",
     indigo: "#4f46e5",
 };
-
-// Mini progress ring for detail panel 
 
 const DetailRing: React.FC<{ percent: number; color: string }> = ({ percent, color }) => {
     const size = 72;

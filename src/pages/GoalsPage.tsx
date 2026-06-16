@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useGoals, type StatusFilter, type TypeFilter } from "../shared/hooks/useGoals";
 import { ToastService } from "../routes/services/toastService";
 import { useTranslation } from "react-i18next";
 import GoalCard from "../shared/components/cards/GoalCard";
@@ -12,7 +13,6 @@ import {
   Search,
   SlidersHorizontal,
 } from "lucide-react";
-
 import GoalForm from "../shared/components/forms/GoalForm";
 import { Modal } from "@/shared/components/ui/Modal";
 import { Button } from "@/shared/components/ui/Button";
@@ -166,20 +166,10 @@ function GoalsPage() {
     setModalOpen(true);
   };
 
-  const handleFormSubmit = (formData: any) => {
-    const newGoal = {
-      ...formData,
-      color: "indigo" as const,
-      stats: { bestStreak: 0, completionRate: 0 },
-      weeklyHistory: [
-        { day: "T2", value: 0 },
-        { day: "T3", value: 0 },
-        { day: "T4", value: 0 },
-        { day: "T5", value: 0 },
-        { day: "T6", value: 0 },
-        { day: "T7", value: 0 },
-        { day: "CN", value: 0 },
-      ],
+    const handleDeleteGoal = (goalId: string) => {
+        deleteGoal(goalId);
+        ToastService.error(t("goals.delete_success"));
+        handleCloseDetail();
     };
     setGoals((prev) => [...prev, newGoal]);
     ToastService.success(t("goals.add_success"));
