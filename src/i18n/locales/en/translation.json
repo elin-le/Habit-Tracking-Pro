@@ -11,7 +11,8 @@
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
-    "copyright": "© 2024 HabitPro · Building better habits every day"
+    "copyright": "© 2024 HabitPro · Building better habits every day",
+    "back": "Back"
   },
   "sidebar": {
     "dashboard": "Dashboard",
@@ -34,7 +35,9 @@
     "btn_create": "Create your first habit",
     "ept-3": "No matching habits",
     "ept-4": "Try adjusting your filters",
-    "search": "Search habits..."
+    "search": "Search habits...",
+    "ept-5": "No results found",
+    "ept-6": "Try a different keyword"
   },
   "habit_form": {
     "title1": "New Habit",
@@ -64,7 +67,8 @@
     "btn_create2": "Save Changes",
     "val-name-1": "*Habit name is required",
     "val-name-2": "*Habit name must be at least 2 characters",
-    "val-name-3": "*Habit name must be under 50 characters"
+    "val-name-3": "*Habit name must be under 50 characters",
+    "paused-hint": "*This habit is paused. Resume the habit to edit its frequency and daily target."
   },
   "days": {
     "sun": "Sun",
@@ -77,10 +81,11 @@
   },
   "dd-menu": {
     "Edit": "Edit",
-    "SetGoal": "Set Goal",
+    "Set Goal": "Set Goal",
     "Pause": "Pause",
     "Resume": "Resume",
     "Archive": "Archive",
+    "Unarchive": "Unarchive",
     "Delete": "Delete"
   },
   "habit_filter": {
@@ -113,7 +118,31 @@
     "Fr": "Fr",
     "Sa": "Sa",
     "filter_by": "Filtering by: ",
-    "pad": "Pick a date"
+    "pad": "Pick a date",
+    "SUNDAY": "Sunday",
+    "MONDAY": "Monday",
+    "TUESDAY": "Tuesday",
+    "WEDNESDAY": "Wednesday",
+    "THURSDAY": "Thursday",
+    "FRIDAY": "Friday",
+    "SATURDAY": "Saturday"
+  },
+  "habit_card": {
+    "mess": "This habit is ",
+    "paused": "paused",
+    "archived": "archived"
+  },
+  "habit_toast": {
+    "toast-1": " has been paused",
+    "toast-2": " has been resumed",
+    "toast-3": "  has been archived"
+  },
+  "habit_a-dialog": {
+    "title": "Delete Habit",
+    "content-1": "Are you sure you want to delete ",
+    "content-2": "This action cannot be undone.",
+    "btn_1": "Cancel",
+    "btn_2": "Delete"
   },
   "pagination": {
     "page": "Page",
@@ -210,6 +239,38 @@
     "empty_hint": "Create habits and check in to see your stats here",
     "empty_action": "Create your habit"
   },
+  "notifications": {
+    "title": "Notifications",
+    "description": "Stay updated with your habits and goals progress",
+    "empty": "No notifications yet",
+    "listTitle": "Recent Notifications",
+    "markAllRead": "Mark all as read",
+    "readBtn": "Read",
+    "demoPanel": {
+      "title": "Quick Notification Triggers",
+      "subtitle": "Select milestones below to send alerts and progress updates",
+      "btnGoal80": "Goal reached 80%",
+      "btnGoalAchieved": "Goal completed",
+      "btnMissedHabit": "Missed habit",
+      "btnStreakRisk": "Streak at risk"
+    },
+    "goal_80": {
+      "title": "Almost there!",
+      "message": "Great! You have completed 80% of your {{habitName}} goal."
+    },
+    "goal_achieved": {
+      "title": "Goal completed!",
+      "message": "Congratulations! You have completed your {{habitName}} goal."
+    },
+    "missed_habit": {
+      "title": "Habit missed",
+      "message": "You missed your {{habitName}} habit yesterday. Keep going today!"
+    },
+    "streak_risk": {
+      "title": "Streak at risk!",
+      "message": "Careful! You are about to break your {{streakCount}}-day {{habitName}} streak."
+    }
+  },
   "dashboard": {
     "completedToday": "Completion today",
     "activeHabits": "Active Habits",
@@ -224,11 +285,8 @@
     "productivity": "Productivity",
     "days": "Days"
   },
-  "notifications":{
-    "title":"Title",
-    "description":"Description",
-    "listTitle":"List Title",
-    "markAllRead":"Mark All Read",
-    "readBtn":"Read"
+  "checkin":{
+    "history":"Check-in History",
+    "no":"Empty"
   }
 }

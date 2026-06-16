@@ -1,0 +1,20 @@
+@import "../../../index.css" reference;
+
+.goal-input {
+    @apply w-full h-12 rounded-2xl text-sm font-medium border border-input bg-background text-foreground placeholder:text-muted-foreground outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-200;
+}
+
+.goal-input-error {
+    @apply border-destructive focus:ring-destructive/20;
+}
+
+.no-spin-buttons::-webkit-inner-spin-button,
+.no-spin-buttons::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.no-spin-buttons {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}

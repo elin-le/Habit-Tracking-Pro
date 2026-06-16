@@ -1,4 +1,6 @@
+import { useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { NotificationContext } from "../../features/notifications/context/NotificationContext";
 
 const TABS = [
   {
@@ -23,8 +25,8 @@ const TABS = [
   {
     value: "notifications",
     label: "Alerts",
-    path: "/notifications",
-    icon: (active: boolean) => (
+    path: "/dashboard/notifications",
+    icon: (_active: boolean) => (
       <svg
         width="22"
         height="22"
@@ -134,6 +136,7 @@ const TABS = [
 export default function BottomTabBar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { unreadCount } = useContext(NotificationContext);
 
   return (
     <nav
@@ -142,20 +145,26 @@ export default function BottomTabBar() {
     >
       <div className="flex items-center justify-around px-2 pt-2 pb-3">
         {TABS.map((tab) => {
-          const active = location.pathname.startsWith(tab.path);
+          const active = tab.value === "home"
+            ? location.pathname === tab.path
+            : location.pathname.startsWith(tab.path);
           return (
             <button
               key={tab.value}
               onClick={() => navigate(tab.path)}
               className={[
-                "flex flex-col items-center gap-1 px-4 py-1 rounded-xl transition-colors",
+                "relative flex flex-col items-center gap-1 px-4 py-1 rounded-xl transition-colors",
                 active ? "text-violet-600" : "text-gray-400",
               ].join(" ")}
             >
-              {tab.icon(active)}
-              {tab.value === "notifications" && (
-                <span className="absolute top-0.5 right-3 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
-              )}
+              <div className="relative">
+                {tab.icon(active)}
+                {tab.value === "notifications" && unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1.5 bg-red-500 text-white text-[8px] font-bold min-w-[15px] h-[15px] rounded-full flex items-center justify-center px-0.5 border border-white">
+                    {unreadCount}
+                  </span>
+                )}
+              </div>
               <span
                 className={[
                   "text-[10px] font-medium",

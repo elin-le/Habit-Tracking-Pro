@@ -1,7 +1,7 @@
 export interface SummaryCardType {
     id: number;
     title: string;
-    value?: number;
+    value?: number | string;
     completed?: number;
     total?: number;
 }

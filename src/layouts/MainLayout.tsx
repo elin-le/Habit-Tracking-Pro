@@ -7,6 +7,7 @@ import BottomTabBar from "./components/BottomTabBar";
 import { useTranslation } from "react-i18next";
 import { useHabitSchedule } from "../shared/hooks/useHabitSchedule";
 import { useHabits } from "../shared/hooks/useHabit";
+import { useCategories } from "@/shared/hooks/useCategory";
 
 export default function MainLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -15,6 +16,7 @@ export default function MainLayout() {
 
   const habitSchedule = useHabitSchedule();
   const habitData = useHabits();
+  const categoryData = useCategories();
 
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--bg)]">
@@ -37,9 +39,13 @@ export default function MainLayout() {
               habits: habitData.habits,
               createHabit: habitData.createHabit,
               updateHabit: habitData.updateHabit,
+              deleteHabit: habitData.deleteHabit,
               habitSchedules: habitSchedule.habitSchedules,
-              replaceHabitSchedules: habitSchedule.replaceHabitSchedules,
               createHabitSchedules: habitSchedule.createHabitSchedules,
+              replaceHabitSchedules: habitSchedule.replaceHabitSchedules,
+              deleteHabitSchedulesByHabitId:
+                habitSchedule.deleteHabitSchedulesByHabitId,
+              categories: categoryData.categories,
               showAddForm,
               setShowAddForm,
             }}

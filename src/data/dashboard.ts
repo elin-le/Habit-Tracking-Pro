@@ -17,8 +17,8 @@ export const SUMMARY_CARDS: SummaryCardType[] = [
         title: "dashboard.activeHabits",
         value: 8,
     },
-    {
-          id: 3,
+     {
+        id: 3,
         title: "dashboard.currentStreak",
         value: "12 Days",
     },
@@ -74,4 +74,3 @@ export const GOAL_PROGRESS: GoalProgressType[] = [
         progress: 58,
     },
 ];
-

@@ -1,4 +1,6 @@
 {
+ 
+
   "auth": {
     "welcome": "Chào mừng quay lại!",
     "phone": "Số điện thoại",
@@ -34,7 +36,9 @@
     "btn_create": "Tạo thói quen đầu tiên của bạn",
     "ept-3": "Không tìm thấy thói quen phù hợp",
     "ept-4": "Hãy thử điều chỉnh bộ lọc của bạn",
-    "search": "Tìm kiếm thói quen..."
+    "search": "Tìm kiếm thói quen...",
+    "ept-5": "Không tìm thấy kết quả",
+    "ept-6": "Hãy thử từ khóa khác"
   },
   "habit_form": {
     "title1": "Thói quen mới",
@@ -64,7 +68,8 @@
     "btn_create2": "Lưu thay đổi",
     "val-name-1": "*Tên thói quen là bắt buộc",
     "val-name-2": "*Tên thói quen phải có ít nhất 2 ký tự",
-    "val-name-3": "*Tên thói quen phải dưới 50 ký tự"
+    "val-name-3": "*Tên thói quen phải dưới 50 ký tự",
+    "paused-hint": "*Thói quen đang tạm dừng. Hãy tiếp tục (Resume) để chỉnh sửa tần suất và mục tiêu mỗi ngày."
   },
   "days": {
     "sun": "CN",
@@ -77,10 +82,11 @@
   },
   "dd-menu": {
     "Edit": "Chỉnh sửa",
-    "SetGoal": "Đặt mục tiêu",
+    "Set Goal": "Đặt mục tiêu",
     "Pause": "Tạm dừng",
     "Resume": "Tiếp tục",
     "Archive": "Lưu trữ",
+    "Unarchive": "Hủy lưu trữ",
     "Delete": "Xóa"
   },
   "habit_filter": {
@@ -113,7 +119,31 @@
     "Fr": "T6",
     "Sa": "T7",
     "filter_by": "Đang lọc theo: ",
-    "pad": "Chọn ngày"
+    "pad": "Chọn ngày",
+    "SUNDAY": "Chủ nhật",
+    "MONDAY": "Thứ hai",
+    "TUESDAY": "Thứ ba",
+    "WEDNESDAY": "Thứ tư",
+    "THURSDAY": "Thứ năm",
+    "FRIDAY": "Thứ sáu",
+    "SATURDAY": "Thứ bảy"
+  },
+  "habit_card": {
+    "mess": "Thói quen này ",
+    "paused": "tạm dừng",
+    "archived": "đã được lưu trữ"
+  },
+  "habit_toast": {
+    "toast-1": " đã bị tạm dừng",
+    "toast-2": " đã được tiếp tục",
+    "toast-3": " đã được lưu trữ"
+  },
+  "habit_a-dialog": {
+    "title": "Xóa Thói quen",
+    "content-1": "Bạn có chắc chắn muốn xóa không?",
+    "content-2": "Hành động này không thể hoàn tác.",
+    "btn_1": "Hủy",
+    "btn_2": "Xóa"
   },
   "pagination": {
     "page": "Trang",
@@ -210,6 +240,38 @@
     "empty_hint": "Tạo thói quen và check-in mỗi ngày để xem thống kê tại đây",
     "empty_action": "Tạo thói quen ngay"
   },
+  "notifications": {
+    "title": "Thông báo",
+    "description": "Cập nhật tiến trình của thói quen và mục tiêu",
+    "empty": "Chưa có thông báo nào",
+    "listTitle": "Thông báo gần đây",
+    "markAllRead": "Đánh dấu tất cả đã đọc",
+    "readBtn": "Đã đọc",
+    "demoPanel": {
+      "title": "Kích hoạt thông báo nhanh",
+      "subtitle": "Chọn các cột mốc bên dưới để gửi cảnh báo và thông báo tiến độ",
+      "btnGoal80": "Mục tiêu đạt 80%",
+      "btnGoalAchieved": "Mục tiêu đã đạt",
+      "btnMissedHabit": "Bỏ lỡ thói quen",
+      "btnStreakRisk": "Nguy cơ đứt chuỗi"
+    },
+    "goal_80": {
+      "title": "Sắp đạt mục tiêu!",
+      "message": "Tuyệt vời! Bạn đã hoàn thành 80% mục tiêu {{habitName}}."
+    },
+    "goal_achieved": {
+      "title": "Đã hoàn thành mục tiêu!",
+      "message": "Chúc mừng! Bạn đã xuất sắc hoàn thành mục tiêu {{habitName}}."
+    },
+    "missed_habit": {
+      "title": "Bỏ lỡ thói quen",
+      "message": "Bạn đã bỏ lỡ thói quen {{habitName}} ngày hôm qua. Cố gắng hôm nay nhé!"
+    },
+    "streak_risk": {
+      "title": "Nguy cơ đứt chuỗi",
+      "message": "Cẩn thận! Bạn sắp làm đứt chuỗi {{habitName}} {{streakCount}} ngày rồi."
+    }
+  },
   "dashboard": {
     "completedToday": "Hoàn thành hôm nay",
     "activeHabits": "Thói quen đang theo dõi",
@@ -224,11 +286,8 @@
     "productivity": "Năng suất",
     "days": "Ngày"
   },
-  "notifications":{
-    "title":"Thông báo",
-    "description":"Mô tả",
-    "listTitle":"Danh sách thông báo",
-    "markAllRead":"Đánh dấu đã đọc hết",
-    "readBtn":"Đọc"
+   "checkin": {
+    "history": "Lịch sử check-in",
+    "no": "Không có lịch sử check-in."
   }
 }

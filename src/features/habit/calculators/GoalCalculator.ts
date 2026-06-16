@@ -207,7 +207,7 @@ export const getStreakProgress = (
     checkins: CheckIn[]
 ): number => {
     if (
-        goal.goalType !== "STREAK" ||
+        goal.targetType !== "STREAK" ||
         goal.targetValue <= 0
     ) {
         return -1;
@@ -232,7 +232,7 @@ export const getTotalCompletion = (
     checkins: CheckIn[]
 ): number => {
     if (
-        goal.goalType !== "TOTAL_COMPLETIONS" ||
+        goal.targetType !== "TOTAL_COMPLETIONS" ||
         goal.targetValue <= 0
     ) {
         return -1;
@@ -262,7 +262,7 @@ export const getTotalCompletionProgress = (
     checkins: CheckIn[]
 ): number => {
     if (
-        goal.goalType !== "TOTAL_COMPLETIONS" ||
+        goal.targetType !== "TOTAL_COMPLETIONS" ||
         goal.targetValue <= 0
     ) {
         return -1;
