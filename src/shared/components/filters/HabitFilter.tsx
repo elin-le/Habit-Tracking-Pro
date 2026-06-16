@@ -9,11 +9,12 @@ import { cn } from "@/shared/lib/utils";
 import { useTranslation } from "react-i18next";
 import { enUS, vi } from "date-fns/locale";
 import type { HabitStatus, Priority } from "@/shared/types/Habit";
-import { mockCategories } from "@/data/category";
 import type { DaysOfWeek } from "@/shared/types/HabitSchedule";
 import { useState } from "react";
+import type { Category } from "@/shared/types/Category";
 
 interface HabitFilterProps {
+  categories: Category[];
   selectedCategory: string | null;
   onCategoryChange: (id: string | null) => void;
   selectedPriority: Priority | null;
@@ -26,6 +27,7 @@ interface HabitFilterProps {
 }
 
 export function HabitFilter({
+  categories,
   selectedCategory,
   onCategoryChange,
   selectedPriority,
@@ -116,7 +118,7 @@ export function HabitFilter({
             >
               {t("habit_filter.cat-0")}
             </FilterChip>
-            {mockCategories.map((cat) => (
+            {categories.map((cat) => (
               <FilterChip
                 key={cat.id}
                 active={selectedCategory === cat.id}
@@ -242,18 +244,18 @@ export function HabitFilter({
                   style={
                     calendarDate
                       ? {
-                        background: "var(--primary)",
-                        borderColor: "var(--primary)",
-                        color: "#fff",
-                        boxShadow:
-                          "0 0 0 2px color-mix(in srgb, var(--primary) 18%, transparent)",
-                      }
+                          background: "var(--primary)",
+                          borderColor: "var(--primary)",
+                          color: "#fff",
+                          boxShadow:
+                            "0 0 0 2px color-mix(in srgb, var(--primary) 18%, transparent)",
+                        }
                       : {
-                        background: "transparent",
-                        borderColor:
-                          "color-mix(in srgb, var(--primary) 18%, transparent)",
-                        color: "var(--sidebar-muted)",
-                      }
+                          background: "transparent",
+                          borderColor:
+                            "color-mix(in srgb, var(--primary) 18%, transparent)",
+                          color: "var(--sidebar-muted)",
+                        }
                   }
                   onMouseEnter={(e) => {
                     if (!calendarDate) {
@@ -295,17 +297,13 @@ export function HabitFilter({
               </PopoverContent>
             </Popover>
           </div>
-
-          {frequencyFilter && (
-            <p
-              className="mt-2 text-xs"
-              style={{ color: "var(--sidebar-muted)" }}
-            >
-              {t("habit_filter.filter_by")}{" "}
-              {t(`habit_filter.${frequencyFilter}`)}
-            </p>
-          )}
         </div>
+
+        {frequencyFilter && (
+          <p className="text-xs" style={{ color: "var(--sidebar-muted)" }}>
+            {t("habit_filter.filter_by")} {t(`habit_filter.${frequencyFilter}`)}
+          </p>
+        )}
       </div>
     </div>
   );

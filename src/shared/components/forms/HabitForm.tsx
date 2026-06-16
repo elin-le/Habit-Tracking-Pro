@@ -9,10 +9,10 @@ import type {
 
 import { useTranslation } from "react-i18next";
 import type { HabitSchedule } from "../../types/HabitSchedule";
-import { mockCategories } from "../../../data/category";
 import { Button } from "../ui/Button";
 import { Modal } from "../ui/Modal";
 import { toast } from "sonner";
+import type { Category } from "@/shared/types/Category";
 
 // Style dùng chung cho input/select/textarea
 const inputStyle: React.CSSProperties = {
@@ -30,6 +30,7 @@ interface HabitFormProps {
   onClose: () => void;
   onSubmit: (data: Habit) => void;
   onSubmitSchedules: (schedules: HabitSchedule[]) => void;
+  categories: Category[];
 }
 
 export function HabitForm({
@@ -38,6 +39,7 @@ export function HabitForm({
   onClose,
   onSubmit,
   onSubmitSchedules,
+  categories,
 }: HabitFormProps) {
   const { t } = useTranslation();
 
@@ -176,7 +178,7 @@ export function HabitForm({
                 setForm((f) => ({ ...f, categoryId: e.target.value }))
               }
             >
-              {mockCategories.map((cat) => (
+              {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {t(`habit_form.${cat.name}`)}
                 </option>

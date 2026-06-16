@@ -14,6 +14,7 @@ import { HabitForm } from "../../../shared/components/forms/HabitForm";
 import { useMemo, useState } from "react";
 import { DAY_OF_WEEK_MAP } from "@/shared/constants/appConstants";
 import { useDebounce } from "@/shared/hooks/useDebounce";
+import type { Category } from "@/shared/types/Category";
 
 type LayoutContext = {
   habits: Habit[];
@@ -24,6 +25,7 @@ type LayoutContext = {
   createHabitSchedules: (s: HabitSchedule[]) => void;
   replaceHabitSchedules: (habitId: string, s: HabitSchedule[]) => void;
   deleteHabitSchedulesByHabitId: (habitId: string) => void;
+  categories: Category[];
   showAddForm: boolean;
   setShowAddForm: (v: boolean) => void;
 };
@@ -34,6 +36,7 @@ export function HabitsPage() {
     habits,
     showAddForm,
     habitSchedules,
+    categories,
     createHabit,
     createHabitSchedules,
     setShowAddForm,
@@ -163,6 +166,7 @@ export function HabitsPage() {
       {/* Filter */}
       <div className="mb-5">
         <HabitFilter
+          categories={categories}
           selectedCategory={filterCategory}
           onCategoryChange={setFilterCategory}
           selectedPriority={filterPriority}
@@ -232,6 +236,7 @@ export function HabitsPage() {
                 deleteHabit(habit.id);
                 deleteHabitSchedulesByHabitId(habit.id);
               }}
+              categories={categories}
             />
           ))}
         </div>
@@ -249,6 +254,7 @@ export function HabitsPage() {
           onClose={() => setShowAddForm(false)}
           onSubmit={createHabit}
           onSubmitSchedules={createHabitSchedules}
+          categories={categories}
         />
       )}
 
@@ -263,6 +269,7 @@ export function HabitsPage() {
           onSubmitSchedules={(schedules) =>
             replaceHabitSchedules(updatingHabit.id, schedules)
           }
+          categories={categories}
         />
       )}
     </div>

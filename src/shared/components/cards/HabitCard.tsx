@@ -12,7 +12,6 @@ import { useNavigate } from "react-router-dom";
 import { DropdownMenu } from "../common/DropdownMenu";
 import type { Habit, HabitStatus } from "../../types/Habit";
 import { CATEGORY_ICONS, PRIORITY_COLORS } from "../../constants/appConstants";
-import { mockCategories } from "../../../data/category";
 import { useTranslation } from "react-i18next";
 import {
   AlertDialog,
@@ -26,12 +25,14 @@ import {
 } from "../ui/alert-dialog";
 import { toast } from "sonner";
 import { useCheckIns } from "../../hooks/useCheckIns";
+import type { Category } from "@/shared/types/Category";
 
 interface HabitCardProps {
   habit: Habit;
   onUpdate: () => void;
   onUpdateStatus: (status: HabitStatus) => void;
   onDelete: () => void;
+  categories: Category[];
 }
 
 export function HabitCard({
@@ -39,6 +40,7 @@ export function HabitCard({
   onUpdate,
   onUpdateStatus,
   onDelete,
+  categories,
 }: HabitCardProps) {
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -46,7 +48,7 @@ export function HabitCard({
   const navigate = useNavigate();
 
   const priorityColor = PRIORITY_COLORS[habit.priority];
-  const category = mockCategories.find((c) => c.id === habit.categoryId);
+  const category = categories.find((c) => c.id === habit.categoryId);
   const today = useMemo(() => new Date().toISOString().split("T")[0], []);
   const { getCheckIn, upsertCheckIn } = useCheckIns();
   const checkIn = getCheckIn(habit.id, today);
