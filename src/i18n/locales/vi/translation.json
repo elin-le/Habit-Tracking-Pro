@@ -188,34 +188,6 @@
       "encouragement": "Cố lên! Bạn đã đi được 80% chặng đường!",
       "achieved": "Tuyệt vời! Bạn đã hoàn thành mục tiêu!"
     }
-<<<<<<< HEAD
-  },
-  "statistics": {
-    "title": "Thống kê",
-    "subtitle": "Nhìn lại hành trình của bạn",
-    "overview": "Tổng quan",
-    "completed_today": "Nhiệm vụ hoàn thành hôm nay",
-    "active_habits": "Thói quen đang duy trì",
-    "at_risk": "Sắp đứt chuỗi",
-    "per_habit": "Chi tiết thói quen",
-    "current_streak": "Chuỗi hiện tại",
-    "longest_streak": "Chuỗi kỷ lục",
-    "total_completions": "Tổng lượt hoàn thành",
-    "completion_rate": "Tỷ lệ hoàn thành",
-    "last_7_days": "Thống kê 7 ngày qua",
-    "days": "ngày",
-    "risk_safe": "An toàn",
-    "risk_warning": "Cần chú ý",
-    "risk_at_risk": "Nguy cơ đứt chuỗi",
-    "empty": "Chưa có dữ liệu để thống kê",
-    "empty_hint": "Tạo thói quen và check-in mỗi ngày để xem thống kê tại đây",
-    "empty_action": "Tạo thói quen ngay"
-  }
-=======
-<<<<<<< Updated upstream
->>>>>>> 3390264 (fix[i18next]: remove duplicate key)
-}
-=======
   },
   "statistics": {
     "title": "Thống kê",
@@ -256,4 +228,3 @@
     "days": "Ngày"
   }
 }
->>>>>>> Stashed changes
