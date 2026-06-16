@@ -1,10 +1,5 @@
 import type { Goal } from "../../../shared/types/Goal";
-
-export interface CheckIn {
-    id: string;
-    habitId: string;
-    checkedAt: string;
-}
+import type { CheckIn } from "../../../shared/types/CheckIn"
 
 type DailySummary = {
     count: number;
@@ -35,38 +30,32 @@ const isDateInRange = (
     );
 };
 
-// Group checkins theo ngày
 export const getDailySummary = (
     habitCheckins: CheckIn[],
     targetPerDay: number
 ): Record<string, DailySummary> => {
-    const summary: Record<
-        string,
-        DailySummary
-    > = {};
+    return habitCheckins.reduce(
+        (summary, checkin) => {
+            const dateKey = getDateKey(
+                checkin.checkedAt
+            );
 
-    for (const checkin of habitCheckins) {
-        const dateKey = getDateKey(
-            checkin.checkedAt
-        );
-
-        if (!summary[dateKey]) {
-            summary[dateKey] = {
+            summary[dateKey] ??= {
                 count: 0,
                 completed: false,
             };
-        }
 
-        summary[dateKey].count++;
-    }
+            summary[dateKey].count +=
+                checkin.completionCount;
 
-    for (const date in summary) {
-        summary[date].completed =
-            summary[date].count >=
-            targetPerDay;
-    }
+            summary[dateKey].completed =
+                summary[dateKey].count >=
+                targetPerDay;
 
-    return summary;
+            return summary;
+        },
+        {} as Record<string, DailySummary>
+    );
 };
 
 export const getCurrentStreak = (

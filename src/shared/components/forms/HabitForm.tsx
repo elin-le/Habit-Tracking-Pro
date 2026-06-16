@@ -229,11 +229,11 @@ export function HabitForm({
               style={
                 form.frequencyType === "DAILY"
                   ? {
-                      borderColor: "var(--primary)",
-                      background:
-                        "color-mix(in srgb, var(--primary) 10%, transparent)",
-                      color: "var(--primary)",
-                    }
+                    borderColor: "var(--primary)",
+                    background:
+                      "color-mix(in srgb, var(--primary) 10%, transparent)",
+                    color: "var(--primary)",
+                  }
                   : inputStyle
               }
             >
@@ -250,11 +250,11 @@ export function HabitForm({
               style={
                 form.frequencyType === "DAY_OF_WEEK"
                   ? {
-                      borderColor: "var(--primary)",
-                      background:
-                        "color-mix(in srgb, var(--primary) 10%, transparent)",
-                      color: "var(--primary)",
-                    }
+                    borderColor: "var(--primary)",
+                    background:
+                      "color-mix(in srgb, var(--primary) 10%, transparent)",
+                    color: "var(--primary)",
+                  }
                   : inputStyle
               }
             >
@@ -283,10 +283,10 @@ export function HabitForm({
                   style={
                     activeDays.includes(index)
                       ? {
-                          borderColor: "var(--primary)",
-                          background: "var(--primary)",
-                          color: "#fff",
-                        }
+                        borderColor: "var(--primary)",
+                        background: "var(--primary)",
+                        color: "#fff",
+                      }
                       : { ...inputStyle, color: "var(--sidebar-muted)" }
                   }
                 >

@@ -232,78 +232,8 @@ export function HabitFilter({
               </FilterChip>
             ))}
 
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "cursor-pointer rounded-full border px-3.5 py-1.5 text-sm font-medium transition-all",
-                    "focus-visible:ring-0 focus-visible:ring-offset-0",
-                    "h-auto",
-                  )}
-                  style={
-                    calendarDate
-                      ? {
-                          background: "var(--primary)",
-                          borderColor: "var(--primary)",
-                          color: "#fff",
-                          boxShadow:
-                            "0 0 0 2px color-mix(in srgb, var(--primary) 18%, transparent)",
-                        }
-                      : {
-                          background: "transparent",
-                          borderColor:
-                            "color-mix(in srgb, var(--primary) 18%, transparent)",
-                          color: "var(--sidebar-muted)",
-                        }
-                  }
-                  onMouseEnter={(e) => {
-                    if (!calendarDate) {
-                      e.currentTarget.style.color = "var(--text)";
-                      e.currentTarget.style.background =
-                        "color-mix(in srgb, var(--primary) 8%, transparent)";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!calendarDate) {
-                      e.currentTarget.style.color = "var(--sidebar-muted)";
-                      e.currentTarget.style.background = "transparent";
-                    }
-                  }}
-                >
-                  <CalendarIcon size={14} />
-                  {calendarDate
-                    ? format(calendarDate, "dd/MM/yyyy")
-                    : t("habit_filter.pad")}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                className="w-auto p-0 shadow-xl border-0"
-                align="start"
-                sideOffset={4}
-                style={{
-                  boxShadow:
-                    "0 8px 32px -4px rgba(0,0,0,0.18), 0 2px 8px -2px rgba(0,0,0,0.1)",
-                  borderRadius: "12px",
-                  overflow: "hidden",
-                }}
-              >
-                <Calendar
-                  mode="single"
-                  selected={calendarDate}
-                  onSelect={handleDateSelect}
-                  locale={locale}
-                />
-              </PopoverContent>
-            </Popover>
           </div>
         </div>
-
-        {frequencyFilter && (
-          <p className="text-xs" style={{ color: "var(--sidebar-muted)" }}>
-            {t("habit_filter.filter_by")} {t(`habit_filter.${frequencyFilter}`)}
-          </p>
-        )}
       </div>
     </div>
   );
