@@ -25,7 +25,7 @@ interface ProgressRingProps {
 export interface GoalCardProps {
     goal: {
         id: string;
-        goalType: "STREAK" | "TOTAL_COMPLETIONS";
+        targetType: "STREAK" | "TOTAL_COMPLETIONS";
         targetValue: number;
         startedDate: string;
         endDate: string;
@@ -251,7 +251,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
     const isNotStarted = progress.status === "NOT_STARTED";
     const isNear = progress.progressPercent >= 80 && !isCompleted;
 
-    const unit = goal.goalType === "STREAK" ? t("goals.days") : t("goals.times");
+    const unit = goal.targetType === "STREAK" ? t("goals.days") : t("goals.times");
     const daysLeft = getDaysLeft(goal.endDate);
 
     // Progress bar width capped at 100%
@@ -320,11 +320,11 @@ const GoalCard: React.FC<GoalCardProps> = ({
                                     text-[11px] font-bold px-2.5 py-1 rounded-full
                                     ${c.badgeBg} ${c.badgeText}
                                 `}>
-                                    {goal.goalType === "STREAK"
+                                    {goal.targetType === "STREAK"
                                         ? <Flame size={11} />
                                         : <Target size={11} />
                                     }
-                                    {goal.goalType === "STREAK"
+                                    {goal.targetType === "STREAK"
                                         ? t("goals.streak")
                                         : t("goals.total_completions")
                                     }

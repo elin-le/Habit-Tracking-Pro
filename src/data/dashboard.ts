@@ -64,3 +64,25 @@ export const GOAL_PROGRESS: GoalProgressType[] = [
         progress: 58,
     },
 ];
+export const SIDEBAR_MENUS = [
+    {
+        id: "dashboard",
+        label: "sidebar.dashboard",
+        active: true,
+    },
+    {
+        id: "habits",
+        label: "sidebar.habits",
+        active: false,
+    },
+    {
+        id: "goals",
+        label: "sidebar.goals",
+        active: false,
+    },
+    {
+        id: "statistics",
+        label: "sidebar.statistics",
+        active: false,
+    }
+];

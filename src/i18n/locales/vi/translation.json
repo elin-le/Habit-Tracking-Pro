@@ -210,6 +210,38 @@
     "empty_hint": "Tạo thói quen và check-in mỗi ngày để xem thống kê tại đây",
     "empty_action": "Tạo thói quen ngay"
   },
+  "notifications": {
+    "title": "Thông báo",
+    "description": "Cập nhật tiến trình của thói quen và mục tiêu",
+    "empty": "Chưa có thông báo nào",
+    "listTitle": "Thông báo gần đây",
+    "markAllRead": "Đánh dấu tất cả đã đọc",
+    "readBtn": "Đã đọc",
+    "demoPanel": {
+      "title": "Kích hoạt thông báo nhanh",
+      "subtitle": "Chọn các cột mốc bên dưới để gửi cảnh báo và thông báo tiến độ",
+      "btnGoal80": "Mục tiêu đạt 80%",
+      "btnGoalAchieved": "Mục tiêu đã đạt",
+      "btnMissedHabit": "Bỏ lỡ thói quen",
+      "btnStreakRisk": "Nguy cơ đứt chuỗi"
+    },
+    "goal_80": {
+      "title": "Sắp đạt mục tiêu!",
+      "message": "Tuyệt vời! Bạn đã hoàn thành 80% mục tiêu {{habitName}}."
+    },
+    "goal_achieved": {
+      "title": "Đã hoàn thành mục tiêu!",
+      "message": "Chúc mừng! Bạn đã xuất sắc hoàn thành mục tiêu {{habitName}}."
+    },
+    "missed_habit": {
+      "title": "Bỏ lỡ thói quen",
+      "message": "Bạn đã bỏ lỡ thói quen {{habitName}} ngày hôm qua. Cố gắng hôm nay nhé!"
+    },
+    "streak_risk": {
+      "title": "Nguy cơ đứt chuỗi",
+      "message": "Cẩn thận! Bạn sắp làm đứt chuỗi {{habitName}} {{streakCount}} ngày rồi."
+    }
+  },
   "dashboard": {
     "completedToday": "Hoàn thành hôm nay",
     "activeHabits": "Thói quen đang theo dõi",
@@ -222,16 +254,9 @@
     "health": "Sức khỏe",
     "learning": "Học tập",
     "productivity": "Năng suất",
-    "goalReadBooks": "Đọc 15 cuốn sách trong tháng",
-    "goalWorkout": "Tập luyện 20 lần trong tháng",
-    "goalDrinkWater": "Uống 2L nước mỗi ngày",
-    "days": "Ngày"
-  },
-  "notifications":{
-    "title":"Thông báo",
-    "description":"Mô tả",
-    "listTitle":"Danh sách thông báo",
-    "markAllRead":"Đánh dấu đã đọc hết",
-    "readBtn":"Đọc"
+    "goalReadBooks": "Đọc sách 30p mỗi ngày",
+    "goalWorkout": "Tập thể dục 20 lần mỗi tháng",
+    "goalDrinkWater": "Uống đủ 2L nước mỗi ngày",
+    "days": "Days"
   }
 }

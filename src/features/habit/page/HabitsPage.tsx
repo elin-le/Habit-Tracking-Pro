@@ -49,7 +49,7 @@ export function HabitsPage() {
   return (
     <div className="animate-in">
       {/* Header */}
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+      {/* <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-4xl font-light">{t("habit.page_title")}</h1>
           <p className="mt-1 text-sm text-gray-500">
@@ -61,7 +61,7 @@ export function HabitsPage() {
             · {t("habit.total")}: {habits.length}
           </p>
         </div>
-      </div>
+      </div> */}
 
       {/* Search */}
       <div className="relative mb-5">

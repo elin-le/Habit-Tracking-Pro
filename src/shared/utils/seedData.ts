@@ -2,6 +2,7 @@ import { mockHabits } from "../../data/habit";
 import { mockHabitSchedules } from "../../data/habit_schedule";
 import { mockCategories } from "../../data/category";
 import { MockUsers } from "../../data/users";
+import { mockGoals } from "../../data/goals";
 import { STORAGE_KEY } from "../constants/appConstants";
 
 export const seedData = () => {
@@ -37,5 +38,13 @@ export const seedCategories = () => {
   if (!categories) {
     localStorage.setItem(STORAGE_KEY.CATEGORYS, JSON.stringify(mockCategories));
     console.log("Seeded categories data");
+  }
+};
+
+export const seedGoals = () => {
+  const goals = localStorage.getItem(STORAGE_KEY.USER_GOALS);
+  if (!goals) {
+    localStorage.setItem(STORAGE_KEY.USER_GOALS, JSON.stringify(mockGoals));
+    console.log("Seeded goals data");
   }
 };
