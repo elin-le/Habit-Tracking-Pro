@@ -229,11 +229,11 @@ export function HabitForm({
               style={
                 form.frequencyType === "DAILY"
                   ? {
-                    borderColor: "var(--primary)",
-                    background:
-                      "color-mix(in srgb, var(--primary) 10%, transparent)",
-                    color: "var(--primary)",
-                  }
+                      borderColor: "var(--primary)",
+                      background:
+                        "color-mix(in srgb, var(--primary) 10%, transparent)",
+                      color: "var(--primary)",
+                    }
                   : inputStyle
               }
             >
@@ -250,11 +250,11 @@ export function HabitForm({
               style={
                 form.frequencyType === "DAY_OF_WEEK"
                   ? {
-                    borderColor: "var(--primary)",
-                    background:
-                      "color-mix(in srgb, var(--primary) 10%, transparent)",
-                    color: "var(--primary)",
-                  }
+                      borderColor: "var(--primary)",
+                      background:
+                        "color-mix(in srgb, var(--primary) 10%, transparent)",
+                      color: "var(--primary)",
+                    }
                   : inputStyle
               }
             >
@@ -283,10 +283,10 @@ export function HabitForm({
                   style={
                     activeDays.includes(index)
                       ? {
-                        borderColor: "var(--primary)",
-                        background: "var(--primary)",
-                        color: "#fff",
-                      }
+                          borderColor: "var(--primary)",
+                          background: "var(--primary)",
+                          color: "#fff",
+                        }
                       : { ...inputStyle, color: "var(--sidebar-muted)" }
                   }
                 >
@@ -304,17 +304,21 @@ export function HabitForm({
               {t("habit_form.target-p-days")}
             </label>
             <input
-              type="number"
-              min={1}
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
               disabled={isPaused}
               value={form.targetPerDay}
-              onChange={(e) =>
-                !isPaused &&
-                setForm({
-                  ...form,
-                  targetPerDay: Number(e.target.value) || 1,
-                })
-              }
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, "");
+
+                if (value.length <= 3) {
+                  setForm({
+                    ...form,
+                    targetPerDay: Number(value || 1),
+                  });
+                }
+              }}
               className="w-full rounded-xl border px-4 py-3 disabled:cursor-not-allowed"
               style={inputStyle}
             />
