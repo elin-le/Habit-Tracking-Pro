@@ -284,10 +284,7 @@
     "health": "Sức khỏe",
     "learning": "Học tập",
     "productivity": "Năng suất",
-    "goalReadBooks": "Đọc sách 30p mỗi ngày",
-    "goalWorkout": "Tập thể dục 20 lần mỗi tháng",
-    "goalDrinkWater": "Uống đủ 2L nước mỗi ngày",
-    "days": "Days"
+    "days": "Ngày"
   },
    "checkin": {
     "history": "Lịch sử check-in",

@@ -9,25 +9,35 @@ export const SUMMARY_CARDS: SummaryCardType[] = [
     {
         id: 1,
         title: "dashboard.completedToday",
-        value: 6,
+        completed: 6,
+        total: 8,
     },
     {
         id: 2,
         title: "dashboard.activeHabits",
         value: 8,
     },
-    {
+     {
         id: 3,
-        title: "dashboard.atRiskHabits",
-        value: 2,
+        title: "dashboard.currentStreak",
+        value: "12 Days",
+    },
+    {
+        id: 4,
+        title: "dashboard.longestStreak",
+        value: "28 Days",
     },
 ];
 
-export const HABIT_STATISTICS: HabitStatisticsType = {
-    currentStreak: 12,
-    longestStreak: 28,
-    completionRate: 78,
-};
+export const HABIT_STATISTICS: HabitStatisticsType[] = [
+    { day: "Mon", rate: 70 },
+    { day: "Tue", rate: 80 },
+    { day: "Wed", rate: 60 },
+    { day: "Thu", rate: 90 },
+    { day: "Fri", rate: 75 },
+    { day: "Sat", rate: 85 },
+    { day: "Sun", rate: 95 },
+];
 
 export const CATEGORY_OVERVIEW: CategoryOverviewType[] = [
     {
@@ -63,26 +73,4 @@ export const GOAL_PROGRESS: GoalProgressType[] = [
         title: "Drink 2L water daily",
         progress: 58,
     },
-];
-export const SIDEBAR_MENUS = [
-    {
-        id: "dashboard",
-        label: "sidebar.dashboard",
-        active: true,
-    },
-    {
-        id: "habits",
-        label: "sidebar.habits",
-        active: false,
-    },
-    {
-        id: "goals",
-        label: "sidebar.goals",
-        active: false,
-    },
-    {
-        id: "statistics",
-        label: "sidebar.statistics",
-        active: false,
-    }
 ];

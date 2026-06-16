@@ -16,18 +16,19 @@ const GoalProgress = ({
                 {t("dashboard.goalProgress")}
             </h2>
 
-            <div className="space-y-5">
+            <div className="goal-grid">
                 {goals.map((goal) => (
-                    <div key={goal.id}>
-                        <div className="flex justify-between mb-2">
-                            <span>
-                                {t(goal.title)}
-                            </span>
+                    <div
+                        key={goal.id}
+                        className="goal-card"
+                    >
+                        <p className="goal-card__title">
+                            {t(goal.title)}
+                        </p>
 
-                            <span>
-                                {goal.progress}%
-                            </span>
-                        </div>
+                        <h3 className="goal-card__value">
+                            {goal.progress}%
+                        </h3>
 
                         <div className="dashboard-progress">
                             <div
