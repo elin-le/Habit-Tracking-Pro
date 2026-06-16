@@ -2,8 +2,7 @@ import { Outlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import "./styles/dashboard-layout.css";
-
-import { SIDEBAR_MENUS } from "../../data/dashboard/dashboard-layout.mock";
+import { SIDEBAR_MENUS } from "../data/dashboard";
 
 const DashboardLayout = () => {
     const { t } = useTranslation();
