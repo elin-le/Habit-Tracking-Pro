@@ -35,13 +35,13 @@
 }
 
 .summary-card__label {
-    font-size: clamp(0.75rem, 1vw, 1rem);
+    font-size: 0.875rem;
     color: #64748b;
 }
 
 .summary-card__value {
     margin-top: 0.5rem;
-    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    font-size: 2rem;
     font-weight: 700;
     color: var(--text-primary);
 }
@@ -91,9 +91,12 @@
 
 .dashboard-card__title {
     margin-bottom: 1rem;
-    font-size: clamp(0.875rem, 1.2vw, 1.1rem);
+
+    font-size: 1rem;
     font-weight: 600;
+
     color: #64748b;
+
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -104,7 +107,6 @@
 
 .text-secondary {
     color: #64748b;
-    font-size: clamp(0.875rem, 1vw, 1rem);
 }
 
 /* ==========================================
@@ -135,40 +137,37 @@
 /* ==========================================
    CATEGORY OVERVIEW
 ========================================== */
-
-.category-overview {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-}
-
-.category-chart {
-    width: 100%;
-    height: 260px;
-}
-
 .category-legend {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
 }
 
-.category-legend__
-item {
+.category-legend__item {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    justify-content: space-between;
 }
 
-.category-legend__item strong {
-    margin-left: auto;
+.category-legend__left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .category-legend__dot {
     width: 12px;
     height: 12px;
-
     border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.category-legend__label {
+    font-size: 0.9rem;
+}
+
+.category-legend__value {
+    font-weight: 600;
 }
 
 /* ==========================================
@@ -200,14 +199,17 @@ item {
 
 .goal-card__title {
     margin-bottom: 0.75rem;
-    font-size: clamp(0.8rem, 1vw, 1rem);
+
+    font-size: 0.875rem;
     color: #64748b;
 }
 
 .goal-card__value {
     margin-bottom: 0.75rem;
-    font-size: clamp(1.25rem, 2vw, 1.75rem);
+
+    font-size: 1.5rem;
     font-weight: 700;
+
     color: var(--text-primary);
 }
 

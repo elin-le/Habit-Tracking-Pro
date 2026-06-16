@@ -27,9 +27,14 @@ const CategoryOverview = ({
     const { t } = useTranslation();
 
     const chartData = categories.map((item) => ({
-        name: t(item.category),
+        name: item.category,
         value: item.progress,
     }));
+
+    const total = chartData.reduce(
+        (sum, item) => sum + item.value,
+        0,
+    );
 
     return (
         <div className="dashboard-card">
@@ -38,7 +43,6 @@ const CategoryOverview = ({
             </h2>
 
             <div className="category-overview">
-
                 <div className="category-chart">
                     <ResponsiveContainer
                         width="100%"
@@ -52,52 +56,69 @@ const CategoryOverview = ({
                                 outerRadius={90}
                                 paddingAngle={3}
                             >
-                                {chartData.map((_, index) => (
-                                    <Cell
-                                        key={index}
-                                        fill={
-                                            COLORS[
-                                            index %
-                                            COLORS.length
-                                            ]
-                                        }
-                                    />
-                                ))}
+                                {chartData.map(
+                                    (_, index) => (
+                                        <Cell
+                                            key={index}
+                                            fill={
+                                                COLORS[
+                                                    index %
+                                                        COLORS.length
+                                                ]
+                                            }
+                                        />
+                                    ),
+                                )}
                             </Pie>
 
-                            <Tooltip />
+                            <Tooltip
+                                formatter={(
+                                    value,
+                                ) => [
+                                    `${value} Habits`,
+                                    "Count",
+                                ]}
+                            />
                         </PieChart>
                     </ResponsiveContainer>
                 </div>
 
-                <div className="category-legend">
+               <div className="category-legend">
                     {chartData.map((item, index) => (
                         <div
                             key={item.name}
                             className="category-legend__item"
                         >
-                            <span
-                                className="category-legend__dot"
-                                style={{
-                                    backgroundColor:
-                                        COLORS[
-                                        index %
-                                        COLORS.length
-                                        ],
-                                }}
-                            />
+                            <div className="category-legend__left">
+                                <div
+                                    className="category-legend__dot"
+                                    style={{
+                                        backgroundColor:
+                                            COLORS[
+                                                index %
+                                                    COLORS.length
+                                            ],
+                                    }}
+                                />
 
-                            <span>
-                                {item.name}
+                                <span className="category-legend__label">
+                                    {item.name}
+                                </span>
+                            </div>
+
+                            <span className="category-legend__value">
+                                {total > 0
+                                    ? Math.round(
+                                        (item.value /
+                                            total) *
+                                            100,
+                                    )
+                                    : 0}
+                                %
                             </span>
-
-                            <strong>
-                                {item.value}%
-                            </strong>
                         </div>
                     ))}
                 </div>
-
             </div>
         </div>
     );
