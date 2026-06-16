@@ -188,11 +188,6 @@
       "encouragement": "Keep it up! You've reached 80% of your goal!",
       "achieved": "Excellent! You've completed your goal!"
     }
-<<<<<<< HEAD
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> 3390264 (fix[i18next]: remove duplicate key)
   },
   "statistics": {
     "title": "Statistics",
@@ -214,28 +209,6 @@
     "empty": "No statistics yet",
     "empty_hint": "Create habits and check in to see your stats here",
     "empty_action": "Create your habit"
-<<<<<<< HEAD
   }
-=======
-  },
-  "dashboard": {
-    "completedToday": "Completed Today",
-    "activeHabits": "Active Habits",
-    "atRiskHabits": "At Risk Habits",
-    "currentStreak": "Current Streak",
-    "longestStreak": "Longest Streak",
-    "completionRate": "Completion Rate",
-    "categoryOverview": "Category Overview",
-    "goalProgress": "Goal Progress",
-    "health": "Health",
-    "learning": "Learning",
-    "productivity": "Productivity",
-    "goalReadBooks": "Read 15 books this month",
-    "goalWorkout": "Workout 20 times this month",
-    "goalDrinkWater": "Drink 2L water daily",
-    "days": "Days"
-  }
->>>>>>> Stashed changes
->>>>>>> 3390264 (fix[i18next]: remove duplicate key)
 }
 
