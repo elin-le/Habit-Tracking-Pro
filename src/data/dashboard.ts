@@ -64,7 +64,6 @@ export const GOAL_PROGRESS: GoalProgressType[] = [
         progress: 58,
     },
 ];
-
 export const SIDEBAR_MENUS = [
     {
         id: "dashboard",

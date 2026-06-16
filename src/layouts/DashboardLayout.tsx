@@ -2,7 +2,8 @@ import { Outlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import "./styles/dashboard-layout.css";
-import { SIDEBAR_MENUS } from "../data/dashboard";
+
+import { SIDEBAR_MENUS } from "../data/dashboard"
 
 const DashboardLayout = () => {
     const { t } = useTranslation();
@@ -18,11 +19,10 @@ const DashboardLayout = () => {
                     {SIDEBAR_MENUS.map((item) => (
                         <button
                             key={item.id}
-                            className={`dashboard-sidebar__item ${
-                                item.active
-                                    ? "dashboard-sidebar__item--active"
-                                    : ""
-                            }`}
+                            className={`dashboard-sidebar__item ${item.active
+                                ? "dashboard-sidebar__item--active"
+                                : ""
+                                }`}
                         >
                             {t(item.label)}
                         </button>
