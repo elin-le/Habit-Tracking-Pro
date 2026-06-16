@@ -35,7 +35,7 @@ export const getHabitDashboardMetrics = (
         getHabitRisk(completionRate);
 
     const goalProgress =
-        goal.goalType === "STREAK"
+        goal.targetType === "STREAK"
             ? getStreakProgress(
                 goal,
                 targetPerDay,

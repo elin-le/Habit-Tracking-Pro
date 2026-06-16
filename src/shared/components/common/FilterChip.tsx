@@ -19,18 +19,18 @@ export function FilterChip({ children, active = false }: FilterChipProps) {
       style={
         active
           ? {
-              background: "var(--primary)",
-              borderColor: "var(--primary)",
-              color: "#fff",
-              boxShadow:
-                "0 0 0 2px color-mix(in srgb, var(--primary) 18%, transparent)",
-            }
+            background: "var(--primary)",
+            borderColor: "var(--primary)",
+            color: "#fff",
+            boxShadow:
+              "0 0 0 2px color-mix(in srgb, var(--primary) 18%, transparent)",
+          }
           : {
-              background: "transparent",
-              borderColor:
-                "color-mix(in srgb, var(--primary) 18%, transparent)",
-              color: "var(--sidebar-muted)",
-            }
+            background: "transparent",
+            borderColor:
+              "color-mix(in srgb, var(--primary) 18%, transparent)",
+            color: "var(--sidebar-muted)",
+          }
       }
       onMouseEnter={(e) => {
         if (!active) {
