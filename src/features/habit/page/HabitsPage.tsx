@@ -129,7 +129,6 @@ export function HabitsPage() {
             <HabitCard
               key={habit.id}
               habit={habit}
-              onUpdate={() => setUpdatingHabit(habit)}
             />
           ))}
         </div>

@@ -11,7 +11,8 @@
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
-    "copyright": "© 2024 HabitPro · Building better habits every day"
+    "copyright": "© 2024 HabitPro · Building better habits every day",
+    "back": "Back"
   },
   "sidebar": {
     "dashboard": "Dashboard",
@@ -34,7 +35,8 @@
       "btn_create": "Create your first habit",
       "ept-3": "No matching habits",
       "ept-4": "Try adjusting your filters",
-      "search": "Search habits..."
+      "search": "Search habits...",
+      "no": "Habit not found"
     },
     "habit_form": {
       "title1": "New Habit",
@@ -182,6 +184,7 @@
         "empty_hint": "Add a goal to a habit below to get started",
         "empty_filter_hint": "No goals match your current filters",
         "clear_filters": "Clear filters",
+        "notfinished": "Not finished",
         "milestones": {
             "start": "First step!",
             "halfway": "Good start! Halfway there!",
@@ -210,6 +213,10 @@
         "empty_hint": "Create habits and check in to see your stats here",
         "empty_action": "Create your habit"
     },
+    "checkin": {
+      "history": "Check-in History",
+      "no": "No check-in history found."
+    },
     "dashboard": {
         "completedToday": "Completed Today",
         "activeHabits": "Active Habits",
@@ -231,27 +238,7 @@
         "goalDrinkWater": "Drink 2L water daily",
 
         "days": "Days"
+    
     }
-  },
-  "statistics": {
-    "title": "Statistics",
-    "subtitle": "Track your streaks and progress",
-    "overview": "Overview",
-    "completed_today": "Completed today",
-    "active_habits": "Active habits",
-    "at_risk": "At-risk habits",
-    "per_habit": "Per-habit statistics",
-    "current_streak": "Current streak",
-    "longest_streak": "Longest streak",
-    "total_completions": "Total completions",
-    "completion_rate": "Completion rate",
-    "last_7_days": "Last 7 days",
-    "days": "days",
-    "risk_safe": "Safe",
-    "risk_warning": "Warning",
-    "risk_at_risk": "At risk",
-    "empty": "No statistics yet",
-    "empty_hint": "Create habits and check in to see your stats here",
-    "empty_action": "Create your habit"
-  }
+
 }
