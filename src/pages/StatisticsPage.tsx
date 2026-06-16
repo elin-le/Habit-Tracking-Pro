@@ -1,7 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { Flame, Trophy, CheckCircle2, TrendingUp, BarChart3 } from "lucide-react";
-import { mockStats, type HabitStat, type RiskLevel } from "../data/statistics";
 import { Link } from "react-router-dom";
+import { mockStats } from "../data/statistics";
+import type { HabitStat, RiskLevel } from "../shared/types/Statistics";
 
 export default function StatisticsPage() {
   const { t } = useTranslation();
