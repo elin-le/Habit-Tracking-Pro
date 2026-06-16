@@ -430,6 +430,38 @@
     "empty_hint": "Create habits and check in to see your stats here",
     "empty_action": "Create your habit"
   },
+  "notifications": {
+    "title": "Notifications",
+    "description": "Stay updated with your habits and goals progress",
+    "empty": "No notifications yet",
+    "listTitle": "Recent Notifications",
+    "markAllRead": "Mark all as read",
+    "readBtn": "Read",
+    "demoPanel": {
+      "title": "Quick Notification Triggers",
+      "subtitle": "Select milestones below to send alerts and progress updates",
+      "btnGoal80": "Goal reached 80%",
+      "btnGoalAchieved": "Goal completed",
+      "btnMissedHabit": "Missed habit",
+      "btnStreakRisk": "Streak at risk"
+    },
+    "goal_80": {
+      "title": "Almost there!",
+      "message": "Great! You have completed 80% of your {{habitName}} goal."
+    },
+    "goal_achieved": {
+      "title": "Goal completed!",
+      "message": "Congratulations! You have completed your {{habitName}} goal."
+    },
+    "missed_habit": {
+      "title": "Habit missed",
+      "message": "You missed your {{habitName}} habit yesterday. Keep going today!"
+    },
+    "streak_risk": {
+      "title": "Streak at risk!",
+      "message": "Careful! You are about to break your {{streakCount}}-day {{habitName}} streak."
+    }
+  }, 
   "dashboard": {
     "completedToday": "Completion today",
     "activeHabits": "Active Habits",
@@ -442,16 +474,9 @@
     "health": "Health",
     "learning": "Learning",
     "productivity": "Productivity",
-    "goalReadBooks": "Read Book",
+    "goalReadBooks": "Read Book 30m per day",
     "goalWorkout": "Practice 20 times per month",
     "goalDrinkWater": "Drink 2L water per day",
     "days": "Days"
-  },
-  "notifications":{
-    "title":"Title",
-    "description":"Description",
-    "listTitle":"List Title",
-    "markAllRead":"Mark All Read",
-    "readBtn":"Read"
   }
 }

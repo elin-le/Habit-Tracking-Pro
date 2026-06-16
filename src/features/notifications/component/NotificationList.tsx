@@ -3,11 +3,15 @@ import { useTranslation } from 'react-i18next';
 import { NotificationContext } from '../context/NotificationContext';
 import type { AppNotification } from '../types';
 
-export const NotificationList = () => {
+export const NotificationList = ({ filter = 'ALL' }: { filter?: string }) => {
   const { t } = useTranslation();
   const { notifications, markAsRead, markAllAsRead } = useContext(NotificationContext);
 
-  if (notifications.length === 0) {
+  const filteredNotifications = filter === 'ALL'
+    ? notifications
+    : notifications.filter((n: any) => n.type === filter);
+
+  if (filteredNotifications.length === 0) {
     return (
       <div 
         className="rounded-xl border px-5 py-16 text-center"
@@ -49,7 +53,7 @@ export const NotificationList = () => {
       </div>
 
       <div className="flex flex-col gap-3">
-        {notifications.map((notif: AppNotification) => (
+        {filteredNotifications.map((notif: AppNotification) => (
           <div 
             key={notif.id}
             className="flex items-start justify-between gap-4 rounded-lg border p-4 transition-all"
@@ -61,10 +65,16 @@ export const NotificationList = () => {
           >
             <div>
               <h4 className="mb-1 text-sm font-medium" style={{ color: 'var(--text)' }}>
-                {notif.title}
+                {t(notif.title, {
+                  ...notif.params,
+                  habitName: notif.params?.habitName ? t(String(notif.params.habitName)) : ''
+                })}
               </h4>
               <p className="text-sm opacity-80" style={{ color: 'var(--text)' }}>
-                {notif.message}
+                {t(notif.message, {
+                  ...notif.params,
+                  habitName: notif.params?.habitName ? t(String(notif.params.habitName)) : ''
+                })}
               </p>
               <span className="mt-2 block text-xs opacity-50" style={{ color: 'var(--text)' }}>
                 {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

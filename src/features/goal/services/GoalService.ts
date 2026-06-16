@@ -65,9 +65,9 @@ export const deleteGoal = (id: string): void => {
 export const calculateGoalProgress = (goal: Goal, checkins: CheckIn[], targetPerDay: number): GoalWithDerived => {
     let currentProgress = 0;
 
-    if (goal.goalType === 'STREAK') {
+    if (goal.targetType === 'STREAK') {
         currentProgress = getCurrentStreakInRange(goal, checkins, targetPerDay);
-    } else if (goal.goalType === 'TOTAL_COMPLETIONS') {
+    } else if (goal.targetType === 'TOTAL_COMPLETIONS') {
         currentProgress = getTotalCompletion(goal, targetPerDay, checkins);
     }
 
