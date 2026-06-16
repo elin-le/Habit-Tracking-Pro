@@ -43,19 +43,14 @@ export const router = createBrowserRouter([
       },
 
       {
-        path: "statistics",
+        path: ROUTES.STATISTICS,
         element: <StatisticsPage />,
       },
 
       {
-        path: "notifications",
+        path: ROUTES.NOTIFICATIONS,
         element: <NotificationsPage />,
       },
-
-      //   {
-      //     path: ROUTES.SETTINGS,
-      //     element: <SettingsPage />,
-      //   },
     ],
   },
 
