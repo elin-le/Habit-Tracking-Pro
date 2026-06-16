@@ -10,6 +10,9 @@ export const mockHabits: Habit[] = [
     priority: "HIGH",
     categoryId: "cat_health",
     userId: "user-1",
+    checkins:[],
+    goals:[],
+    schedules:[]
   },
   {
     id: "habit-2",
@@ -20,6 +23,9 @@ export const mockHabits: Habit[] = [
     priority: "MEDIUM",
     categoryId: "cat_health",
     userId: "user-1",
+    checkins:[],
+    goals:[],
+    schedules:[]
   },
   {
     id: "habit-3",
@@ -30,6 +36,9 @@ export const mockHabits: Habit[] = [
     priority: "LOW",
     categoryId: "cat_study",
     userId: "user-1",
+    checkins:[],
+    goals:[],
+    schedules:[]
   },
   {
     id: "habit-4",
@@ -40,6 +49,9 @@ export const mockHabits: Habit[] = [
     priority: "MEDIUM",
     categoryId: "cat_mindfulness",
     userId: "user-1",
+    checkins:[],
+    goals:[],
+    schedules:[]
   },
   {
     id: "habit-5",
@@ -50,6 +62,9 @@ export const mockHabits: Habit[] = [
     priority: "HIGH",
     categoryId: "cat_health",
     userId: "user-1",
+    checkins:[],
+    goals:[],
+    schedules:[]
   },
   {
     id: "habit-6",
@@ -60,6 +75,9 @@ export const mockHabits: Habit[] = [
     priority: "MEDIUM",
     categoryId: "cat_health",
     userId: "user-1",
+    checkins:[],
+    goals:[],
+    schedules:[]
   },
   {
     id: "habit-7",
@@ -70,6 +88,9 @@ export const mockHabits: Habit[] = [
     priority: "LOW",
     categoryId: "cat_mindfulness",
     userId: "user-1",
+    checkins:[],
+    goals:[],
+    schedules:[]
   },
   {
     id: "habit-8",
@@ -80,5 +101,8 @@ export const mockHabits: Habit[] = [
     priority: "LOW",
     categoryId: "cat_study",
     userId: "user-1",
+    checkins:[],
+    goals:[],
+    schedules:[]
   },
 ];
