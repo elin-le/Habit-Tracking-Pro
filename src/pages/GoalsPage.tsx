@@ -5,63 +5,99 @@ import { useTranslation } from "react-i18next";
 import GoalCard from "../shared/components/cards/GoalCard";
 import GoalDetailPanel from "../features/goal/components/GoalDetailPanel";
 import {
-    Target,
-    Zap,
-    Award,
-    CheckCircle2,
-    Plus,
-    Search,
-    SlidersHorizontal,
+  Target,
+  Zap,
+  Award,
+  CheckCircle2,
+  Plus,
+  Search,
+  SlidersHorizontal,
 } from "lucide-react";
 import GoalForm from "../shared/components/forms/GoalForm";
-import { STORAGE_KEY } from "../shared/constants/appConstants";
-import { Modal } from "../shared/components/ui/modal";
-import { Button } from "../shared/components/ui/button";
+import { Modal } from "@/shared/components/ui/Modal";
+import { Button } from "@/shared/components/ui/Button";
 
-// GoalsPage 
-function GoalsPage() {
-    const { t } = useTranslation();
+const MOCK_GOALS_DATA = [
+  {
+    id: "goal1",
+    habitName: "Uống nước",
+    goalType: "STREAK" as const,
+    targetValue: 30,
+    startedDate: "2026-05-15",
+    endDate: "2026-06-13",
+    progress: {
+      currentProgress: 30,
+      progressPercent: 100,
+      status: "COMPLETED" as const,
+    },
+    color: "emerald" as const,
+    stats: { bestStreak: 30, completionRate: 100 },
+    weeklyHistory: [
+      { day: "T2", value: 100 },
+      { day: "T3", value: 100 },
+      { day: "T4", value: 100 },
+      { day: "T5", value: 100 },
+      { day: "T6", value: 100 },
+      { day: "T7", value: 100 },
+      { day: "CN", value: 100 },
+    ],
+  },
+  {
+    id: "goal2",
+    habitName: "Đọc sách",
+    goalType: "STREAK" as const,
+    targetValue: 21,
+    startedDate: "2026-05-28",
+    endDate: "",
+    progress: {
+      currentProgress: 17,
+      progressPercent: 81,
+      status: "IN_PROGRESS" as const,
+    },
+    color: "orange" as const,
+    stats: { bestStreak: 17, completionRate: 81 },
+    weeklyHistory: [
+      { day: "T2", value: 100 },
+      { day: "T3", value: 100 },
+      { day: "T4", value: 100 },
+      { day: "T5", value: 0 },
+      { day: "T6", value: 100 },
+      { day: "T7", value: 100 },
+      { day: "CN", value: 100 },
+    ],
+  },
+  {
+    id: "goal3",
+    habitName: "Tập gym",
+    goalType: "TOTAL_COMPLETIONS" as const,
+    targetValue: 12,
+    startedDate: "2026-06-01",
+    endDate: "",
+    progress: {
+      currentProgress: 3,
+      progressPercent: 25,
+      status: "IN_PROGRESS" as const,
+    },
+    color: "indigo" as const,
+    stats: { bestStreak: 3, completionRate: 25 },
+    weeklyHistory: [
+      { day: "T2", value: 100 },
+      { day: "T3", value: 0 },
+      { day: "T4", value: 100 },
+      { day: "T5", value: 0 },
+      { day: "T6", value: 100 },
+      { day: "T7", value: 0 },
+      { day: "CN", value: 0 },
+    ],
+  },
+];
 
-    const [modalOpen, setModalOpen] = useState(false);
-    const [selectedHabit, setSelectedHabit] = useState({ id: "", name: "" });
-    const [selectedGoalDetail, setSelectedGoalDetail] = useState<any | null>(null);
-    const [panelOpen, setPanelOpen] = useState(false);
+const MOCK_HABITS_WITHOUT_GOAL = [
+  { id: "habit_extra1", name: "Chạy bộ buổi sáng" },
+  { id: "habit_extra2", name: "Học ngoại ngữ" },
+];
 
-    // Filters
-    const [search, setSearch] = useState("");
-    const {
-        goals,
-        filteredGoals,
-        statusFilter, setStatusFilter,
-        typeFilter, setTypeFilter,
-        deleteGoal, createGoal, refreshGoals
-    } = useGoals();
-
-    // Get all habits from local storage
-    const allHabits = useMemo(() => {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY.USER_HABITS) || "[]");
-    }, []);
-
-    const habitsWithoutGoal = useMemo(() => {
-        const activeGoalHabitIds = new Set(goals.filter(g => g.progress.status === "NOT_STARTED" || g.progress.status === "IN_PROGRESS").map((g) => g.habitId));
-        return allHabits.filter((h: any) => !activeGoalHabitIds.has(h.id));
-    }, [allHabits, goals]);
-
-    const [showFilters, setShowFilters] = useState(false);
-
-    // Derived stats 
-    const stats = useMemo(() => ({
-        total: goals.length,
-        inProgress: goals.filter((g) => g.progress.status === "IN_PROGRESS").length,
-        near: goals.filter((g) => g.progress.progressPercent >= 80 && g.progress.status !== "COMPLETED").length,
-        completed: goals.filter((g) => g.progress.status === "COMPLETED").length,
-    }), [goals]);
-
-    // Handlers 
-    const handleAddGoal = (habit: { id: string; name: string }) => {
-        setSelectedHabit(habit);
-        setModalOpen(true);
-    };
+// Filter types
 
 type StatusFilter =
   | "ALL"
@@ -73,18 +109,62 @@ type TypeFilter = "ALL" | "STREAK" | "TOTAL_COMPLETIONS";
 
 // GoalsPage
 
-    const handleCloseDetail = () => {
-        setPanelOpen(false);
-        // Clear goal data AFTER slide-out animation completes
-        setTimeout(() => setSelectedGoalDetail(null), 450);
-    };
+function GoalsPage() {
+  const { t } = useTranslation();
 
-    const handleArchiveGoal = (goalId: string) => {
-        // TODO: chưa có trạng thái ARCHIVE, tạm thời xoá luôn 
-        deleteGoal(goalId);
-        ToastService.success(t("goals.archive_success"));
-        handleCloseDetail();
-    };
+  const [goals, setGoals] = useState(MOCK_GOALS_DATA);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedHabit, setSelectedHabit] = useState({ id: "", name: "" });
+  const [selectedGoalDetail, setSelectedGoalDetail] = useState<any | null>(
+    null,
+  );
+  const [panelOpen, setPanelOpen] = useState(false);
+
+  // Filters
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>("ALL");
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Derived stats
+
+  const stats = useMemo(
+    () => ({
+      total: goals.length,
+      inProgress: goals.filter((g) => g.progress.status === "IN_PROGRESS")
+        .length,
+      near: goals.filter(
+        (g) =>
+          g.progress.progressPercent >= 80 && g.progress.status !== "COMPLETED",
+      ).length,
+      completed: goals.filter((g) => g.progress.status === "COMPLETED").length,
+    }),
+    [goals],
+  );
+
+  // Filtered goals
+
+  const filteredGoals = useMemo(() => {
+    return goals.filter((g) => {
+      const matchSearch =
+        !search || g.habitName.toLowerCase().includes(search.toLowerCase());
+      const matchStatus =
+        statusFilter === "ALL" ||
+        (statusFilter === "NEAR_COMPLETION"
+          ? g.progress.progressPercent >= 80 &&
+          g.progress.status !== "COMPLETED"
+          : g.progress.status === statusFilter);
+      const matchType = typeFilter === "ALL" || g.goalType === typeFilter;
+      return matchSearch && matchStatus && matchType;
+    });
+  }, [goals, search, statusFilter, typeFilter]);
+
+  // Handlers
+
+  const handleAddGoal = (habit: { id: string; name: string }) => {
+    setSelectedHabit(habit);
+    setModalOpen(true);
+  };
 
     const handleDeleteGoal = (goalId: string) => {
         deleteGoal(goalId);
@@ -126,14 +206,14 @@ type TypeFilter = "ALL" | "STREAK" | "TOTAL_COMPLETIONS";
   return (
     <div className="flex flex-col gap-6 pb-24 md:pb-8 text-[var(--text)] animate-in fade-in duration-300">
       {/* Page header  */}
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+      {/* <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl sm:text-4xl font-light tracking-tight">
             {t("goals.title")}
           </h1>
           <p className="mt-1 text-sm opacity-60">{t("goals.subtitle")}</p>
         </div>
-      </div>
+      </div> */}
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -217,34 +297,34 @@ type TypeFilter = "ALL" | "STREAK" | "TOTAL_COMPLETIONS";
                                     focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)]
                                     transition-[border-color,box-shadow] duration-150
                                 "
-                            />
-                        </div>
+              />
+            </div>
 
-                        {/* Filter toggle */}
-                        <button
-                            onClick={() => setShowFilters((v) => !v)}
-                            aria-pressed={showFilters}
-                            className={`
+            {/* Filter toggle */}
+            <button
+              onClick={() => setShowFilters((v) => !v)}
+              aria-pressed={showFilters}
+              className={`
                 flex items-center gap-1.5 h-9 px-3.5 rounded-full
                 border text-sm font-medium
                 transition-all duration-150
                 ${showFilters || hasActiveFilters
-                                    ? "border-[var(--primary)] bg-[var(--primary)]/10 text-[var(--primary)]"
-                                    : "border-[var(--text)]/10 opacity-70 hover:opacity-100"
-                                }
+                  ? "border-[var(--primary)] bg-[var(--primary)]/10 text-[var(--primary)]"
+                  : "border-[var(--text)]/10 opacity-70 hover:opacity-100"
+                }
             `}
-                        >
-                            <SlidersHorizontal size={14} />
-                            {t("goals.filter")}
-                            {hasActiveFilters && (
-                                <span className="w-4 h-4 flex items-center justify-center rounded-full bg-[var(--primary)] text-white text-[10px] font-black">
-                                    {(statusFilter !== "ALL" ? 1 : 0) +
-                                        (typeFilter !== "ALL" ? 1 : 0)}
-                                </span>
-                            )}
-                        </button>
-                    </div>
-                </div>
+            >
+              <SlidersHorizontal size={14} />
+              {t("goals.filter")}
+              {hasActiveFilters && (
+                <span className="w-4 h-4 flex items-center justify-center rounded-full bg-[var(--primary)] text-white text-[10px] font-black">
+                  {(statusFilter !== "ALL" ? 1 : 0) +
+                    (typeFilter !== "ALL" ? 1 : 0)}
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
 
         {/* Filter chips — animated */}
         {showFilters && (
@@ -337,185 +417,185 @@ type TypeFilter = "ALL" | "STREAK" | "TOTAL_COMPLETIONS";
                             rounded-3xl border
                             text-center
                         "
-                        style={{
-                            background: "var(--surface)",
-                            borderColor:
-                                "color-mix(in srgb, var(--primary) 20%, transparent)",
-                        }}
-                    >
-                        <div
-                            className="
+            style={{
+              background: "var(--surface)",
+              borderColor:
+                "color-mix(in srgb, var(--primary) 20%, transparent)",
+            }}
+          >
+            <div
+              className="
                             w-14 h-14 rounded-2xl flex items-center justify-center
                             bg-slate-100/50 opacity-60
                         "
-                        >
-                            <Target size={24} />
-                        </div>
-                        <div>
-                            <p className="text-lg font-semibold opacity-90">
-                                {t("goals.empty_title")}
-                            </p>
-                            <p className="text-sm opacity-60 mt-1">
-                                {search || hasActiveFilters
-                                    ? t("goals.empty_filter_hint")
-                                    : t("goals.empty_hint")}
-                            </p>
-                        </div>
-                        {hasActiveFilters && (
-                            <button
-                                onClick={() => {
-                                    setStatusFilter("ALL");
-                                    setTypeFilter("ALL");
-                                    setSearch("");
-                                }}
-                                className="text-sm font-semibold text-[var(--primary)] hover:underline mt-2"
-                            >
-                                {t("goals.clear_filters")}
-                            </button>
-                        )}
-                    </div>
-                )}
-            </section>
+            >
+              <Target size={24} />
+            </div>
+            <div>
+              <p className="text-lg font-semibold opacity-90">
+                {t("goals.empty_title")}
+              </p>
+              <p className="text-sm opacity-60 mt-1">
+                {search || hasActiveFilters
+                  ? t("goals.empty_filter_hint")
+                  : t("goals.empty_hint")}
+              </p>
+            </div>
+            {hasActiveFilters && (
+              <button
+                onClick={() => {
+                  setStatusFilter("ALL");
+                  setTypeFilter("ALL");
+                  setSearch("");
+                }}
+                className="text-sm font-semibold text-[var(--primary)] hover:underline mt-2"
+              >
+                {t("goals.clear_filters")}
+              </button>
+            )}
+          </div>
+        )}
+      </section>
 
-            {/* Habits without goal */}
-            {habitsWithoutGoal.length > 0 && (
-                <section className="flex flex-col gap-4 mt-8">
-                    <h2 className="text-lg font-bold">{t("goals.no_goal")}</h2>
-                    <div className="flex flex-col gap-2.5">
-                        {habitsWithoutGoal.map((habit) => (
-                            <div
-                                key={habit.id}
-                                className="
+      {/* Habits without goal */}
+      {MOCK_HABITS_WITHOUT_GOAL.length > 0 && (
+        <section className="flex flex-col gap-4 mt-8">
+          <h2 className="text-lg font-bold">{t("goals.no_goal")}</h2>
+          <div className="flex flex-col gap-2.5">
+            {MOCK_HABITS_WITHOUT_GOAL.map((habit) => (
+              <div
+                key={habit.id}
+                className="
                                     flex items-center justify-between
                                     rounded-2xl p-4 border
                                     hover:shadow-sm transition-shadow duration-200
                                 "
-                                style={{
-                                    background: "var(--surface)",
-                                    borderColor:
-                                        "color-mix(in srgb, var(--primary) 15%, transparent)",
-                                }}
-                            >
-                                <div className="flex items-center gap-3">
-                                    <div
-                                        className="
+                style={{
+                  background: "var(--surface)",
+                  borderColor:
+                    "color-mix(in srgb, var(--primary) 15%, transparent)",
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className="
                                         w-8 h-8 rounded-xl flex items-center justify-center shrink-0
                                         bg-slate-100/50 opacity-60
                                     "
-                                    >
-                                        <Target size={14} />
-                                    </div>
-                                    <span className="font-semibold text-base opacity-90">
-                                        {habit.name}
-                                    </span>
-                                </div>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleAddGoal(habit)}
-                                    className="shrink-0 flex items-center"
-                                >
-                                    <Plus size={14} />
-                                    <span className="ml-2">{t("goals.add_goal")}</span>
-                                </Button>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-            )}
-
-            {/* Create goal modal */}
-            {modalOpen && (
-                <Modal
-                    title={t("goals.add_goal")}
-                    onClose={() => setModalOpen(false)}
-                    size="sm"
+                  >
+                    <Target size={14} />
+                  </div>
+                  <span className="font-semibold text-base opacity-90">
+                    {habit.name}
+                  </span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleAddGoal(habit)}
+                  className="shrink-0 flex items-center"
                 >
-                    <GoalForm
-                        habitId={selectedHabit.id}
-                        habitName={selectedHabit.name}
-                        onSubmit={handleFormSubmit}
-                        onCancel={() => setModalOpen(false)}
-                    />
-                </Modal>
-            )}
+                  <Plus size={14} />
+                  <span className="ml-2">{t("goals.add_goal")}</span>
+                </Button>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
-            {/* Detail drawer */}
-            <GoalDetailPanel
-                goal={selectedGoalDetail}
-                habitName={selectedGoalDetail?.habitName ?? ""}
-                isOpen={panelOpen}
-                onClose={handleCloseDetail}
-                onArchive={handleArchiveGoal}
-                onDelete={handleDeleteGoal}
-            />
-        </div>
-    );
+      {/* Create goal modal */}
+      {modalOpen && (
+        <Modal
+          title={t("goals.add_goal")}
+          onClose={() => setModalOpen(false)}
+          size="sm"
+        >
+          <GoalForm
+            habitId={selectedHabit.id}
+            habitName={selectedHabit.name}
+            onSubmit={handleFormSubmit}
+            onCancel={() => setModalOpen(false)}
+          />
+        </Modal>
+      )}
+
+      {/* Detail drawer */}
+      <GoalDetailPanel
+        goal={selectedGoalDetail}
+        habitName={selectedGoalDetail?.habitName ?? ""}
+        isOpen={panelOpen}
+        onClose={handleCloseDetail}
+        onArchive={handleArchiveGoal}
+        onDelete={handleDeleteGoal}
+      />
+    </div>
+  );
 }
 
 // Summary card
 
 const SummaryCard: React.FC<{
-    icon: React.ReactNode;
-    label: string;
-    value: number;
-    iconClass: string;
-    onClick?: () => void;
-    active?: boolean;
+  icon: React.ReactNode;
+  label: string;
+  value: number;
+  iconClass: string;
+  onClick?: () => void;
+  active?: boolean;
 }> = ({ icon, label, value, iconClass, onClick, active }) => (
-    <button
-        type="button"
-        onClick={onClick}
-        disabled={!onClick}
-        className={`
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={!onClick}
+    className={`
             flex items-center gap-3.5 p-4 sm:p-5 rounded-2xl text-left w-full
             bg-[var(--surface)]
             border transition-all duration-200
             ${onClick ? "cursor-pointer hover:shadow-md hover:-translate-y-0.5" : "cursor-default"}
             ${active
-                ? "border-[var(--primary)] ring-2 ring-[var(--primary)]/20"
-                : "border-transparent"
-            }
+        ? "border-[var(--primary)] ring-2 ring-[var(--primary)]/20"
+        : "border-transparent"
+      }
         `}
-        style={{
-            borderColor: active
-                ? "var(--primary)"
-                : "color-mix(in srgb, var(--primary) 15%, transparent)",
-        }}
+    style={{
+      borderColor: active
+        ? "var(--primary)"
+        : "color-mix(in srgb, var(--primary) 15%, transparent)",
+    }}
+  >
+    <div
+      className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 ${iconClass}`}
     >
-        <div
-            className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 ${iconClass}`}
-        >
-            {icon}
-        </div>
-        <div className="min-w-0">
-            <p className="text-xl sm:text-2xl font-black leading-none">{value}</p>
-            <p className="text-xs opacity-60 font-semibold mt-1 truncate">{label}</p>
-        </div>
-    </button>
+      {icon}
+    </div>
+    <div className="min-w-0">
+      <p className="text-xl sm:text-2xl font-black leading-none">{value}</p>
+      <p className="text-xs opacity-60 font-semibold mt-1 truncate">{label}</p>
+    </div>
+  </button>
 );
 
 // Filter chip
 
 const FilterChip: React.FC<{
-    active: boolean;
-    onClick: () => void;
-    children: React.ReactNode;
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
 }> = ({ active, onClick, children }) => (
-    <button
-        type="button"
-        onClick={onClick}
-        className={`
+  <button
+    type="button"
+    onClick={onClick}
+    className={`
             h-8 px-4 rounded-full text-sm font-semibold
             border transition-all duration-150
             ${active
-                ? "border-[var(--primary)] bg-[var(--primary)]/10 text-[var(--primary)]"
-                : "border-[var(--text)]/10 opacity-70 hover:opacity-100"
-            }
+        ? "border-[var(--primary)] bg-[var(--primary)]/10 text-[var(--primary)]"
+        : "border-[var(--text)]/10 opacity-70 hover:opacity-100"
+      }
         `}
-    >
-        {children}
-    </button>
+  >
+    {children}
+  </button>
 );
 
 export default GoalsPage;

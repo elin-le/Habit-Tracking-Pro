@@ -17,14 +17,14 @@ export default function StatisticsPage() {
   return (
     <div className="flex flex-col gap-6 pb-24 md:pb-8 text-[var(--text)]">
       {/* Tiêu đề trang */}
-      <div>
+      {/* <div>
         <h1 className="text-3xl sm:text-4xl font-light">{t("statistics.title")}</h1>
         <p className="mt-1 text-sm opacity-60">{t("statistics.subtitle")}</p>
-      </div>
+      </div> */}
 
       {stats.length === 0 ? (
-          <EmptyState />
-        ) : (
+        <EmptyState />
+      ) : (
         <>
           {/* ---- 3 thẻ tổng quan ---- */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -114,13 +114,13 @@ function HabitStatCard({ stat }: { stat: HabitStat }) {
       {/* 4 chỉ số */}
       <div className="grid grid-cols-2 gap-3 text-sm">
         <Metric icon={<Flame size={15} />} label={t("statistics.current_streak")}
-                value={`${stat.currentStreak} ${t("statistics.days")}`} />
+          value={`${stat.currentStreak} ${t("statistics.days")}`} />
         <Metric icon={<Trophy size={15} />} label={t("statistics.longest_streak")}
-                value={`${stat.longestStreak} ${t("statistics.days")}`} />
+          value={`${stat.longestStreak} ${t("statistics.days")}`} />
         <Metric icon={<CheckCircle2 size={15} />} label={t("statistics.total_completions")}
-                value={`${stat.totalCompletions}`} />
+          value={`${stat.totalCompletions}`} />
         <Metric icon={<TrendingUp size={15} />} label={t("statistics.completion_rate")}
-                value={`${stat.completionRate}%`} />
+          value={`${stat.completionRate}%`} />
       </div>
       {/* Thanh 7 ngày gần nhất*/}
       <div>

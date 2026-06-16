@@ -241,5 +241,22 @@
       "title": "Streak at risk!",
       "message": "Careful! You are about to break your {{streakCount}}-day {{habitName}} streak."
     }
+  }, 
+  "dashboard": {
+    "completedToday": "Completion today",
+    "activeHabits": "Active Habits",
+    "atRiskHabits": "At Risk Habits",
+    "currentStreak": "Current Streak",
+    "longestStreak": "Longest Streak",
+    "completionRate": "Completion Rate",
+    "categoryOverview": "Category Overview",
+    "goalProgress": "Goal Progress",
+    "health": "Health",
+    "learning": "Learning",
+    "productivity": "Productivity",
+    "goalReadBooks": "Read Book 30m per day",
+    "goalWorkout": "Practice 20 times per month",
+    "goalDrinkWater": "Drink 2L water per day",
+    "days": "Days"
   }
 }
