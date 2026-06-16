@@ -1,12 +1,10 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import {
     X,
     Calendar,
     Flame,
-    Target,
     Trophy,
     CheckCircle2,
-    AlertTriangle,
     Archive,
     Trash2,
     Clock,
