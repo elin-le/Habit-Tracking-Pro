@@ -1,5 +1,5 @@
 import { cn } from "@/shared/lib/utils";
-import { Button } from "../ui/button";
+import { Button } from "../ui/Button";
 
 interface FilterChipProps {
   children: React.ReactNode;
