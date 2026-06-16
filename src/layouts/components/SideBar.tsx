@@ -6,6 +6,7 @@ import type { User } from "../../shared/types/User"
 import { STORAGE_KEY } from "../../shared/constants/appConstants"
 
 
+
 function HomeIcon({ className = "" }: { className?: string }) {
     return (
         <svg className={className} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -131,11 +132,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
                     >
                         <Icon />
                         <span className="flex-1">{label}</span>
-                        {badge !== undefined && (
-                            <span className="bg-red-500 text-white text-[11px] font-semibold min-w-[20px] h-5 rounded-full flex items-center justify-center px-1.5">
-                                {badge}
-                            </span>
-                        )}
+                        {badge}
                     </NavLink>
                 ))}
             </nav>
