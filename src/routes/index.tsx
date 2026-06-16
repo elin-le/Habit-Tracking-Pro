@@ -6,7 +6,7 @@ import AuthLayout from "../layouts/AuthLayout";
 import { ROUTES } from "../shared/constants/appConstants";
 
 import { HabitsPage } from "../features/habit/page/HabitsPage";
-import { HabitHistoryPage } from "../features/habit/components/HabitHistoryPage";
+// import { HabitHistoryPage } from "../features/habit/components/HabitHistoryPage";
 import GoalsPage from "../pages/GoalsPage";
 import { NotificationsPage } from "../pages/NotificationsPage";
 
@@ -39,7 +39,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "habits/:habitId/history",
-        element: <HabitHistoryPage />,
+        // element: <HabitHistoryPage />,
       },
 
       {
