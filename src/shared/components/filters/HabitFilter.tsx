@@ -4,7 +4,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { format } from "date-fns";
 import { useState } from "react";
 import { Calendar } from "../ui/calendar";
-import { Button } from "../ui/button";
+import { Button } from "../ui/Button";
 import { DAYS } from "@/shared/constants/appConstants";
 import { cn } from "@/shared/lib/utils";
 import { useTranslation } from "react-i18next";

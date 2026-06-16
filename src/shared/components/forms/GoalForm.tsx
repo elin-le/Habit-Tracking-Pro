@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { AlertCircle, Flame, Target } from "lucide-react";
 
 import { useTranslation } from "react-i18next";
-import { Button } from "../ui/button";
+import { Button } from "../ui/Button";
 
 // Types
 
