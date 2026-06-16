@@ -5,6 +5,14 @@ import AuthLayout from "../layouts/AuthLayout";
 
 import { ROUTES } from "../shared/constants/appConstants";
 
+import { HabitsPage } from "../features/habit/page/HabitsPage";
+import GoalsPage from "../pages/GoalsPage";
+import { NotificationsPage } from "../pages/NotificationsPage";
+
+import StatisticsPage from "../pages/StatisticsPage";
+
+import DashboardPage from "../pages/DashboardPage";
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -18,34 +26,38 @@ export const router = createBrowserRouter([
   {
     path: ROUTES.DASHBOARD,
     element: <MainLayout />,
-    // children: [
-    //   {
-    //     path: ROUTES.HABITS,
-    //     element: <HabitsPage />,
-    //   },
+    children: [
+      {
+        path: ROUTES.DASHBOARD,
+        element: <DashboardPage />,
+      },
 
-    //   {
-    //     path: ROUTES.GOALS,
-    //     element: <GoalsPage />,
-    //   },
+      {
+        path: ROUTES.HABITS,
+        element: <HabitsPage />,
+      },
 
-    //   {
-    //     path: ROUTES.STATISTICS,
-    //     element: <StatisticsPage />,
-    //   },
+      {
+        path: ROUTES.GOALS,
+        element: <GoalsPage />,
+      },
 
-    //   {
-    //     path: ROUTES.NOTIFICATIONS,
-    //     element: <NotificationsPage />,
-    //   },
+      {
+        path: "statistics",
+        element: <StatisticsPage />,
+      },
 
-    //   {
-    //     path: ROUTES.SETTINGS,
-    //     element: <SettingsPage />,
-    //   },
-    // ],
+      {
+        path: "notifications",
+        element: <NotificationsPage />,
+      },
+
+      //   {
+      //     path: ROUTES.SETTINGS,
+      //     element: <SettingsPage />,
+      //   },
+    ],
   },
-
 
   //   {
   //     path: "*",

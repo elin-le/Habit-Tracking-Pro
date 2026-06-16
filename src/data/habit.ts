@@ -1,16 +1,84 @@
-//Example
+import type { Habit } from "../shared/types/Habit";
 
-export const habits = [
-    {
-        id: "1",
-        name: "Read Book",
-        category: "Learning",
-        streak: 12
-    },
-    {
-        id: "2",
-        name: "Workout",
-        category: "Health",
-        streak: 7
-    }
+export const mockHabits: Habit[] = [
+  {
+    id: "habit-1",
+    name: "Drink Water",
+    frequencyType: "DAILY",
+    targetPerDay: 5,
+    status: "ACTIVE",
+    priority: "HIGH",
+    categoryId: "cat_health",
+    userId: "user-1",
+  },
+  {
+    id: "habit-2",
+    name: "Morning Workout",
+    frequencyType: "DAY_OF_WEEK",
+    targetPerDay: 1,
+    status: "ACTIVE",
+    priority: "MEDIUM",
+    categoryId: "cat_health",
+    userId: "user-1",
+  },
+  {
+    id: "habit-3",
+    name: "Read Book",
+    frequencyType: "DAILY",
+    targetPerDay: 1,
+    status: "ACTIVE",
+    priority: "LOW",
+    categoryId: "cat_study",
+    userId: "user-1",
+  },
+  {
+    id: "habit-4",
+    name: "Meditate",
+    frequencyType: "DAILY",
+    targetPerDay: 1,
+    status: "PAUSED",
+    priority: "MEDIUM",
+    categoryId: "cat_mindfulness",
+    userId: "user-1",
+  },
+  {
+    id: "habit-5",
+    name: "Sleep Early",
+    frequencyType: "DAY_OF_WEEK",
+    targetPerDay: 1,
+    status: "ACTIVE",
+    priority: "HIGH",
+    categoryId: "cat_health",
+    userId: "user-1",
+  },
+  {
+    id: "habit-6",
+    name: "No Sugar",
+    frequencyType: "DAY_OF_WEEK",
+    targetPerDay: 1,
+    status: "ACTIVE",
+    priority: "MEDIUM",
+    categoryId: "cat_health",
+    userId: "user-1",
+  },
+  {
+    id: "habit-7",
+    name: "Journal Writing",
+    frequencyType: "DAILY",
+    targetPerDay: 1,
+    status: "ACTIVE",
+    priority: "LOW",
+    categoryId: "cat_mindfulness",
+    userId: "user-1",
+  },
+  {
+    id: "habit-8",
+    name: "Learn Spanish",
+    frequencyType: "DAY_OF_WEEK",
+    targetPerDay: 2,
+    status: "ARCHIVED",
+    priority: "LOW",
+    categoryId: "cat_study",
+    userId: "user-1",
+  },
 ];
