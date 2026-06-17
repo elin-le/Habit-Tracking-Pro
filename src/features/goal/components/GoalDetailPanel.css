@@ -1,0 +1,49 @@
+.goal-detail-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  transition: opacity 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.goal-detail-drawer {
+  transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+  border-color: color-mix(in srgb, var(--primary) 15%, transparent);
+  color: var(--text);
+}
+
+.goal-detail-header {
+  border-color: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.goal-detail-close-btn {
+  background: transparent;
+  transition: background-color 150ms;
+}
+
+.goal-detail-close-btn:hover {
+  background-color: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.goal-detail-card {
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.goal-detail-info {
+  background: color-mix(in srgb, var(--surface) 50%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.goal-detail-footer {
+  background: var(--surface);
+  border-color: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.goal-detail-delete-btn {
+  background: color-mix(in srgb, #ef4444 4%, transparent);
+  border-color: color-mix(in srgb, #ef4444 15%, transparent);
+  color: #ef4444;
+}
+
+.goal-detail-delete-btn:hover {
+  background: color-mix(in srgb, #ef4444 10%, transparent);
+}

@@ -189,6 +189,8 @@
     "weekly_performance": "Hiệu suất 7 ngày qua",
     "congrats_completed": "Chúc mừng! Bạn đã hoàn thành mục tiêu này!",
     "congrats_near": "Cố lên! Bạn đã đạt hơn 80% chặng đường rồi!",
+    "motivation_eyebrow": "CỐ GẮNG LÊN",
+    "motivation_headline": "Hành trình ngàn dặm bắt đầu từ một bước chân. Bạn làm được mà!",
     "started_date": "Ngày bắt đầu",
     "end_date": "Ngày kết thúc",
     "action_archive": "Lưu trữ mục tiêu",
@@ -250,6 +252,7 @@
     "empty": "Chưa có dữ liệu để thống kê",
     "empty_hint": "Tạo thói quen và check-in mỗi ngày để xem thống kê tại đây",
     "empty_action": "Tạo thói quen ngay",
+    "statistics.no_match": "Không có thói quen khớp bộ lọc",
     "btn_export": "Xuất dữ liệu",
     "ex_noti1": "Xuất dữ liệu thành công",
     "ex_noti2": "Xuất dữ liệu thất bại"

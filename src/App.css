@@ -59,3 +59,13 @@ body {
 .community-highlight {
     animation: community-glow 2.5s infinite;
 }
+
+@media (max-width: 768px) {
+  * {
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
+  }
+  *::-webkit-scrollbar {
+    display: none; 
+  }
+}

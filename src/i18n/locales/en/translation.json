@@ -190,6 +190,8 @@
     "weekly_performance": "Last 7 days performance",
     "congrats_completed": "Congratulations! You've successfully completed this goal!",
     "congrats_near": "Keep it up! You have reached over 80% of your goal!",
+    "motivation_eyebrow": "KEEP GOING",
+    "motivation_headline": "A journey of a thousand miles begins with a single step. You can do it!",
     "started_date": "Started",
     "end_date": "Ended",
     "action_archive": "Archive goal",
@@ -251,6 +253,7 @@
     "empty": "No statistics yet",
     "empty_hint": "Create habits and check in to see your stats here",
     "empty_action": "Create your habit",
+    "statistics.no_match": "No habits match the selected filters",
     "btn_export": "Download",
     "ex_noti1": "Data export successful",
     "ex_noti2": "Data export failed"

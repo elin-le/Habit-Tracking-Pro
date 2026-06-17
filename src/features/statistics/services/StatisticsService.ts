@@ -10,17 +10,6 @@ import {
 } from "../../habit/calculators/GoalCalculator";
 import { getHabitRisk } from "../../habit/calculators/riskDetector";
 
-/* ============================================================
- *  StatisticsService đọc dữ liệu THẬT từ localStorage và suy ra
- *  số liệu thống kê cho từng habit.
- *  Dùng engine của Đan (đã đọc completionCount) để tính streak.
- *
- *  TODO: khi Đan merge getLast7DaysCompletionProgress, thay khối
- *  tính last7Days bên dưới bằng:
- *    getLast7DaysCompletionProgress(habitCheckIns, target)
- *      .map((d) => d.completionPercentage)
- * ============================================================ */
-
 const readList = <T>(key: string): T[] => {
   try {
     const raw = localStorage.getItem(key);
@@ -91,6 +80,8 @@ const deriveHabitStat = (
     id: habit.id,
     name: habit.name,
     category,
+    categoryId: habit.categoryId,
+    priority: habit.priority,
     currentStreak,
     longestStreak,
     totalCompletions,
