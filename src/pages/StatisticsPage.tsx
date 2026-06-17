@@ -1,18 +1,17 @@
 import { useTranslation } from "react-i18next";
 import { Flame, Trophy, CheckCircle2, TrendingUp, BarChart3 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { mockStats } from "../data/statistics";
+import { useHabitStats } from "../shared/hooks/useHabitStats";
 import type { HabitStat, RiskLevel } from "../shared/types/Statistics";
 
 export default function StatisticsPage() {
   const { t } = useTranslation();
-  const stats = mockStats;
+  const { stats } = useHabitStats();
 
-  //Số liệu tổng quan (tính đơn giản từ mock)
   const total = stats.length;
   const completedToday = stats.filter((s) => s.last7Days[s.last7Days.length - 1] === 100).length;
   const completedTodayPct = total === 0 ? 0 : Math.round((completedToday / total) * 100);
-  const activeHabits = stats.filter((s) => s.currentStreak > 0).length;
+  const activeHabits = stats.length;
   const atRisk = stats.filter((s) => s.riskLevel === "AT_RISK").length;
 
   return (

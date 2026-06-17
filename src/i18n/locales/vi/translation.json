@@ -292,10 +292,18 @@
     "health": "Sức khỏe",
     "learning": "Học tập",
     "productivity": "Năng suất",
+  },
+   "checkin": {
+    "history": "Lịch sử check-in",
+    "no": "Không có lịch sử check-in.",
+    "not_finished": "Chưa hoàn thành",
+    "completed":"Đạt mục tiêu"
     "days": "Ngày"
   },
-  "checkin": {
-    "history": "Lịch sử check-in",
-    "no": "Không có lịch sử check-in."
+  "setting":{
+    "setting":"Cài đặt",
+    "darkMode":"Chế độ tối",
+    "vietnamese":"Tiếng Việt",
+    "readOnly":"Chỉ đọc"
   }
 }

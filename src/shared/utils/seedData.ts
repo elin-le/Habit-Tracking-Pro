@@ -4,6 +4,7 @@ import { mockCategories } from "../../data/category";
 import { MockUsers } from "../../data/users";
 import { mockGoals } from "../../data/goals";
 import { STORAGE_KEY } from "../constants/appConstants";
+import { mockCheckIns } from "@/data/checkin";
 
 export const seedData = () => {
   const users = localStorage.getItem(STORAGE_KEY.USERS);
@@ -46,5 +47,13 @@ export const seedGoals = () => {
   if (!goals) {
     localStorage.setItem(STORAGE_KEY.USER_GOALS, JSON.stringify(mockGoals));
     console.log("Seeded goals data");
+  }
+};
+
+export const seedCheckins = () => {
+  const checkins = localStorage.getItem(STORAGE_KEY.USER_CHECKINS);
+  if (!checkins) {
+    localStorage.setItem(STORAGE_KEY.USER_CHECKINS, JSON.stringify(mockCheckIns));
+    console.log("Seeded user checkins data");
   }
 };

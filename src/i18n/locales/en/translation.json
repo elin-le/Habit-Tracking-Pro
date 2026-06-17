@@ -295,8 +295,16 @@
     "productivity": "Productivity",
     "days": "Days"
   },
-  "checkin": {
-    "history": "Check-in History",
-    "no": "Empty"
+  "checkin":{
+    "history":"Check-in History",
+    "no":"Empty",
+    "not_finished": "Not finished",
+    "completed":"Completed"
+  },
+  "setting":{
+    "setting":"Setting",
+    "darkMode":"Dark Mode",
+    "vietnamese":"Vietnamese",
+    "readOnly":"Read Only"
   }
 }

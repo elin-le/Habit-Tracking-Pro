@@ -317,3 +317,62 @@ export const getCompletionRate = (
         100
     );
 };
+type CompletionDto = {
+    day: string;
+    completion: number;
+    completionPercentage: number;
+};
+
+export const getLast7DaysCompletionProgress = (
+    goal: Goal,
+    habitCheckIns: CheckIn[],
+    targetPerDay: number
+): CompletionDto[] => {
+    const summary = getDailySummary(
+        habitCheckIns,
+        targetPerDay
+    );
+
+    const today = new Date();
+    const result: CompletionDto[] = [];
+
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+
+        const dateKey = getDateKey(date);
+
+        // Nếu ngày nằm ngoài khoảng goal thì trả về 0
+        if (
+            !isDateInRange(
+                dateKey,
+                goal.startedDate,
+                goal.endDate
+            )
+        ) {
+            result.push({
+                day: dateKey,
+                completion: 0,
+                completionPercentage: 0,
+            });
+            continue;
+        }
+
+        const completion =
+            summary[dateKey]?.count ?? 0;
+
+        result.push({
+            day: dateKey,
+            completion,
+            completionPercentage: Math.min(
+                Math.round(
+                    (completion / targetPerDay) *
+                    100
+                ),
+                100
+            ),
+        });
+    }
+
+    return result;
+};

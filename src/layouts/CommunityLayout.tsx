@@ -9,22 +9,10 @@ interface CommunityLayoutProps {
   onBack?: () => void;
 }
 
-/** Shape handed down to nested routes through <Outlet context>. */
 interface CommunityContext {
   searchQuery: string;
 }
 
-/**
- * Dedicated chrome for the whole Community section. Used directly as a
- * route `element`, the same way MainLayout/AuthLayout are:
- *
- *   { path: ROUTES.COMMUNITY, element: <CommunityLayout />, children: [...] }
- *
- * It owns the search box in its sticky header and the dark/light toggle,
- * then hands the current search text down to whichever child route is
- * active via React Router's Outlet context. Read it from any nested page
- * with `useCommunitySearch()`.
- */
 export default function CommunityLayout({ title = 'Cộng đồng', subtitle, onBack }: CommunityLayoutProps) {
   const [isDark, setIsDark] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
