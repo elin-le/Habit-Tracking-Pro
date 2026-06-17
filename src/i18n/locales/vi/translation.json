@@ -291,13 +291,13 @@
     "goalProgress": "Tiến độ mục tiêu",
     "health": "Sức khỏe",
     "learning": "Học tập",
-    "productivity": "Năng suất",
+    "productivity": "Năng suất"
   },
    "checkin": {
     "history": "Lịch sử check-in",
     "no": "Không có lịch sử check-in.",
     "not_finished": "Chưa hoàn thành",
-    "completed":"Đạt mục tiêu"
+    "completed":"Đạt mục tiêu",
     "days": "Ngày"
   },
   "setting":{
@@ -305,5 +305,8 @@
     "darkMode":"Chế độ tối",
     "vietnamese":"Tiếng Việt",
     "readOnly":"Chỉ đọc"
+  },
+  "heatmap": {
+    "more":"Thêm"
   }
 }

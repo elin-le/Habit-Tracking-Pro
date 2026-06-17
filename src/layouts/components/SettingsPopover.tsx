@@ -1,3 +1,5 @@
+
+import { useEffect } from "react"
 import { Settings, Globe, Lock, Moon } from "lucide-react";
 import { Switch } from "../../shared/components/ui/switch";
 import {
@@ -14,20 +16,30 @@ export default function SettingsPopover() {
     const { readOnly, setReadOnly } = useReadOnly();
     const { theme, toggleTheme } = useTheme();
     const { t, i18n } = useTranslation();
+    useEffect(() => {
+        const root = document.documentElement;
 
+        root.classList.toggle("dark", theme === "dark");
+
+        localStorage.setItem("theme", theme);
+    }, [theme]);
     return (
         <Popover>
             <PopoverTrigger asChild>
                 <button
                     className="
-                        relative
-                        h-10 w-10
-                        rounded-xl
-                        flex items-center justify-center
-                        text-violet-200
-                        hover:bg-white/10
-                        transition
-                    "
+        relative
+        h-10 w-10
+        rounded-xl
+        flex items-center justify-center
+
+        text-violet-600
+
+        hover:bg-violet-50
+        dark:hover:bg-white/10
+
+        transition
+    "
                 >
                     <Settings size={18} />
 
@@ -48,23 +60,32 @@ export default function SettingsPopover() {
             <PopoverContent
                 align="end"
                 className="
-                    w-80
-                    bg-[#1e1448]
-                    border-white/10
-                    text-white
-                "
+        w-80
+
+        border
+
+        bg-white
+        text-zinc-900
+        border-zinc-200
+
+        dark:bg-indigo-900
+        dark:text-zinc-100
+        dark:border-zinc-800
+    "
             >
                 <div className="space-y-4">
-                    <h3 className="font-semibold text-violet-100">
+                    <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
                         {t("setting.setting")}
                     </h3>
-                    <div className="h-px bg-white/10" />
+                    <div className="h-px bg-zinc-200 dark:bg-indigo-600" />
 
                     {/* Language */}
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-between rounded-lg px-2 py-2 hover:bg-zinc-100 dark:hover:bg-indigo-800 transition-colors">
+                        <div className="flex items-center gap-2 text-violet-600 dark:text-violet-400">
                             <Globe size={16} />
-                            <span>{t("setting.vietnamese")}</span>
+                            <span className="text-zinc-900 dark:text-zinc-100">
+                                {t("setting.vietnamese")}
+                            </span>
                         </div>
 
                         <Switch
@@ -76,10 +97,10 @@ export default function SettingsPopover() {
                     </div>
 
                     {/* Theme */}
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-between rounded-lg px-2 py-2 hover:bg-zinc-100 dark:hover:bg-indigo-800 transition-colors">
+                        <div className="flex items-center gap-2 text-indigo-800 dark:text-indigo-400">
                             <Moon size={16} />
-                            <span>{t("setting.darkMode")}</span>
+                            <span className="text-zinc-900 dark:text-zinc-100">{t("setting.darkMode")}</span>
                         </div>
 
                         <Switch
@@ -89,10 +110,10 @@ export default function SettingsPopover() {
                     </div>
 
                     {/* Read Only */}
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-between rounded-lg px-2 py-2 hover:bg-zinc-100 dark:hover:bg-indigo-800 transition-colors">
+                        <div className="flex items-center gap-2 text-violet-600 dark:text-violet-400">
                             <Lock size={16} />
-                            <span>Read Only</span>
+                            <span className="text-zinc-900 dark:text-zinc-100">Read Only</span>
                         </div>
 
                         <Switch

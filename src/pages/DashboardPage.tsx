@@ -9,6 +9,11 @@ import { getDashboardData } from "../features/dashboard/services/DashboardServic
 
 import "../features/dashboard/Dashboard.css";
 
+import { HeatMap } from "@/shared/components/heatmap/HeatMap";
+import { buildHeatMapData } from "@/shared/components/heatmap/heatmap.util"
+import type { CheckIn } from "@/shared/types/CheckIn"
+import { STORAGE_KEY } from "@/shared/constants/appConstants"
+
 const DashboardPage = () => {
     const [selectedCategory, setSelectedCategory] =
         useState("ALL");
@@ -19,10 +24,10 @@ const DashboardPage = () => {
         categoryOverview,
         goalProgress,
     } = getDashboardData(selectedCategory);
-
+    const checkins = JSON.parse(localStorage.getItem(STORAGE_KEY.USER_CHECKINS) || "[]") as CheckIn[];
+    console.log("CHECKINS", checkins);
     return (
         <div className="dashboard-page">
-
             {/* Summary Cards */}
             <section className="dashboard-summary">
                 <SummaryCard
@@ -30,9 +35,7 @@ const DashboardPage = () => {
                 />
             </section>
 
-            {/* Dashboard Content */}
             <section className="dashboard-grid">
-
                 <div className="dashboard-grid__category">
                     <CategoryOverview
                         categories={categoryOverview}
@@ -44,15 +47,15 @@ const DashboardPage = () => {
                         statistics={habitStatistics}
                     />
                 </div>
-
-                <div className="dashboard-grid__goals">
-                    <GoalProgress
-                        goals={goalProgress}
-                    />
-                </div>
-
             </section>
 
+            <section className="dashboard-heatmap">
+                <HeatMap data={buildHeatMapData(checkins)} weeks={20} />
+            </section>
+
+            <section className="dashboard-goals">
+                <GoalProgress goals={goalProgress} />
+            </section>
         </div>
     );
 };
