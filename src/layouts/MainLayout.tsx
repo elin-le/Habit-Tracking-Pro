@@ -23,7 +23,7 @@ export default function MainLayout() {
   const { t } = useTranslation();
 
   const habitData = useHabits(currentUser.phone);
-  const habitSchedule = useHabitSchedule(habitData.habits);
+  const habitSchedule = useHabitSchedule(currentUser.phone);
   const categoryData = useCategories();
 
   const goalData = useGoals();

@@ -338,18 +338,14 @@ export function HabitForm({
 
                 if (value === "") {
                   setForm((f) => ({ ...f, targetPerDay: "" })); // ✅ callback form
+                  setTargetPerDayError(validateTargetPerDay(""));
                   return;
                 }
 
-                if (targetPerDayError) {
-                  setTargetPerDayError(validateTargetPerDay(Number(value)));
-                }
+                const numValue = Math.min(999, Number(value));
 
-                setForm((f) => ({
-                  ...f,
-                  targetPerDay: Math.min(999, Number(value)),
-                })); // ✅ callback form
-                setTargetPerDayError(validateTargetPerDay(form.targetPerDay));
+                setForm((f) => ({ ...f, targetPerDay: numValue }));
+                setTargetPerDayError(validateTargetPerDay(numValue));
               }}
               onFocus={(e) => {
                 if (!targetPerDayError)
