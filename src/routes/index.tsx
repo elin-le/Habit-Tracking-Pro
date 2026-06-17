@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import MainLayout from "../layouts/MainLayout";
 import AuthLayout from "../layouts/AuthLayout";
+import CommunityLayout from "../layouts/CommunityLayout"
 
 import { ROUTES } from "../shared/constants/appConstants";
 
@@ -11,8 +12,8 @@ import GoalsPage from "../pages/GoalsPage";
 import { NotificationsPage } from "../pages/NotificationsPage";
 
 import StatisticsPage from "../pages/StatisticsPage";
-
 import DashboardPage from "../pages/DashboardPage";
+import CommunityPage from "../features/community/CommunityPage"
 
 export const router = createBrowserRouter([
   {
@@ -29,7 +30,7 @@ export const router = createBrowserRouter([
     element: <MainLayout />,
     children: [
       {
-        path: ROUTES.DASHBOARD,
+        index: true,
         element: <DashboardPage />,
       },
 
@@ -58,9 +59,14 @@ export const router = createBrowserRouter([
       },
     ],
   },
-
-  //   {
-  //     path: "*",
-  //     element: <Navigate to={ROUTES.DASHBOARD} replace />,
-  //   },
+  {
+    path: ROUTES.COMMUNITY,
+    element: <CommunityLayout />,
+    children: [
+      {
+        index: true,
+        element: <CommunityPage />
+      }
+    ]
+  }
 ]);

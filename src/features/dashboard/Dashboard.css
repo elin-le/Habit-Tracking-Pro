@@ -152,24 +152,38 @@
 .category-legend {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 1rem;
 }
 
 .category-legend__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.category-legend__left {
     display: flex;
     align-items: center;
     gap: 0.75rem;
 }
 
-.category-legend__item strong {
-    margin-left: auto;
-}
-
 .category-legend__dot {
     width: 12px;
     height: 12px;
-
     border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.category-legend__label {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+.category-legend__value {
+    margin-left: auto;
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
 /* ==========================================

@@ -160,7 +160,7 @@ export default function Header({
         <div className="flex items-center gap-3 min-w-0">
           <AvatarBadge name={currentUser.username} src={currentUser.avt} />
           <div className="min-w-0">
-            <p className="text-xs text-violet-400 font-medium truncate">
+            <p className="text-xs text-violet-400 font-medium truncate" style={{fontFamily:"UVN Giong Song"}}>
               {subtitle ?? `${greeting},`}
             </p>
             <h1 className="text-lg font-bold leading-tight truncate">
@@ -228,7 +228,7 @@ export default function Header({
           <h1 className="text-3xl font-bold leading-tight truncate">
             {title + " " + currentUser.username}
           </h1>
-          <p className="text-base text-violet-400 mt-1 leading-tight truncate">
+          <p className="text-base text-violet-400 mt-1 leading-tight truncate" style={{fontFamily:"UVN Giong Song"}}>
             {subtitle ?? "Here's your progress overview"}
           </p>
         </div>

@@ -23,7 +23,7 @@ const GoalProgress = ({
                         className="goal-card"
                     >
                         <p className="goal-card__title">
-                            {t(goal.title)}
+                            {goal.title}
                         </p>
 
                         <h3 className="goal-card__value">
