@@ -1,0 +1,30 @@
+.goal-card-empty {
+  background: var(--surface);
+  border-color: color-mix(in srgb, var(--primary) 15%, transparent);
+  color: var(--text);
+}
+
+.goal-card-icon-bg {
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: color-mix(in srgb, var(--text) 40%, transparent);
+}
+
+.goal-card-add-btn {
+  background: color-mix(in srgb, var(--primary) 4%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 20%, transparent);
+  color: color-mix(in srgb, var(--primary) 90%, var(--text));
+}
+
+.goal-card-add-btn:hover {
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.goal-card-container {
+  background: var(--surface);
+  border-color: color-mix(in srgb, var(--primary) 18%, transparent);
+  color: var(--text);
+}
+
+.goal-card-footer {
+  border-color: color-mix(in srgb, var(--primary) 10%, transparent);
+}
