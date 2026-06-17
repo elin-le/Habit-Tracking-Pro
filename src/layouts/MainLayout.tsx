@@ -8,14 +8,20 @@ import { useTranslation } from "react-i18next";
 import { useHabitSchedule } from "../shared/hooks/useHabitSchedule";
 import { useHabits } from "../shared/hooks/useHabit";
 import { useCategories } from "@/shared/hooks/useCategory";
+import { STORAGE_KEY } from "@/shared/constants/appConstants";
+import type { User } from "@/shared/types/User";
 
 export default function MainLayout() {
+  const currentUser = JSON.parse(
+    localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "{}",
+  ) as User;
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const { t } = useTranslation();
 
-  const habitSchedule = useHabitSchedule();
-  const habitData = useHabits();
+  const habitData = useHabits(currentUser.phone);
+  const habitSchedule = useHabitSchedule(habitData.habits);
   const categoryData = useCategories();
 
   return (

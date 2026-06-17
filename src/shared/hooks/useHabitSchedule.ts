@@ -1,28 +1,32 @@
 import { useState } from "react";
 import type { HabitSchedule } from "../types/HabitSchedule";
+import type { Habit } from "../types/Habit";
 import { STORAGE_KEY } from "../constants/appConstants";
 
-function readHabitSchedules(): HabitSchedule[] {
+function readAllHabitSchedules(): HabitSchedule[] {
   const raw = localStorage.getItem(STORAGE_KEY.USER_HABIT_SCHEDULES);
   return raw ? JSON.parse(raw) : [];
 }
 
-function writeHabitSchedules(habitSchedules: HabitSchedule[]) {
+function writeAllHabitSchedules(habitSchedules: HabitSchedule[]) {
   localStorage.setItem(
     STORAGE_KEY.USER_HABIT_SCHEDULES,
     JSON.stringify(habitSchedules),
   );
 }
 
-export function useHabitSchedule() {
+export function useHabitSchedule(userHabits: Habit[]) {
+  const userHabitIds = userHabits.map((h) => h.id);
+
   const [habitSchedules, setHabitSchedules] = useState<HabitSchedule[]>(() =>
-    readHabitSchedules(),
+    readAllHabitSchedules().filter((s) => userHabitIds.includes(s.habitId)),
   );
 
   const createHabitSchedules = (newSchedules: HabitSchedule[]) => {
-    const next = [...newSchedules, ...habitSchedules];
-    setHabitSchedules(next);
-    writeHabitSchedules(next);
+    const allSchedules = readAllHabitSchedules(); // đọc toàn bộ, không chỉ phần đã filter
+    const next = [...newSchedules, ...allSchedules];
+    writeAllHabitSchedules(next);
+    setHabitSchedules(next.filter((s) => userHabitIds.includes(s.habitId)));
   };
 
   const getSchedulesByHabitId = (habitId: string) => {
@@ -33,18 +37,20 @@ export function useHabitSchedule() {
     habitId: string,
     newSchedules: HabitSchedule[],
   ) => {
+    const allSchedules = readAllHabitSchedules();
     const next = [
-      ...habitSchedules.filter((s) => s.habitId !== habitId),
+      ...allSchedules.filter((s) => s.habitId !== habitId),
       ...newSchedules,
     ];
-    setHabitSchedules(next);
-    writeHabitSchedules(next);
+    writeAllHabitSchedules(next);
+    setHabitSchedules(next.filter((s) => userHabitIds.includes(s.habitId)));
   };
 
   const deleteHabitSchedulesByHabitId = (habitId: string) => {
-    const next = habitSchedules.filter((s) => s.habitId !== habitId);
-    setHabitSchedules(next);
-    writeHabitSchedules(next);
+    const allSchedules = readAllHabitSchedules();
+    const next = allSchedules.filter((s) => s.habitId !== habitId);
+    writeAllHabitSchedules(next);
+    setHabitSchedules(next.filter((s) => userHabitIds.includes(s.habitId)));
   };
 
   return {
