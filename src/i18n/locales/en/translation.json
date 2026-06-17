@@ -298,5 +298,11 @@
   "checkin": {
     "history": "Check-in History",
     "no": "Empty"
+  },
+  "setting":{
+    "setting":"Setting",
+    "darkMode":"Dark Mode",
+    "vietnamese":"Vietnamese",
+    "readOnly":"Read Only"
   }
 }

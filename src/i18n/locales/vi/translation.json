@@ -297,5 +297,11 @@
   "checkin": {
     "history": "Lịch sử check-in",
     "no": "Không có lịch sử check-in."
+  },
+  "setting":{
+    "setting":"Cài đặt",
+    "darkMode":"Chế độ tối",
+    "vietnamese":"Tiếng Việt",
+    "readOnly":"Chỉ đọc"
   }
 }
