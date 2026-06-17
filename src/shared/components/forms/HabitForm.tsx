@@ -406,7 +406,21 @@ export function HabitForm({
           <Button
             variant="outline"
             onClick={onClose}
-            className="cursor-pointer text-black dark:text-white"
+            className="cursor-pointer"
+            style={{
+              borderColor:
+                "color-mix(in srgb, var(--primary) 20%, transparent)",
+              background: "color-mix(in srgb, var(--primary) 4%, transparent)",
+              color: "var(--text)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background =
+                "color-mix(in srgb, var(--primary) 10%, transparent)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background =
+                "color-mix(in srgb, var(--primary) 4%, transparent)";
+            }}
           >
             {t("habit_form.btn_cancel")}
           </Button>
