@@ -12,13 +12,13 @@ export interface HabitStatisticsType {
 }
 
 export interface CategoryOverviewType {
-    id: number;
+    id: string;
     category: string;
     progress: number;
 }
 
 export interface GoalProgressType {
-    id: number;
+    id: string;
     title: string;
     progress: number;
 }

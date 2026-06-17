@@ -29,7 +29,7 @@ const HabitStatistics = ({
             <div className="completion-chart">
                 <ResponsiveContainer
                     width="100%"
-                    height={300}
+                    height={390}
                 >
                     <LineChart data={statistics}>
                         <CartesianGrid strokeDasharray="3 3" />

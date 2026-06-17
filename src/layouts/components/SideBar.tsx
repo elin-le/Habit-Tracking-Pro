@@ -5,6 +5,7 @@ import { NotificationBadge } from '../../features/notifications/component/Notifi
 import type { User } from "../../shared/types/User"
 import { STORAGE_KEY } from "../../shared/constants/appConstants"
 
+const SIDEBAR_WIDTH = "260px";
 
 
 function HomeIcon({ className = "" }: { className?: string }) {
@@ -53,7 +54,33 @@ function BellIcon({ className = "" }: { className?: string }) {
         </svg>
     );
 }
+function CommunityIcon({ className = "" }: { className?: string }) {
+    return (
+        <svg
+            className={className}
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            {/* User giữa */}
+            <circle cx="12" cy="8" r="3" />
+            <path d="M7.5 19c0-2.5 2-4 4.5-4s4.5 1.5 4.5 4" />
 
+            {/* User trái */}
+            <circle cx="5.5" cy="10" r="2" />
+            <path d="M2.5 18c0-1.8 1.4-3 3.2-3" />
+
+            {/* User phải */}
+            <circle cx="18.5" cy="10" r="2" />
+            <path d="M21.5 18c0-1.8-1.4-3-3.2-3" />
+        </svg>
+    );
+}
 function CloseIcon() {
     return (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -85,6 +112,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
         { to: ROUTES.HABITS, label: t("sidebar.habits"), icon: HabitsIcon },
         { to: ROUTES.GOALS, label: t("sidebar.goals"), icon: GoalsIcon },
         { to: "/dashboard/statistics", label: t("sidebar.statistics"), icon: StatisticsIcon },
+        { to: ROUTES.COMMUNITY, label: t("sidebar.community"), icon: CommunityIcon, highlight: true, badge: "NEW", },
         { to: "/dashboard/notifications", label: t('sidebar.notifications'), icon: BellIcon, badge: <NotificationBadge /> },
     ];
 
@@ -159,7 +187,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     return (
         <>
             {/* Desktop Sidebar */}
-            <aside className="hidden lg:flex flex-col w-[220px] min-h-screen bg-[#1a1040] shrink-0">
+            <aside
+                className="hidden lg:flex flex-col min-h-screen bg-[#1a1040] shrink-0"
+                style={{ width: SIDEBAR_WIDTH }}
+            >
                 <SidebarContent />
             </aside>
 
@@ -174,8 +205,9 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
             {/* Mobile Drawer */}
             <aside
+                style={{ width: SIDEBAR_WIDTH }}
                 className={[
-                    "fixed top-0 left-0 bottom-0 z-50 w-[220px] bg-[#1a1040] flex flex-col transition-transform duration-300 lg:hidden",
+                    "fixed top-0 left-0 bottom-0 z-50 bg-[#1a1040] flex flex-col transition-transform duration-300 lg:hidden",
                     isOpen ? "translate-x-0" : "-translate-x-full",
                 ].join(" ")}
             >

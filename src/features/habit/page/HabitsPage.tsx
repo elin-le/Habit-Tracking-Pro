@@ -76,18 +76,14 @@ export function HabitsPage() {
 
   const filteredHabits = useMemo(() => {
     return habits.filter((habit) => {
-      const statusOk = filterStatus
-        ? habit.status === filterStatus
-        : habit.status === "ACTIVE";
+      const statusOk = filterStatus === null || habit.status === filterStatus;
 
       const categoryOk = !filterCategory || habit.categoryId === filterCategory;
 
       const priorityOk = !filterPriority || habit.priority === filterPriority;
 
-      let scheduleOk = true;
-      if (statusOk && habit.status === "ACTIVE" && frequencyFilter) {
-        scheduleOk = isScheduledOnDow(habit, frequencyFilter);
-      }
+      const scheduleOk =
+        !frequencyFilter || isScheduledOnDow(habit, frequencyFilter);
 
       // console.log(habit.name, {
       //   statusOk,

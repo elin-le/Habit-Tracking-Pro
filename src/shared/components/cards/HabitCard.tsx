@@ -11,7 +11,11 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { DropdownMenu } from "../common/DropdownMenu";
 import type { Habit, HabitStatus } from "../../types/Habit";
-import { CATEGORY_ICONS, PRIORITY_COLORS } from "../../constants/appConstants";
+import {
+  CATEGORY_ICONS,
+  PRIORITY_COLORS,
+  STATUS_COLORS,
+} from "../../constants/appConstants";
 import { useTranslation } from "react-i18next";
 import {
   AlertDialog,
@@ -26,6 +30,7 @@ import {
 import { toast } from "sonner";
 import { useCheckIns } from "../../hooks/useCheckIns";
 import type { Category } from "@/shared/types/Category";
+import { cn } from "@/shared/lib/utils";
 
 interface HabitCardProps {
   habit: Habit;
@@ -48,6 +53,7 @@ export function HabitCard({
   const navigate = useNavigate();
 
   const priorityColor = PRIORITY_COLORS[habit.priority];
+  const statusColor = STATUS_COLORS[habit.status];
   const category = categories.find((c) => c.id === habit.categoryId);
   const today = useMemo(() => new Date().toISOString().split("T")[0], []);
   const { getCheckIn, upsertCheckIn } = useCheckIns();
@@ -55,6 +61,9 @@ export function HabitCard({
   const currentCount = checkIn?.completionCount ?? 0;
   const targetPerDay = habit.targetPerDay ?? 1;
   const isCompleted = currentCount >= targetPerDay;
+
+  const minusDisabled = habit.status !== "ACTIVE" || currentCount <= 0;
+  const plusDisabled = habit.status !== "ACTIVE" || isCompleted;
 
   return (
     <div
@@ -97,6 +106,7 @@ export function HabitCard({
             >
               {t(`habit_form.${category?.name}`) ?? habit.categoryId}
             </span>
+
             <span
               className="rounded-full px-2 py-1 text-xs capitalize"
               style={{
@@ -106,6 +116,17 @@ export function HabitCard({
             >
               {t(`habit_form.${habit.priority}`)}
             </span>
+
+            <span
+              className="rounded-full px-2 py-1 text-xs capitalize"
+              style={{
+                background: `color-mix(in srgb, ${statusColor} 12%, transparent)`,
+                color: statusColor,
+              }}
+            >
+              {t(`habit_form.${habit.status}`)}
+            </span>
+
             <span
               className="flex items-center gap-1 rounded-md px-2.5 py-0.5 text-xs"
               style={{
@@ -141,77 +162,90 @@ export function HabitCard({
         }}
       >
         {/* Hàng chính: ring + status + actions */}
-        {habit.status === "ACTIVE" ? (
-          <div className="flex items-center gap-3 p-3">
+        <div className="flex items-center gap-3 p-3">
+          <div
+            className={cn(
+              "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-[3px] font-medium",
+              `${currentCount}/${targetPerDay}`.length > 4
+                ? "text-[10px]"
+                : "text-sm",
+            )}
+            style={{ borderColor: "var(--primary)" }}
+          >
+            {currentCount}/{targetPerDay}
+          </div>
+
+          <div className="min-w-0 flex-1">
             <div
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-[3px] text-sm font-medium"
-              style={{ borderColor: "var(--primary)" }}
+              className="flex items-center gap-1.5 whitespace-nowrap text-sm font-medium"
+              style={{ color: isCompleted ? "#22c55e" : "#f59e0b" }}
             >
-              {currentCount}/{targetPerDay}
-            </div>
-
-            <div className="min-w-0 flex-1">
-              <div
-                className="flex items-center gap-1.5 whitespace-nowrap text-sm font-medium"
-                style={{ color: isCompleted ? "#22c55e" : "#f59e0b" }}
-              >
-                <CheckCircle size={14} className="shrink-0" />
+              <CheckCircle size={14} className="shrink-0" />
+              <span className="truncate">
                 {isCompleted
-                  ? "Completed today"
+                  ? t("habit_card.status-1")
                   : currentCount === 0
-                    ? "Not started"
-                    : "In progress"}
-              </div>
-            </div>
-
-            <div className="flex shrink-0 gap-1.5">
-              <button
-                type="button"
-                className="flex h-7 w-7 items-center justify-center rounded-full border"
-                style={{
-                  borderColor: "var(--sidebar-muted)",
-                  color: "var(--sidebar-muted)",
-                  opacity: currentCount <= 0 ? 0.5 : 1,
-                  pointerEvents: currentCount <= 0 ? "none" : "auto",
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const next = Math.max(0, currentCount - 1);
-                  upsertCheckIn(habit.id, today, next);
-                  //onUpdate();
-                }}
-              >
-                <Minus size={13} />
-              </button>
-              <button
-                type="button"
-                className="flex h-7 w-7 items-center justify-center rounded-full border"
-                style={{
-                  borderColor: isCompleted
-                    ? "var(--sidebar-muted)"
-                    : "var(--primary)",
-                  background: isCompleted
-                    ? "transparent"
-                    : "color-mix(in srgb, var(--primary) 12%, transparent)",
-                  color: isCompleted
-                    ? "var(--sidebar-muted)"
-                    : "var(--primary)",
-                  opacity: isCompleted ? 0.5 : 1,
-                  pointerEvents: isCompleted ? "none" : "auto",
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const next = Math.min(currentCount + 1, targetPerDay);
-                  upsertCheckIn(habit.id, today, next);
-                  // onUpdate();
-                }}
-              >
-                <Plus size={13} />
-              </button>
+                    ? t("habit_card.status-2")
+                    : t("habit_card.status-3")}
+              </span>
             </div>
           </div>
-        ) : (
-          <div
+
+          <div className="flex shrink-0 gap-1.5">
+            <button
+              type="button"
+              className="flex h-8 w-8 items-center justify-center rounded-full border transition-all duration-200 enabled:hover:scale-105 enabled:hover:shadow-md cursor-pointer disabled:cursor-not-allowed"
+              disabled={minusDisabled}
+              style={{
+                borderColor: minusDisabled
+                  ? "var(--primary-light)"
+                  : "var(--primary)",
+
+                background: minusDisabled
+                  ? "color-mix(in srgb, var(--primary-light) 10%, transparent)"
+                  : "color-mix(in srgb, var(--primary) 15%, transparent)",
+
+                color: minusDisabled
+                  ? "var(--primary-light)"
+                  : "var(--primary)",
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                const next = Math.max(0, currentCount - 1);
+                upsertCheckIn(habit.id, today, next);
+                //onUpdate();
+              }}
+            >
+              <Minus size={13} />
+            </button>
+            <button
+              type="button"
+              className="flex h-8 w-8 items-center justify-center rounded-full border transition-all duration-200 enabled:hover:scale-105 enabled:hover:shadow-md cursor-pointer disabled:cursor-not-allowed"
+              disabled={plusDisabled}
+              style={{
+                borderColor: plusDisabled
+                  ? "var(--primary-light)"
+                  : "var(--primary)",
+
+                background: plusDisabled
+                  ? "color-mix(in srgb, var(--primary-light) 10%, transparent)"
+                  : "color-mix(in srgb, var(--primary) 15%, transparent)",
+
+                color: plusDisabled ? "var(--primary-light)" : "var(--primary)",
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                const next = Math.min(currentCount + 1, targetPerDay);
+                upsertCheckIn(habit.id, today, next);
+                // onUpdate();
+              }}
+            >
+              <Plus size={13} />
+            </button>
+          </div>
+        </div>
+
+        {/* <div
             style={{
               background: "var(--bg-deep)",
               borderRadius: "var(--radius-sm)",
@@ -225,8 +259,7 @@ export function HabitCard({
             {t("habit_card.mess")}{" "}
             {t(`habit_card.${habit.status.toLowerCase()}`)}
             {" !"}
-          </div>
-        )}
+          </div> */}
 
         {/* Footer: View history */}
         <div
@@ -237,7 +270,7 @@ export function HabitCard({
         >
           <button
             type="button"
-            className="flex w-full items-center justify-center gap-1.5 rounded text-xs transition-colors"
+            className="flex w-full items-center justify-center gap-1.5 rounded text-xs transition-colors cursor-pointer"
             style={{ color: "var(--primary)" }}
             onClick={(e) => {
               e.stopPropagation();
@@ -245,7 +278,7 @@ export function HabitCard({
             }}
           >
             <History size={13} />
-            View check-in history
+            {t("habit_card.btn_view")}
           </button>
         </div>
       </div>
@@ -307,7 +340,7 @@ export function HabitCard({
                 className="mx-1 font-semibold"
                 style={{ color: "var(--text)" }}
               >
-                "{habit.name}"
+                {habit.name}
               </span>
               ?<br />
               {t("habit_a-dialog.content-2")}
