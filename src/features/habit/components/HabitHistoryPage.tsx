@@ -5,7 +5,7 @@ import { useOutletContext } from "react-router-dom";
 import { useCheckIns } from "@/shared/hooks/useCheckIns";
 import type { Habit } from "@/shared/types/Habit";
 import { useMemo } from "react";
-import { CATEGORY_ICONS, PRIORITY_COLORS } from "@/shared/constants/appConstants";
+import { CATEGORY_ICONS } from "@/shared/constants/appConstants";
 import { mockCategories } from "@/data/category";
 
 type LayoutContext = {
