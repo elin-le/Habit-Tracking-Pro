@@ -1,33 +1,36 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   useGoals,
   type StatusFilter,
   type TypeFilter,
-} from "../shared/hooks/useGoals";
-import { ToastService } from "../routes/services/toastService";
+} from "../../../shared/hooks/useGoals.ts";
+import { ToastService } from "../../../routes/services/toastService.ts";
 import { useTranslation } from "react-i18next";
-import GoalCard from "../shared/components/cards/GoalCard";
-import GoalDetailPanel from "../features/goal/components/GoalDetailPanel";
+import GoalCard from "../../../shared/components/cards/GoalCard.tsx";
+import GoalDetailPanel from "../components/GoalDetailPanel.tsx";
+import { SummaryCard } from "../components/SummaryCard.tsx";
+import { FilterChip } from "../components/FilterChip.tsx";
 import {
   Target,
   Zap,
   Award,
   CheckCircle2,
-  Plus,
   Search,
   SlidersHorizontal,
+  X,
 } from "lucide-react";
 import GoalForm, {
   type GoalFormData,
-} from "../shared/components/forms/GoalForm";
-import { STORAGE_KEY } from "../shared/constants/appConstants";
-import { Modal } from "../shared/components/ui/Modal";
-import { Button } from "../shared/components/ui/Button";
-import type { Habit } from "../shared/types/Habit";
-import type { Goal, GoalWithDerived } from "../shared/types/Goal";
-import { removeAccents } from "../shared/utils/stringUtils";
+} from "../../../shared/components/forms/GoalForm";
+import { STORAGE_KEY } from "../../../shared/constants/appConstants";
+import { Modal } from "../../../shared/components/ui/Modal.tsx";
+import type { Habit } from "../../../shared/types/Habit.ts";
+import type { Goal, GoalWithDerived } from "../../../shared/types/Goal.ts";
+import { removeAccents } from "../../../shared/utils/stringUtils.ts";
+import { usePagination } from "../../../shared/hooks/usePagination";
+import { Pagination } from "../../../shared/components/common/Pagination";
+import "../Goals.css";
 
-// GoalsPage
 function GoalsPage() {
   const { t } = useTranslation();
 
@@ -42,13 +45,14 @@ function GoalsPage() {
   const {
     goals,
     filteredGoals,
-    statusFilter,
-    setStatusFilter,
+    statusFilters,
+    setStatusFilters,
+    toggleStatusFilter,
     typeFilter,
     setTypeFilter,
     createGoal,
     updateGoal,
-    deleteGoal
+    deleteGoal,
   } = useGoals();
 
   // Get all habits from local storage
@@ -74,7 +78,7 @@ function GoalsPage() {
   // Derived stats
   const stats = useMemo(
     () => ({
-      total: goals.length,
+      total: goals.filter((g) => g.progress.status !== "COMPLETED").length,
       inProgress: goals.filter((g) => g.progress.status === "IN_PROGRESS")
         .length,
       near: goals.filter(
@@ -87,14 +91,67 @@ function GoalsPage() {
   );
 
   const displayedGoals = useMemo(() => {
-    if (!search.trim()) return filteredGoals;
-    const normalizedSearch = removeAccents(search);
-    return filteredGoals.filter((g) => {
-      const habit = allHabits.find((h: Habit) => h.id === g.habitId);
-      const habitName = habit ? removeAccents(habit.name) : "";
-      return habitName.includes(normalizedSearch);
+    let result = filteredGoals;
+
+    if (search.trim()) {
+      const normalizedSearch = removeAccents(search);
+      result = result.filter((g) => {
+        const habit = allHabits.find((h: Habit) => h.id === g.habitId);
+        const habitName = habit ? removeAccents(habit.name) : "";
+        return habitName.includes(normalizedSearch);
+      });
+    }
+
+    const priorityWeight: Record<string, number> = {
+      HIGH: 3,
+      MEDIUM: 2,
+      LOW: 1,
+    };
+
+    return result.sort((a, b) => {
+      const aCompletion = a.progress.status === "COMPLETED";
+      const bCompletion = b.progress.status === "COMPLETED";
+
+      if (aCompletion && !bCompletion) return 1;
+      if (!aCompletion && bCompletion) return -1;
+
+      const habitA = allHabits.find((h) => h.id === a.habitId);
+      const habitB = allHabits.find((h) => h.id === b.habitId);
+
+      const priorityA = habitA ? priorityWeight[habitA.priority] || 0 : 0;
+      const priorityB = habitB ? priorityWeight[habitB.priority] || 0 : 0;
+
+      return priorityB - priorityA;
     });
   }, [filteredGoals, search, allHabits]);
+
+
+  // Pagination logic
+
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
+
+  const GOALS_PER_PAGE = isMobile ? 4 : 6;
+
+  const {
+    currentPage,
+    totalPages,
+    paginatedItems: paginatedGoals,
+    getPageNumbers,
+    handlePageChange,
+  } = usePagination(displayedGoals, "", () => true, GOALS_PER_PAGE);
+
+  const {
+    currentPage: currentHabitPage,
+    totalPages: totalHabitPages,
+    paginatedItems: paginatedHabits,
+    getPageNumbers: getHabitPageNumbers,
+    handlePageChange: handleHabitPageChange,
+  } = usePagination(habitsWithoutGoal, "", () => true, GOALS_PER_PAGE);
 
   // Handlers
 
@@ -123,13 +180,6 @@ function GoalsPage() {
     setTimeout(() => setSelectedGoalDetail(null), 450);
   };
 
-  const handleArchiveGoal = (goalId: string) => {
-    // TODO: chưa có trạng thái ARCHIVE, tạm thời xoá luôn
-    deleteGoal(goalId);
-    ToastService.success(t("goals.archive_success"));
-    handleCloseDetail();
-  };
-
   const handleDeleteGoal = (goalId: string) => {
     deleteGoal(goalId);
     ToastService.error(t("goals.delete_success"));
@@ -149,13 +199,13 @@ function GoalsPage() {
     }
   };
 
-  const hasActiveFilters = statusFilter !== "ALL" || typeFilter !== "ALL";
+  const hasActiveFilters = !statusFilters.includes("ALL") || typeFilter !== "ALL";
 
   // Main UI
   return (
     <div className="flex flex-col gap-6 pb-24 md:pb-8 text-[var(--text)] animate-in fade-in duration-300">
       {/* Page header  */}
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 lg:hidden">
         <div>
           <h1 className="text-3xl sm:text-4xl font-light tracking-tight">
             {t("goals.title")}
@@ -171,46 +221,42 @@ function GoalsPage() {
           label={t("goals.tracking")}
           value={stats.total}
           iconClass="text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/40"
-          activeColorClass="border-slate-400 dark:border-slate-500 ring-1 ring-slate-400/20"
-          onClick={() => setStatusFilter("ALL")}
-          active={statusFilter === "ALL"}
+          activeColorClass="bg-slate-50 dark:bg-slate-800/40 border-slate-400 dark:border-slate-500 ring-1 ring-slate-400/20"
+          onClick={() => {
+            if (statusFilters.includes("TRACKING")) {
+              toggleStatusFilter("ALL");
+            } else {
+              toggleStatusFilter("TRACKING");
+            }
+          }}
+          active={statusFilters.includes("TRACKING")}
         />
         <SummaryCard
           icon={<Zap size={18} />}
           label={t("goals.in_progress")}
           value={stats.inProgress}
           iconClass="text-amber-500 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20"
-          activeColorClass="border-amber-400 dark:border-amber-500 ring-1 ring-amber-400/20"
-          onClick={() =>
-            setStatusFilter(
-              statusFilter === "IN_PROGRESS" ? "ALL" : "IN_PROGRESS",
-            )
-          }
-          active={statusFilter === "IN_PROGRESS"}
+          activeColorClass="bg-amber-50 dark:bg-amber-900/10 border-amber-400 dark:border-amber-500 ring-1 ring-amber-400/20"
+          onClick={() => toggleStatusFilter("IN_PROGRESS")}
+          active={statusFilters.includes("IN_PROGRESS")}
         />
         <SummaryCard
           icon={<Award size={18} />}
           label={t("goals.near_completion")}
           value={stats.near}
           iconClass="text-violet-500 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20"
-          activeColorClass="border-violet-400 dark:border-violet-500 ring-1 ring-violet-400/20"
-          onClick={() =>
-            setStatusFilter(
-              statusFilter === "NEAR_COMPLETION" ? "ALL" : "NEAR_COMPLETION",
-            )
-          }
-          active={statusFilter === "NEAR_COMPLETION"}
+          activeColorClass="bg-violet-50 dark:bg-violet-900/10 border-violet-400 dark:border-violet-500 ring-1 ring-violet-400/20"
+          onClick={() => toggleStatusFilter("NEAR_COMPLETION")}
+          active={statusFilters.includes("NEAR_COMPLETION")}
         />
         <SummaryCard
           icon={<CheckCircle2 size={18} />}
           label={t("goals.completed")}
           value={stats.completed}
           iconClass="text-teal-500 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/20"
-          activeColorClass="border-teal-400 dark:border-teal-500 ring-1 ring-teal-400/20"
-          onClick={() =>
-            setStatusFilter(statusFilter === "COMPLETED" ? "ALL" : "COMPLETED")
-          }
-          active={statusFilter === "COMPLETED"}
+          activeColorClass="bg-teal-50 dark:bg-teal-900/10 border-teal-400 dark:border-teal-500 ring-1 ring-teal-400/20"
+          onClick={() => toggleStatusFilter("COMPLETED")}
+          active={statusFilters.includes("COMPLETED")}
         />
       </div>
 
@@ -218,7 +264,7 @@ function GoalsPage() {
       <section className="flex flex-col gap-5 mt-6">
         {/* Search + filter toolbar */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <h2 className="text-base font-bold">
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight">
             {t("goals.tracking")}
             {displayedGoals.length !== goals.length && (
               <span className="ml-2 text-sm font-normal opacity-60">
@@ -240,7 +286,6 @@ function GoalsPage() {
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={t("goals.search_placeholder")}
                 className="
-
                                     h-9 w-full pl-9 pr-4
                                     rounded-full
                                     border border-slate-200 dark:border-slate-700
@@ -273,11 +318,27 @@ function GoalsPage() {
               {t("goals.filter")}
               {hasActiveFilters && (
                 <span className="w-4 h-4 flex items-center justify-center rounded-full bg-[var(--primary)] text-white text-[10px] font-black">
-                  {(statusFilter !== "ALL" ? 1 : 0) +
+                  {(statusFilters.includes("ALL") ? 0 : statusFilters.length) +
                     (typeFilter !== "ALL" ? 1 : 0)}
                 </span>
               )}
             </button>
+
+            {/* Clear Filters / Search */}
+            {(hasActiveFilters || search.trim() !== "") && (
+              <button
+                onClick={() => {
+                  setStatusFilters(["ALL"]);
+                  setTypeFilter("ALL");
+                  setSearch("");
+                }}
+                className="flex items-center gap-1.5 h-9 px-3 rounded-full text-[var(--text)]/60 bg-[var(--text)]/5 hover:bg-[var(--text)]/10 transition-colors text-sm font-medium"
+                title={t("goals.clear_filters")}
+              >
+                <X size={14} />
+                <span className="hidden sm:inline">{t("goals.clear_filters")}</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -298,24 +359,36 @@ function GoalsPage() {
                   "NOT_STARTED",
                 ] as StatusFilter[]
               ).map((s) => {
-                let activeCls = "bg-[var(--primary)]/8 text-[var(--primary)] border-[var(--primary)]/40";
-                let inactiveCls = "bg-transparent text-[var(--text)]/55 border-[var(--text)]/10 hover:border-[var(--text)]/20 hover:text-[var(--text)]/75";
-                
+                let activeCls =
+                  "bg-[var(--primary)]/8 text-[var(--primary)] border-[var(--primary)]/40";
+                let inactiveCls =
+                  "bg-transparent text-[var(--text)]/55 border-[var(--text)]/10 hover:border-[var(--text)]/20 hover:text-[var(--text)]/75";
+
                 if (s === "IN_PROGRESS") {
-                  activeCls = "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-700";
+                  activeCls =
+                    "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-700";
                 } else if (s === "NEAR_COMPLETION") {
-                  activeCls = "bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-300 border-violet-300 dark:border-violet-700";
+                  activeCls =
+                    "bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-300 border-violet-300 dark:border-violet-700";
                 } else if (s === "COMPLETED") {
-                  activeCls = "bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-300 border-teal-300 dark:border-teal-700";
+                  activeCls =
+                    "bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-300 border-teal-300 dark:border-teal-700";
                 } else if (s === "NOT_STARTED") {
-                  activeCls = "bg-slate-100 dark:bg-slate-800/40 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-600";
+                  activeCls =
+                    "bg-zinc-100 dark:bg-zinc-800/40 text-zinc-600 dark:text-zinc-300 border-zinc-300 dark:border-zinc-600";
                 }
 
                 return (
                   <FilterChip
                     key={s}
-                    active={statusFilter === s}
-                    onClick={() => setStatusFilter(s)}
+                    active={
+                      s === "TRACKING"
+                        ? statusFilters.includes("IN_PROGRESS") &&
+                          statusFilters.includes("NOT_STARTED") &&
+                          statusFilters.length === 2
+                        : statusFilters.includes(s)
+                    }
+                    onClick={() => toggleStatusFilter(s)}
                     activeClass={activeCls}
                     inactiveClass={inactiveCls}
                   >
@@ -340,13 +413,17 @@ function GoalsPage() {
               </span>
               {(["ALL", "STREAK", "TOTAL_COMPLETIONS"] as TypeFilter[]).map(
                 (ty) => {
-                  let activeCls = "bg-[var(--primary)]/8 text-[var(--primary)] border-[var(--primary)]/40";
-                  let inactiveCls = "bg-transparent text-[var(--text)]/55 border-[var(--text)]/10 hover:border-[var(--text)]/20 hover:text-[var(--text)]/75";
-                  
+                  let activeCls =
+                    "bg-[var(--primary)]/8 text-[var(--primary)] border-[var(--primary)]/40";
+                  let inactiveCls =
+                    "bg-transparent text-[var(--text)]/55 border-[var(--text)]/10 hover:border-[var(--text)]/20 hover:text-[var(--text)]/75";
+
                   if (ty === "STREAK") {
-                    activeCls = "bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 border-orange-300 dark:border-orange-700";
+                    activeCls =
+                      "bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 border-orange-300 dark:border-orange-700";
                   } else if (ty === "TOTAL_COMPLETIONS") {
-                    activeCls = "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700";
+                    activeCls =
+                      "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700";
                   }
 
                   return (
@@ -371,9 +448,9 @@ function GoalsPage() {
         )}
 
         {/* Goal grid */}
-        {displayedGoals.length > 0 ? (
+        {paginatedGoals.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {displayedGoals.map((g) => {
+            {paginatedGoals.map((g) => {
               const habit = allHabits.find((h: Habit) => h.id === g.habitId);
               const habitName = habit ? habit.name : t("goals.hidden_habit");
 
@@ -384,9 +461,6 @@ function GoalsPage() {
                   habitName={habitName}
                   onSelectDetail={handleSelectDetail}
                   onEdit={() => handleOpenEditModal(g)}
-                  onArchive={() => {
-                    handleArchiveGoal(g.id);
-                  }}
                   onDelete={() => {
                     handleDeleteGoal(g.id);
                   }}
@@ -402,12 +476,8 @@ function GoalsPage() {
                             py-16 px-8
                             rounded-3xl border
                             text-center
+                            goals-empty-state
                         "
-            style={{
-              background: "var(--surface)",
-              borderColor:
-                "color-mix(in srgb, var(--primary) 20%, transparent)",
-            }}
           >
             <div
               className="
@@ -430,7 +500,7 @@ function GoalsPage() {
             {hasActiveFilters && (
               <button
                 onClick={() => {
-                  setStatusFilter("ALL");
+                  setStatusFilters(["ALL"]);
                   setTypeFilter("ALL");
                   setSearch("");
                 }}
@@ -441,52 +511,42 @@ function GoalsPage() {
             )}
           </div>
         )}
+
+        {totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            getPageNumbers={getPageNumbers}
+            handlePageChange={handlePageChange}
+          />
+        )}
       </section>
 
       {/* Habits without goal */}
       {habitsWithoutGoal.length > 0 && (
         <section className="flex flex-col gap-4 mt-8">
-          <h2 className="text-lg font-bold">{t("goals.no_goal")}</h2>
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight">
+            {t("goals.no_goal")}
+          </h2>
           <div className="flex flex-col gap-2.5">
-            {habitsWithoutGoal.map((habit) => (
-              <div
+            {paginatedHabits.map((habit) => (
+              <GoalCard
                 key={habit.id}
-                className="
-                                    flex items-center justify-between
-                                    rounded-2xl p-4 border
-                                    hover:shadow-sm transition-shadow duration-200
-                                "
-                style={{
-                  background: "var(--surface)",
-                  borderColor:
-                    "color-mix(in srgb, var(--primary) 15%, transparent)",
-                }}
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className="
-                                        w-8 h-8 rounded-xl flex items-center justify-center shrink-0
-                                        bg-slate-100/50 opacity-60
-                                    "
-                  >
-                    <Target size={14} />
-                  </div>
-                  <span className="font-semibold text-base opacity-90">
-                    {habit.name}
-                  </span>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleAddGoal(habit)}
-                  className="shrink-0 flex items-center"
-                >
-                  <Plus size={14} />
-                  <span className="ml-2">{t("goals.add_goal")}</span>
-                </Button>
-              </div>
+                habitName={habit.name}
+                isEmpty={true}
+                onAddGoal={() => handleAddGoal(habit)}
+              />
             ))}
           </div>
+
+          {totalHabitPages > 1 && (
+            <Pagination
+              currentPage={currentHabitPage}
+              totalPages={totalHabitPages}
+              getPageNumbers={getHabitPageNumbers}
+              handlePageChange={handleHabitPageChange}
+            />
+          )}
         </section>
       )}
 
@@ -515,7 +575,9 @@ function GoalsPage() {
         >
           <GoalForm
             habitId={editingGoal.habitId}
-            habitName={allHabits.find((h) => h.id === editingGoal.habitId)?.name || ""}
+            habitName={
+              allHabits.find((h) => h.id === editingGoal.habitId)?.name || ""
+            }
             initialData={editingGoal}
             onSubmit={handleEditSubmit}
             onCancel={() => setEditingGoal(null)}
@@ -535,79 +597,10 @@ function GoalsPage() {
         isOpen={panelOpen}
         onClose={handleCloseDetail}
         onEdit={handleOpenEditModal}
-        onArchive={handleArchiveGoal}
         onDelete={handleDeleteGoal}
       />
     </div>
   );
 }
-
-// Summary card
-
-const SummaryCard: React.FC<{
-  icon: React.ReactNode;
-  label: string;
-  value: number;
-  iconClass: string;
-  activeColorClass?: string;
-  onClick?: () => void;
-  active?: boolean;
-}> = ({ icon, label, value, iconClass, activeColorClass = "border-[var(--primary)] ring-1 ring-[var(--primary)]/15", onClick, active }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    disabled={!onClick}
-    className={`
-            flex items-center gap-3.5 p-4 sm:p-5 rounded-2xl text-left w-full
-            bg-[var(--surface)]
-            border transition-all duration-200
-            ${onClick ? "cursor-pointer hover:shadow-md hover:-translate-y-0.5" : "cursor-default"}
-            ${active ? activeColorClass : "border-transparent"}
-        `}
-    style={{
-      borderColor: active
-        ? undefined
-        : "color-mix(in srgb, var(--primary) 12%, transparent)",
-    }}
-  >
-    <div
-      className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 ${iconClass}`}
-    >
-      {icon}
-    </div>
-    <div className="min-w-0">
-      <p className="text-xl sm:text-2xl font-black leading-none">{value}</p>
-      <p className="text-xs opacity-60 font-semibold mt-1 truncate">{label}</p>
-    </div>
-  </button>
-);
-
-// Filter chip
-
-const FilterChip: React.FC<{
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-  activeClass?: string;
-  inactiveClass?: string;
-}> = ({
-  active,
-  onClick,
-  children,
-  activeClass = "bg-[var(--primary)] text-white border-[var(--primary)] shadow-sm",
-  inactiveClass = "bg-[var(--primary)]/10 text-[var(--primary)] border-[var(--primary)]/20 hover:bg-[var(--primary)]/20",
-}) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className={`
-            h-8 px-4 rounded-full text-sm font-semibold
-            border transition-all duration-150
-            ${active ? activeClass : inactiveClass}
-        `}
-  >
-    {children}
-  </button>
-);
 
 export default GoalsPage;
