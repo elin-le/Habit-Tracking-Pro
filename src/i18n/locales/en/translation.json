@@ -250,7 +250,8 @@
     "risk_at_risk": "At risk",
     "empty": "No statistics yet",
     "empty_hint": "Create habits and check in to see your stats here",
-    "empty_action": "Create your habit"
+    "empty_action": "Create your habit",
+    "statistics.no_match": "No habits match the selected filters"
   },
   "notifications": {
     "title": "Notifications",
