@@ -19,7 +19,7 @@ export default function MainLayout() {
   const categoryData = useCategories();
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[var(--bg)]">
+    <div className="flex h-screen overflow-hidden bg-[var(--bg)] playfair-display-normal">
       <SideBar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="flex flex-col flex-1 min-w-0">
