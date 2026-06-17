@@ -10,6 +10,6 @@ export const buildHeatMapData = (checkins: CheckIn[]) => {
 
         map[date] = (map[date] || 0) + c.completionCount;
     }
-
+    console.log("Build heat map", map)
     return map;
 };

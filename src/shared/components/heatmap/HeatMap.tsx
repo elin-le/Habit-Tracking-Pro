@@ -28,7 +28,12 @@ const MONTH_LABELS = [
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
 
-const toKey = (d: Date) => d.toISOString().split("T")[0];
+const toKey = (d: Date) =>
+    [
+        d.getFullYear(),
+        String(d.getMonth() + 1).padStart(2, "0"),
+        String(d.getDate()).padStart(2, "0"),
+    ].join("-");
 
 function getLevel(count: number, max: number) {
     if (count <= 0 || max <= 0) return 0;
@@ -82,7 +87,9 @@ export const HeatMap = ({ data, weeks = 12, title = "Activity" }: Props) => {
         for (let i = 0; i < cells.length; i += 7) {
             cols.push(cells.slice(i, i + 7));
         }
-
+        console.log(
+            cells.filter(cell => cell.count > 0)
+        );
         return { columns: cols, max: maxCount };
     }, [data, weeks]);
 
@@ -103,19 +110,28 @@ export const HeatMap = ({ data, weeks = 12, title = "Activity" }: Props) => {
 
     const monthLabels = useMemo(() => {
         const labels: { index: number; label: string }[] = [];
-        let lastMonth = -1;
+
         columns.forEach((col, i) => {
-            const month = col[0].date.getMonth();
-            if (month !== lastMonth) {
-                labels.push({ index: i, label: MONTH_LABELS[month] });
-                lastMonth = month;
+            const firstDayOfMonth = col.find(
+                cell => cell.date.getDate() === 1
+            );
+
+            if (firstDayOfMonth) {
+                labels.push({
+                    index: i,
+                    label: MONTH_LABELS[firstDayOfMonth.date.getMonth()],
+                });
             }
         });
+
         return labels;
     }, [columns]);
 
     return (
-        <div className="w-full rounded-xl border border-zinc-200 bg-white p-3 sm:p-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="w-full rounded-xl border p-3 sm:p-4" style={{
+            backgroundColor: "var(--surface-color)",
+            borderColor: "var(--border-color, rgb(228 228 231))",
+        }}>
             <div className="mb-2 flex items-center justify-between gap-2">
                 <h3 className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
                     {title}
@@ -131,17 +147,28 @@ export const HeatMap = ({ data, weeks = 12, title = "Activity" }: Props) => {
             <div ref={scrollRef} className="-mx-1 overflow-x-auto px-1 pb-1">
                 <div className="inline-flex min-w-max flex-col gap-1">
                     <div className="flex pl-5 sm:pl-6" aria-hidden="true">
-                        {columns.map((_, i) => (
-                            <div
-                                key={i}
-                                className="mr-[2px] w-[10px] text-[10px] text-zinc-400 sm:mr-1 sm:w-3 dark:text-zinc-500"
-                            >
-                                {monthLabels.find((m) => m.index === i)?.label ?? ""}
-                            </div>
-                        ))}
+                        {columns.map((_, i) => {
+                            const label = monthLabels.find((m) => m.index === i)?.label;
+
+                            return (
+                                <div
+                                    key={i}
+                                    className="
+                    w-[18px]
+                    sm:w-[24px]
+                    shrink-0
+                    text-[10px]
+                    text-zinc-400
+                    dark:text-zinc-500
+                "
+                                >
+                                    {label}
+                                </div>
+                            );
+                        })}
                     </div>
 
-                    <div className="flex gap-[2px] sm:gap-1">
+                    <div className="flex gap-1 sm:gap-1.5">
                         <div className="flex flex-col gap-[2px] pr-1 sm:gap-1 sm:pr-2" aria-hidden="true">
                             {WEEKDAY_LABELS.map((d, i) => (
                                 <div
@@ -154,7 +181,7 @@ export const HeatMap = ({ data, weeks = 12, title = "Activity" }: Props) => {
                         </div>
 
                         {columns.map((col, ci) => (
-                            <div key={ci} className="flex flex-col gap-[2px] sm:gap-1">
+                            <div key={ci} className="flex flex-col gap-1 sm:gap-1.5">
                                 {col.map((cell) => (
                                     <button
                                         key={cell.key}
@@ -166,7 +193,7 @@ export const HeatMap = ({ data, weeks = 12, title = "Activity" }: Props) => {
                                         aria-label={`${formatDateLabel(cell.date)}: ${cell.count} check-ins`}
                                         aria-pressed={selected === cell.key}
                                         className={[
-                                            "h-[10px] w-[10px] rounded-[2px] sm:h-3 sm:w-3",
+                                            "h-[14px] w-[14px] rounded-[3px] sm:h-[18px] sm:w-[18px]",
                                             "motion-safe:transition-transform motion-safe:hover:scale-110",
                                             "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-emerald-600",
                                             cell.inRange
