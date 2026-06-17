@@ -9,6 +9,8 @@ import { NotificationContext } from "../../features/notifications/context/Notifi
 import type { Category } from "../../shared/types/Category"
 import type { User } from "../../shared/types/User"
 import { STORAGE_KEY } from "../../shared/constants/appConstants"
+import SettingsPopover from "./SettingsPopover"
+
 
 interface HeaderProps {
   title?: string;
@@ -113,6 +115,25 @@ function AvatarBadge({ name, src }: { name: string; src?: string }) {
   );
 }
 
+function SettingsIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="3" />
+
+      <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33h.01a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51h.01a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v.01a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
+    </svg>
+  );
+}
 export default function Header({
   title,
   subtitle,
@@ -125,16 +146,14 @@ export default function Header({
   setShowAddForm,
   createHabit,
   createHabitSchedules,
-  userName = "Alex",
-  avatarUrl,
 }: HeaderProps) {
   const { t, i18n } = useTranslation();
   const { theme, toggleTheme } = useTheme();
-  const [lang, setLang] = useState<"EN" | "VI">("EN");
+  // const [lang, setLang] = useState<"EN" | "VI">("EN");
   const categories = JSON.parse(localStorage.getItem(STORAGE_KEY.CATEGORYS) || "[]") as Category[];
   const currentUser = JSON.parse(localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "{}") as User;
-  
-// 1. Khai báo thêm hàm đọc thông báo
+
+  // 1. Khai báo thêm hàm đọc thông báo
   const { unreadCount, notifications, markAsRead, markAllAsRead } = useContext(NotificationContext);
 
   // 2. State điều khiển mở popup & click ra ngoài tự đóng
@@ -158,11 +177,11 @@ export default function Header({
     return "Good evening";
   })();
 
-  const toggleLang = () => {
-    const newLang = lang === "EN" ? "VI" : "EN";
-    setLang(newLang);
-    i18n.changeLanguage(newLang.toLowerCase());
-  };
+  // const toggleLang = () => {
+  //   const newLang = lang === "EN" ? "VI" : "EN";
+  //   setLang(newLang);
+  //   i18n.changeLanguage(newLang.toLowerCase());
+  // };
 
   return (
     <header
@@ -175,7 +194,7 @@ export default function Header({
         <div className="flex items-center gap-3 min-w-0">
           <AvatarBadge name={currentUser.username} src={currentUser.avt} />
           <div className="min-w-0">
-            <p className="text-xs text-violet-400 font-medium truncate" style={{fontFamily:"UVN Giong Song"}}>
+            <p className="text-xs text-violet-400 font-medium truncate" style={{ fontFamily: "UVN Giong Song" }}>
               {subtitle ?? `${greeting},`}
             </p>
             <h1 className="text-lg font-bold leading-tight truncate">
@@ -185,8 +204,7 @@ export default function Header({
         </div>
 
         {/* Right: quick toggles, nổi hẳn lên so với nền để không bị lẫn vào body khi light mode */}
-        <div className="flex items-center gap-2 shrink-0">
-          {/* Language toggle */}
+        {/* <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={toggleLang}
             aria-label="Toggle language"
@@ -205,7 +223,6 @@ export default function Header({
             </span>
           </button>
 
-          {/* Dark/Light toggle */}
           <button
             onClick={toggleTheme}
             aria-label="Toggle dark mode"
@@ -229,6 +246,31 @@ export default function Header({
               {theme === "light" ? <MoonIcon /> : <SunIcon />}
             </span>
           </button>
+        </div> */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Notification */}
+          <button
+            onClick={() => setShowNotifications(!showNotifications)}
+            className="
+      relative
+      w-9 h-9
+      flex items-center justify-center
+      rounded-xl
+      text-violet-500
+      hover:bg-violet-50
+      transition
+    "
+          >
+            <BellIcon />
+
+            {unreadCount > 0 && (
+              <span className="absolute top-0 right-0 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
+          </button>
+
+          <SettingsPopover />
         </div>
       </div>
 
@@ -243,7 +285,7 @@ export default function Header({
           <h1 className="text-3xl font-bold leading-tight truncate">
             {title + " " + currentUser.username}
           </h1>
-          <p className="text-base text-violet-400 mt-1 leading-tight truncate" style={{fontFamily:"UVN Giong Song"}}>
+          <p className="text-base text-violet-400 mt-1 leading-tight truncate" style={{ fontFamily: "UVN Giong Song" }}>
             {subtitle ?? "Here's your progress overview"}
           </p>
         </div>
@@ -270,9 +312,8 @@ export default function Header({
             </div>
           )}
 
-          <div className="w-px h-6 bg-violet-100 mx-1" />
-
-          {/* Language toggle */}
+          {/* <div className="w-px h-6 bg-violet-100 mx-1" /> */}
+          {/* 
           <button
             onClick={toggleLang}
             aria-label="Toggle language"
@@ -291,7 +332,6 @@ export default function Header({
             </span>
           </button>
 
-          {/* Dark/Light toggle */}
           <button
             onClick={toggleTheme}
             aria-label="Toggle dark mode"
@@ -314,10 +354,10 @@ export default function Header({
             >
               {theme === "light" ? <MoonIcon /> : <SunIcon />}
             </span>
-          </button>
+          </button> */}
 
-          <div className="w-px h-6 bg-violet-100 mx-1" />
-
+          {/* <div className="w-px h-6 bg-violet-100 mx-1" /> */}
+          <SettingsPopover />
           {/* Bell */}
           <div ref={dropdownRef}>
             <button
@@ -334,7 +374,7 @@ export default function Header({
 
             {/* Khung Popup thả xuống */}
             {showNotifications && (
-              <div 
+              <div
                 className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl shadow-xl border overflow-hidden z-50 flex flex-col"
                 style={{ background: 'var(--surface)', borderColor: 'color-mix(in srgb, var(--primary) 20%, transparent)' }}
               >
@@ -343,7 +383,7 @@ export default function Header({
                     {t('notifications.title')}
                   </h3>
                   {unreadCount > 0 && (
-                    <button 
+                    <button
                       onClick={(e) => { e.stopPropagation(); markAllAsRead(); }}
                       className="text-sm font-medium text-blue-600 hover:text-blue-700"
                     >
@@ -417,7 +457,7 @@ export default function Header({
                 </div>
               </div>
             )}
-          </div>          
+          </div>
 
           {/* New Habit */}
           <button

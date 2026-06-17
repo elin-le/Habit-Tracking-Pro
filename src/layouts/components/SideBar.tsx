@@ -53,6 +53,7 @@ function BellIcon({ className = "" }: { className?: string }) {
         </svg>
     );
 }
+
 function CommunityIcon({ className = "" }: { className?: string }) {
     return (
         <svg
@@ -210,8 +211,21 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
                                     </span>
                                 )}
                             </span>
-
-                            {badge}
+                            {badge && (
+                                <span
+                                    className="
+                            relative z-10
+                            px-2 py-0.5
+                            rounded-full
+                            text-[10px]
+                            font-bold
+                            bg-white
+                            text-violet-700
+                        "
+                                >
+                                    {badge}
+                                </span>
+                            )}
                         </NavLink>
                     )
                 )}
