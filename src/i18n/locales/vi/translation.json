@@ -500,5 +500,14 @@
     "goalWorkout": "Tập thể dục 20 lần mỗi tháng",
     "goalDrinkWater": "Uống đủ 2L nước mỗi ngày",
     "days": "Days"
+<<<<<<< Updated upstream
+=======
+  },
+   "checkin": {
+    "history": "Lịch sử check-in",
+    "no": "Không có lịch sử check-in.",
+    "not_finished": "Chưa hoàn thành",
+    "completed":"Đạt mục tiêu"
+>>>>>>> Stashed changes
   }
 }

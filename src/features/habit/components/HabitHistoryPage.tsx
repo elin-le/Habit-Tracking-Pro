@@ -146,7 +146,7 @@ export function HabitHistoryPage() {
                     })}
                   </span>
                   <span className="text-xs capitalize mt-0.5" style={{ color: isTargetMet ? "#22c55e" : "#f59e0b" }}>
-                    {isTargetMet ? t("goals.completed") : t("goals.notfinished")}
+                    {isTargetMet ? t("checkin.completed") : t("checkin.not_finished")}
                   </span>
                 </div>
 

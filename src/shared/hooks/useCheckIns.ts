@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { STORAGE_KEY } from "../constants/appConstants";
 import type { CheckIn } from "../types/CheckIn";
 
@@ -6,70 +6,61 @@ function readCheckInsFromStorage(): CheckIn[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY.USER_CHECKINS);
     return raw ? JSON.parse(raw) : [];
-  } catch (e) {
+  } catch {
     return [];
   }
 }
 
 function writeCheckInsToStorage(checkIns: CheckIn[]) {
   try {
-    localStorage.setItem(STORAGE_KEY.USER_CHECKINS, JSON.stringify(checkIns));
-  } catch (e) {
+    localStorage.setItem(
+      STORAGE_KEY.USER_CHECKINS,
+      JSON.stringify(checkIns),
+    );
+  } catch {
     // ignore
   }
 }
 
 function createCheckInId() {
-  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+  if (
+    typeof crypto !== "undefined" &&
+    typeof crypto.randomUUID === "function"
+  ) {
     return crypto.randomUUID();
   }
+
   return `checkin_${Date.now()}_${Math.floor(Math.random() * 1000000)}`;
 }
 
-let globalCheckIns: CheckIn[] = readCheckInsFromStorage();
-const subscribers = new Set<(next: CheckIn[]) => void>();
-
-function notifySubscribers(next: CheckIn[]) {
-  subscribers.forEach((s) => {
-    try {
-      s(next);
-    } catch (e) {
-      // ignore subscriber errors
-    }
-  });
-}
-
-function persistGlobal(next: CheckIn[]) {
-  globalCheckIns = next;
-  writeCheckInsToStorage(next);
-  notifySubscribers(next);
-}
-
 export function useCheckIns() {
-  const [checkIns, setCheckIns] = useState<CheckIn[]>(globalCheckIns);
+  const [checkIns, setCheckIns] = useState<CheckIn[]>(() =>
+    readCheckInsFromStorage(),
+  );
 
-  useEffect(() => {
-    const sub = (next: CheckIn[]) => setCheckIns(next);
-    subscribers.add(sub);
-    // In case storage changed before subscription
-    setCheckIns(globalCheckIns);
-    return () => {
-      subscribers.delete(sub);
-    };
-  }, []);
-
-  const getCheckInsByDate = (checkedAt: string) =>
-    globalCheckIns.filter((checkIn) => checkIn.checkedAt === checkedAt);
-
-  const getCheckIn = (habitId: string, checkedAt: string) =>
-    globalCheckIns.find(
-      (checkIn) => checkIn.habitId === habitId && checkIn.checkedAt === checkedAt,
+  const getCheckInsByDate = (checkedAt: string) => {
+    return checkIns.filter(
+      (checkIn) => checkIn.checkedAt === checkedAt,
     );
+  };
+
+  const getCheckIn = (habitId: string, checkedAt: string) => {
+    return checkIns.find(
+      (checkIn) =>
+        checkIn.habitId === habitId &&
+        checkIn.checkedAt === checkedAt,
+    );
+  };
+
   const getHistoryByHabitId = (habitId: string) => {
-    return globalCheckIns
+    return checkIns
       .filter((checkIn) => checkIn.habitId === habitId)
-      .sort((a, b) => new Date(b.checkedAt).getTime() - new Date(a.checkedAt).getTime());
-   };
+      .sort(
+        (a, b) =>
+          new Date(b.checkedAt).getTime() -
+          new Date(a.checkedAt).getTime(),
+      );
+  };
 
   const upsertCheckIn = (
     habitId: string,
@@ -77,16 +68,24 @@ export function useCheckIns() {
     completionCount: number,
   ) => {
     const nextCount = Math.max(0, completionCount);
-    const existing = globalCheckIns.find(
-      (c) => c.habitId === habitId && c.checkedAt === checkedAt,
+
+    const existing = checkIns.find(
+      (checkIn) =>
+        checkIn.habitId === habitId &&
+        checkIn.checkedAt === checkedAt,
     );
 
     const next = existing
-      ? globalCheckIns.map((checkIn) =>
-          checkIn.id === existing.id ? { ...checkIn, completionCount: nextCount } : checkIn,
+      ? checkIns.map((checkIn) =>
+          checkIn.id === existing.id
+            ? {
+                ...checkIn,
+                completionCount: nextCount,
+              }
+            : checkIn,
         )
       : [
-          ...globalCheckIns,
+          ...checkIns,
           {
             id: createCheckInId(),
             habitId,
@@ -95,14 +94,15 @@ export function useCheckIns() {
           },
         ];
 
-    persistGlobal(next);
+    setCheckIns(next);
+    writeCheckInsToStorage(next);
   };
 
   return {
     checkIns,
     getCheckInsByDate,
     getCheckIn,
+    getHistoryByHabitId,
     upsertCheckIn,
-    getHistoryByHabitId
   };
 }
