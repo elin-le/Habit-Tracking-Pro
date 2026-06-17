@@ -1,11 +1,6 @@
-import { CalendarIcon, SlidersHorizontal } from "lucide-react";
+import {  SlidersHorizontal } from "lucide-react";
 import { FilterChip } from "../common/FilterChip";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { format } from "date-fns";
-import { Calendar } from "../ui/calendar";
-import { Button } from "../ui/Button";
 import { DAY_OF_WEEK_MAP, DAYS } from "@/shared/constants/appConstants";
-import { cn } from "@/shared/lib/utils";
 import { useTranslation } from "react-i18next";
 import { enUS, vi } from "date-fns/locale";
 import type { HabitStatus, Priority } from "@/shared/types/Habit";
@@ -39,7 +34,6 @@ export function HabitFilter({
   onClearAll,
 }: HabitFilterProps) {
   const { t, i18n } = useTranslation();
-  const locale = i18n.language === "vi" ? vi : enUS;
 
   const [calendarDate, setCalendarDate] = useState<Date | undefined>();
 
@@ -48,13 +42,6 @@ export function HabitFilter({
     setCalendarDate(undefined); // bỏ chọn calendar khi chọn weekday chip
     onFrequencyChange(frequencyFilter === dow ? null : dow);
   };
-
-  const handleDateSelect = (date: Date | undefined) => {
-    if (!date) return;
-    setCalendarDate(date);
-    onFrequencyChange(DAY_OF_WEEK_MAP[date.getDay()]); // convert ngay thành DaysOfWeek
-  };
-
   const activeFilterCount =
     (selectedCategory ? 1 : 0) +
     (selectedPriority ? 1 : 0) +

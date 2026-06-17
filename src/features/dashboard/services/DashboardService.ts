@@ -71,23 +71,23 @@ function isHabitCompletedOnDate(
     return (checkIn?.completionCount ?? 0) >= habit.targetPerDay;
 }
 
-function getHabitWeeklyCompletionRate(
-    habit: Habit,
-    checkIns: CheckIn[],
-): number {
-    let completed = 0;
+// function getHabitWeeklyCompletionRate(
+//     habit: Habit,
+//     checkIns: CheckIn[],
+// ): number {
+//     let completed = 0;
 
-    for (let i = 0; i < 7; i++) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
+//     for (let i = 0; i < 7; i++) {
+//         const date = new Date();
+//         date.setDate(date.getDate() - i);
 
-        if (isHabitCompletedOnDate(habit, checkIns, getDateKey(date))) {
-            completed++;
-        }
-    }
+//         if (isHabitCompletedOnDate(habit, checkIns, getDateKey(date))) {
+//             completed++;
+//         }
+//     }
 
-    return Math.round((completed / 7) * 100);
-}
+//     return Math.round((completed / 7) * 100);
+// }
 
 function buildSummaryCards(
     activeHabits: Habit[],
