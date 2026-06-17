@@ -12,77 +12,36 @@ import {
     Sparkles,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import type { GoalWithDerived } from "../../types/Goal";
+import { getGoalTheme } from "../../utils/goalTheme";
 
-// Types
+// Types 
 
 interface ProgressRingProps {
     progress: number;
     size?: number;
     strokeWidth?: number;
     color?: string;
+    isCompleted?: boolean;
 }
 
 export interface GoalCardProps {
-    goal: {
-        id: string;
-        targetType: "STREAK" | "TOTAL_COMPLETIONS";
-        targetValue: number;
-        startedDate: string;
-        endDate: string;
-        progress: {
-            currentProgress: number;
-            progressPercent: number;
-            status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
-        };
-        color?: "emerald" | "orange" | "indigo" | "rose";
-    };
+    goal: GoalWithDerived;
     habitName: string;
-    onSelectDetail: (goal: any) => void;
+    onSelectDetail: (goal: GoalWithDerived) => void;
     onEdit?: () => void;
     onArchive?: () => void;
     onDelete?: () => void;
 }
 
-// Color map 
-
-const COLOR_MAP = {
-    emerald: {
-        ring: "#10b981",
-        badgeBg: "bg-emerald-50 dark:bg-emerald-950/30",
-        badgeText: "text-emerald-600 dark:text-emerald-400",
-        progressBar: "bg-emerald-500",
-        glow: "hover:shadow-emerald-500/10",
-    },
-    orange: {
-        ring: "#f97316",
-        badgeBg: "bg-orange-50 dark:bg-orange-950/30",
-        badgeText: "text-orange-600 dark:text-orange-400",
-        progressBar: "bg-orange-500",
-        glow: "hover:shadow-orange-500/10",
-    },
-    indigo: {
-        ring: "#4f46e5",
-        badgeBg: "bg-indigo-50 dark:bg-indigo-950/30",
-        badgeText: "text-indigo-600 dark:text-indigo-400",
-        progressBar: "bg-indigo-600",
-        glow: "hover:shadow-indigo-500/10",
-    },
-    rose: {
-        ring: "#f43f5e",
-        badgeBg: "bg-rose-50 dark:bg-rose-950/30",
-        badgeText: "text-rose-600 dark:text-rose-400",
-        progressBar: "bg-rose-500",
-        glow: "hover:shadow-rose-500/10",
-    },
-} as const;
-
 // Progress Ring 
 
 const ProgressRing: React.FC<ProgressRingProps> = ({
     progress,
-    size = 64,
-    strokeWidth = 5,
-    color = "#6366f1",
+    size = 80,
+    strokeWidth = 7,
+    color,
+    isCompleted,
 }) => {
     const radius = (size - strokeWidth) / 2;
     const circumference = 2 * Math.PI * radius;
@@ -96,32 +55,33 @@ const ProgressRing: React.FC<ProgressRingProps> = ({
             style={{ transform: "rotate(-90deg)" }}
             aria-hidden="true"
         >
+            {/* Track */}
             <circle
                 cx={size / 2}
                 cy={size / 2}
                 r={radius}
                 fill="none"
-                stroke="currentColor"
-                className="text-slate-100 dark:text-slate-800"
+                stroke="color-mix(in srgb, var(--primary) 12%, transparent)"
                 strokeWidth={strokeWidth}
             />
+            {/* Progress arc */}
             <circle
                 cx={size / 2}
                 cy={size / 2}
                 r={radius}
                 fill="none"
-                stroke={color}
+                stroke={isCompleted ? "#10b981" : color}
                 strokeWidth={strokeWidth}
                 strokeDasharray={circumference}
                 strokeDashoffset={offset}
                 strokeLinecap="round"
-                style={{ transition: "stroke-dashoffset 0.6s cubic-bezier(0.4,0,0.2,1)" }}
+                style={{ transition: "stroke-dashoffset 0.8s cubic-bezier(0.4,0,0.2,1)" }}
             />
         </svg>
     );
 };
 
-// Dropdown Menu
+// Dropdown
 
 interface GoalDropdownProps {
     onEdit?: () => void;
@@ -151,8 +111,8 @@ const GoalDropdown: React.FC<GoalDropdownProps> = ({ onEdit, onArchive, onDelete
                 aria-expanded={open}
                 className="
                     p-1.5 rounded-lg
-                    opacity-60 hover:opacity-100
-                    hover:bg-slate-100/50
+                    opacity-50 hover:opacity-100
+                    hover:bg-white/10
                     transition-all duration-150
                 "
             >
@@ -161,18 +121,19 @@ const GoalDropdown: React.FC<GoalDropdownProps> = ({ onEdit, onArchive, onDelete
 
             {open && (
                 <>
-                    {/* Invisible backdrop for outside-click */}
                     <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
                     <div
                         className="
                             absolute right-0 top-8 z-50
-                            min-w-[148px] py-1.5
-                            bg-[var(--surface)]
-                            border border-slate-200 dark:border-slate-700/80
-                            rounded-2xl shadow-xl
+                            min-w-[152px] py-1.5
+                            border rounded-2xl shadow-2xl
                             overflow-hidden
                             animate-in fade-in slide-in-from-top-2 duration-150
                         "
+                        style={{
+                            background: "var(--surface)",
+                            borderColor: "color-mix(in srgb, var(--primary) 15%, transparent)",
+                        }}
                         role="menu"
                     >
                         <DropdownItem icon={<Edit3 size={13} />} onClick={() => { setOpen(false); onEdit?.(); }}>
@@ -181,7 +142,7 @@ const GoalDropdown: React.FC<GoalDropdownProps> = ({ onEdit, onArchive, onDelete
                         <DropdownItem icon={<Archive size={13} />} onClick={() => { setOpen(false); onArchive?.(); }}>
                             {t("goals.archive_goal")}
                         </DropdownItem>
-                        <div className="my-1 mx-3 border-t border-slate-100 dark:border-slate-700/60" />
+                        <div className="my-1 mx-3 border-t" style={{ borderColor: "color-mix(in srgb, var(--primary) 10%, transparent)" }} />
                         <DropdownItem
                             icon={<Trash2 size={13} />}
                             onClick={() => { setOpen(false); onDelete?.(); }}
@@ -211,18 +172,16 @@ const DropdownItem: React.FC<{
             transition-colors duration-100
             ${danger
                 ? "text-red-500 hover:bg-red-50/50"
-                : "opacity-90 hover:bg-slate-50/10"
+                : "opacity-90 hover:bg-white/5"
             }
         `}
     >
-        <span className={danger ? "text-red-400" : "opacity-60"}>
-            {icon}
-        </span>
+        <span className={danger ? "text-red-400" : "opacity-50"}>{icon}</span>
         {children}
     </button>
 );
 
-// Days remaining helper 
+// Helpers
 
 function getDaysLeft(endDate: string): number | null {
     if (!endDate) return null;
@@ -232,7 +191,13 @@ function getDaysLeft(endDate: string): number | null {
     return Math.ceil((end.getTime() - today.getTime()) / 86_400_000);
 }
 
-// GoalCard 
+function formatDate(dateStr: string, locale?: string): string {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    return d.toLocaleDateString(locale ?? undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
+//  GoalCard 
 
 const GoalCard: React.FC<GoalCardProps> = ({
     goal,
@@ -242,202 +207,179 @@ const GoalCard: React.FC<GoalCardProps> = ({
     onArchive,
     onDelete,
 }) => {
-    const { t } = useTranslation();
-    const { progress, color = "indigo" } = goal;
-    // Thêm fallback an toàn: nếu màu trong LocalStorage cũ chưa bị xoá và không có trong COLOR_MAP thì lấy màu indigo
-    const c = COLOR_MAP[color as keyof typeof COLOR_MAP] || COLOR_MAP.indigo;
+    const { t, i18n } = useTranslation();
+    const { progress } = goal;
+    const theme = getGoalTheme(goal.targetType);
 
     const isCompleted = progress.status === "COMPLETED";
     const isNotStarted = progress.status === "NOT_STARTED";
     const isNear = progress.progressPercent >= 80 && !isCompleted;
+    const isStreak = goal.targetType === "STREAK";
 
-    const unit = goal.targetType === "STREAK" ? t("goals.days") : t("goals.times");
+    const unit = isStreak ? t("goals.days") : t("goals.sessions");
     const daysLeft = getDaysLeft(goal.endDate);
-
-    // Progress bar width capped at 100%
     const barPercent = Math.min(progress.progressPercent, 100);
+
+    // Days-left urgency level
+    const daysUrgency =
+        daysLeft === null ? "normal"
+        : daysLeft <= 0 ? "overdue"
+        : daysLeft <= 3 ? "critical"
+        : daysLeft <= 7 ? "warning"
+        : "normal";
 
     return (
         <article
             onClick={() => onSelectDetail(goal)}
             className={`
                 group relative overflow-hidden
-                bg-[var(--surface)]
-                border border-slate-200/80 dark:border-slate-700/60
-                rounded-3xl
+                rounded-3xl border
                 cursor-pointer select-none
                 transition-all duration-300 ease-out
-                hover:-translate-y-1 hover:shadow-xl
-                ${c.glow}
+                hover:-translate-y-1 hover:shadow-2xl
+                ${theme.glow}
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]
             `}
+            style={{
+                background: "var(--surface)",
+                borderColor: "color-mix(in srgb, var(--primary) 18%, transparent)",
+                color: "var(--text)",
+            }}
             tabIndex={0}
             role="button"
             aria-label={`Goal: ${habitName}`}
             onKeyDown={(e) => e.key === "Enter" && onSelectDetail(goal)}
         >
-            {/* Colored top accent strip */}
+            {/* ── Animated top progress strip ── */}
             <div
-                className={`absolute top-0 left-0 right-0 h-0.5 ${c.progressBar} opacity-70`}
-                style={{ width: `${barPercent}%`, transition: "width 0.6s cubic-bezier(0.4,0,0.2,1)" }}
+                className={`absolute top-0 left-0 h-[3px] ${isCompleted ? "bg-[#10b981]" : theme.progressBar} opacity-80`}
+                style={{
+                    width: `${barPercent}%`,
+                    transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)",
+                }}
             />
 
-            <div className="flex gap-0 sm:gap-0 h-full">
-                {/* Left: Progress ring panel */}
-                <div className="
-                    w-[88px] shrink-0
-                    flex flex-col items-center justify-center gap-1.5
-                    border-r border-slate-100 dark:border-slate-700/50
-                    py-5
-                ">
-                    <div className="relative flex items-center justify-center">
-                        <ProgressRing
-                            progress={progress.progressPercent}
-                            color={c.ring}
-                            size={72}
-                            strokeWidth={6}
-                        />
-                        <span className="absolute text-[13px] font-black">
-                            {progress.progressPercent}%
-                        </span>
-                    </div>
-                    {/* Counts below ring */}
-                    <span className="text-xs font-semibold opacity-60">
-                        {progress.currentProgress}/{goal.targetValue}
+            {/* ── Subtle radial glow backdrop ── */}
+            <div
+                className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                style={{
+                    background: `radial-gradient(ellipse at top left, color-mix(in srgb, ${isCompleted ? "#10b981" : theme.hex} 6%, transparent), transparent 65%)`,
+                }}
+            />
+
+            <div className="relative flex flex-col p-5 gap-3">
+
+                {/* ── Row 1: Type badge + Menu ── */}
+                <div className="flex items-center justify-between gap-2">
+                    <span className={`
+                        inline-flex items-center gap-1.5
+                        text-[11px] font-bold px-2.5 py-1 rounded-full tracking-wide
+                        ${isCompleted ? "bg-[#10b981]/15 text-[#10b981]" : `${theme.badgeBg} ${theme.badgeText}`}
+                    `}>
+                        {isStreak ? <Flame size={11} /> : <Target size={11} />}
+                        {isStreak ? t("goals.streak") : t("goals.total_completions")}
                     </span>
+
+                    <div className="flex items-center gap-1">
+                        {/* Status pill */}
+                        {isCompleted && (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#10b981]/15 text-[#10b981]">
+                                <CheckCircle2 size={10} />
+                                {t("goals.completed")}
+                            </span>
+                        )}
+                        {isNotStarted && (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-400/10 opacity-60">
+                                <Clock size={10} />
+                                {t("goals.not_started")}
+                            </span>
+                        )}
+                        {isNear && (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-400">
+                                <Sparkles size={10} />
+                                80%+
+                            </span>
+                        )}
+                        <GoalDropdown onEdit={onEdit} onArchive={onArchive} onDelete={onDelete} />
+                    </div>
                 </div>
 
-                {/* Right: Content */}
-                <div className="flex-1 flex flex-col justify-between px-5 py-5 min-w-0">
-                    {/* Top row */}
-                    <div>
-                        <div className="flex items-start justify-between gap-2">
-                            {/* Badges */}
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                                {/* Goal type badge */}
-                                <span className={`
-                                    inline-flex items-center gap-1.5
-                                    text-[11px] font-bold px-2.5 py-1 rounded-full
-                                    ${c.badgeBg} ${c.badgeText}
-                                `}>
-                                    {goal.targetType === "STREAK"
-                                        ? <Flame size={11} />
-                                        : <Target size={11} />
-                                    }
-                                    {goal.targetType === "STREAK"
-                                        ? t("goals.streak")
-                                        : t("goals.total_completions")
-                                    }
-                                </span>
-
-                                {/* Status badge */}
-                                {isCompleted && (
-                                    <span className="
-                                        inline-flex items-center gap-1
-                                        text-[11px] font-bold px-2.5 py-1 rounded-full
-                                        bg-emerald-50 dark:bg-emerald-950/30
-                                        text-emerald-600 dark:text-emerald-400
-                                    ">
-                                        <CheckCircle2 size={11} />
-                                        {t("goals.completed")}
-                                    </span>
-                                )}
-                                {isNotStarted && (
-                                    <span className="
-                                        inline-flex items-center gap-1
-                                        text-[11px] font-bold px-2.5 py-1 rounded-full
-                                        bg-slate-100/50
-                                        opacity-70
-                                    ">
-                                        <Clock size={11} />
-                                        {t("goals.not_started")}
-                                    </span>
-                                )}
-                                {isNear && (
-                                    <span className="
-                                        inline-flex items-center gap-1
-                                        text-[11px] font-bold px-2.5 py-1 rounded-full
-                                        bg-violet-50 dark:bg-violet-950/30
-                                        text-violet-600 dark:text-violet-400
-                                    ">
-                                        <Sparkles size={11} />
-                                        80%+
-                                    </span>
-                                )}
-                            </div>
-
-                            {/* Menu */}
-                            <GoalDropdown onEdit={onEdit} onArchive={onArchive} onDelete={onDelete} />
+                {/* ── Row 2: Ring + Title + Count ── */}
+                <div className="flex items-center gap-4">
+                    {/* Progress ring */}
+                    <div className="relative shrink-0 flex items-center justify-center">
+                        <ProgressRing
+                            progress={progress.progressPercent}
+                            color={theme.hex}
+                            size={76}
+                            strokeWidth={7}
+                            isCompleted={isCompleted}
+                        />
+                        <div className="absolute flex flex-col items-center leading-none">
+                            <span className="text-[15px] font-black tabular-nums">
+                                {barPercent}%
+                            </span>
                         </div>
+                    </div>
 
-                        {/* Habit name */}
-                        <h3 className="
-                            text-base font-bold mt-3
-                            line-clamp-1
-                        ">
+                    {/* Title + progress count */}
+                    <div className="min-w-0 flex-1">
+                        <h3 className="text-[15px] font-bold leading-snug line-clamp-2">
                             {habitName}
                         </h3>
-
-                        {/* Target description */}
-                        <p className="text-xs opacity-60 mt-1">
-                            {t("goals.target")}: {goal.targetValue} {unit}
-                            {" · "}
-                            {t("goals.current_progress")}: {progress.currentProgress}
-                        </p>
-                    </div>
-
-                    {/* Progress bar */}
-                    <div className="mt-3">
-                        <div className="h-1.5 rounded-full bg-slate-100 dark:bg-slate-700/60 overflow-hidden">
-                            <div
-                                className={`h-full rounded-full ${c.progressBar} transition-all duration-700 ease-out`}
-                                style={{ width: `${barPercent}%` }}
-                                role="progressbar"
-                                aria-valuenow={progress.progressPercent}
-                                aria-valuemin={0}
-                                aria-valuemax={100}
-                            />
+                        <div className="mt-1.5 flex items-baseline gap-1">
+                            <span
+                                className="text-xl font-black tabular-nums"
+                                style={{ color: isCompleted ? "#10b981" : theme.hex }}
+                            >
+                                {progress.currentProgress}
+                            </span>
+                            <span className="text-xs opacity-40 font-semibold">
+                                / {goal.targetValue} {unit}
+                            </span>
                         </div>
                     </div>
+                </div>
 
-                    {/* Footer */}
-                    <div className="
-                        flex items-center justify-between
-                        mt-4 pt-3
-                        border-t border-slate-100/50
-                        text-[11px] sm:text-xs opacity-60 font-medium
-                    ">
-                        <span className="flex items-center gap-1.5">
-                            <Calendar size={12} />
+
+
+                {/* Footer */}
+                <div
+                    className="flex items-center justify-between pt-3 border-t text-[11px] font-medium"
+                    style={{ borderColor: "color-mix(in srgb, var(--primary) 10%, transparent)" }}
+                >
+                    {/* Left: date */}
+                    <div className="flex items-center gap-2 opacity-55 min-w-0">
+                        <Calendar size={11} className="shrink-0" />
+                        <span className="truncate">
                             {goal.endDate
-                                ? `${t("goals.end_date")}: ${goal.endDate}`
-                                : `${t("goals.started_date")}: ${goal.startedDate}`
+                                ? `${t("goals.end_date")}: ${formatDate(goal.endDate, i18n.language)}`
+                                : `${t("goals.started_date")}: ${formatDate(goal.startedDate, i18n.language)}`
                             }
                         </span>
-
-                        {/* Days left indicator */}
-                        {!isCompleted && daysLeft !== null && (
-                            <span className={`flex items-center gap-1.5 font-bold ${daysLeft <= 3
-                                ? "text-red-500 dark:text-red-400"
-                                : daysLeft <= 7
-                                    ? "text-amber-500"
-                                    : "opacity-80"
-                                }`}>
-                                <Clock size={12} />
-                                {daysLeft <= 0
-                                    ? t("goals.overdue")
-                                    : `${daysLeft}d`
-                                }
-                            </span>
-                        )}
-
-                        {isCompleted && (
-                            <span className="flex items-center gap-1.5 font-bold text-emerald-500 dark:text-emerald-400">
-                                <CheckCircle2 size={12} />
-                                {t("goals.done")}
-                            </span>
-                        )}
                     </div>
+
+                    {/* Right: days-left chip or done */}
+                    {isCompleted ? (
+                        <span className="flex items-center gap-1 font-bold text-[#10b981]">
+                            <CheckCircle2 size={11} />
+                            {t("goals.done")}
+                        </span>
+                    ) : daysLeft !== null ? (
+                        <span className={`
+                            inline-flex items-center gap-1 font-bold rounded-full px-2 py-0.5 shrink-0
+                            ${daysUrgency === "overdue" ? "bg-red-500/15 text-red-500"
+                            : daysUrgency === "critical" ? "bg-red-400/15 text-red-400"
+                            : daysUrgency === "warning" ? "bg-amber-400/15 text-amber-400"
+                            : "opacity-55"}
+                        `}>
+                            <Clock size={10} />
+                            {daysLeft <= 0
+                                ? t("goals.overdue")
+                                : `${daysLeft} ${t("goals.days")} ${t("goals.left")}`
+                            }
+                        </span>
+                    ) : null}
                 </div>
             </div>
         </article>

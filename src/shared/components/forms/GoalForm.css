@@ -1,7 +1,7 @@
 @import "../../../index.css" reference;
 
 .goal-input {
-    @apply w-full h-12 rounded-2xl text-sm font-medium border border-input bg-background text-foreground placeholder:text-muted-foreground outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-200;
+    @apply w-full h-12 rounded-2xl text-sm font-medium border border-input bg-background text-foreground placeholder:text-muted-foreground outline-none transition-all duration-200;
 }
 
 .goal-input-error {

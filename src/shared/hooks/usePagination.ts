@@ -26,7 +26,7 @@ export function usePagination<T>(
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery]);
+  }, [items, searchQuery]);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {

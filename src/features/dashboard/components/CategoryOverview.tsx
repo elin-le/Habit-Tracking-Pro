@@ -7,7 +7,7 @@ import {
     Tooltip,
 } from "recharts";
 
-import { type CategoryOverviewType } from "../Dashboard.type";
+import type { CategoryOverviewType } from "../Dashboard.type";
 
 interface CategoryOverviewProps {
     categories: CategoryOverviewType[];
@@ -26,9 +26,20 @@ const CategoryOverview = ({
 }: CategoryOverviewProps) => {
     const { t } = useTranslation();
 
+    const total = categories.reduce(
+        (sum, item) => sum + item.progress,
+        0,
+    );
+
     const chartData = categories.map((item) => ({
-        name: t(item.category),
+        name: item.category,
         value: item.progress,
+        percent:
+            total > 0
+                ? Math.round(
+                      (item.progress / total) * 100,
+                  )
+                : 0,
     }));
 
     return (
@@ -38,7 +49,6 @@ const CategoryOverview = ({
             </h2>
 
             <div className="category-overview">
-
                 <div className="category-chart">
                     <ResponsiveContainer
                         width="100%"
@@ -48,56 +58,72 @@ const CategoryOverview = ({
                             <Pie
                                 data={chartData}
                                 dataKey="value"
+                                nameKey="name"
                                 innerRadius={60}
                                 outerRadius={90}
                                 paddingAngle={3}
                             >
-                                {chartData.map((_, index) => (
-                                    <Cell
-                                        key={index}
-                                        fill={
-                                            COLORS[
-                                            index %
-                                            COLORS.length
-                                            ]
-                                        }
-                                    />
-                                ))}
+                                {chartData.map(
+                                    (_, index) => (
+                                        <Cell
+                                            key={index}
+                                            fill={
+                                                COLORS[
+                                                    index %
+                                                        COLORS.length
+                                                ]
+                                            }
+                                        />
+                                    ),
+                                )}
                             </Pie>
 
-                            <Tooltip />
+                            <Tooltip
+                                formatter={(
+                                    value,
+                                    _,
+                                    props,
+                                ) => [
+                                    `${value} Habits (${props.payload.percent}%)`,
+                                    props.payload.name,
+                                ]}
+                            />
                         </PieChart>
                     </ResponsiveContainer>
                 </div>
 
                 <div className="category-legend">
-                    {chartData.map((item, index) => (
-                        <div
-                            key={item.name}
-                            className="category-legend__item"
-                        >
-                            <span
-                                className="category-legend__dot"
-                                style={{
-                                    backgroundColor:
-                                        COLORS[
-                                        index %
-                                        COLORS.length
-                                        ],
-                                }}
-                            />
+                    {chartData.map(
+                        (item, index) => (
+                            <div
+                                key={item.name}
+                                className="category-legend__item"
+                            >
+                                <div className="category-legend__left">
+                                    <div
+                                        className="category-legend__dot"
+                                        style={{
+                                            backgroundColor:
+                                                COLORS[
+                                                    index %
+                                                        COLORS.length
+                                                ],
+                                        }}
+                                    />
 
-                            <span>
-                                {item.name}
-                            </span>
+                                    <span className="category-legend__label">
+                                        {item.name}
+                                    </span>
+                                </div>
 
-                            <strong>
-                                {item.value}%
-                            </strong>
-                        </div>
-                    ))}
+                                <span className="category-legend__value">
+                                    {item.value} (
+                                    {item.percent}%)
+                                </span>
+                            </div>
+                        ),
+                    )}
                 </div>
-
             </div>
         </div>
     );
