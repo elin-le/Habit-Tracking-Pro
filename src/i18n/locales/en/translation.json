@@ -20,7 +20,8 @@
     "goals": "Goals",
     "statistics": "Statistics",
     "settings": "Settings",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "community":"Community"
   },
   "habit": {
     "create": "Create Habit",

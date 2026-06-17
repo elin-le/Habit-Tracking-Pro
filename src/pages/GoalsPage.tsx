@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useGoals, type StatusFilter, type TypeFilter } from "../shared/hooks/useGoals";
 import { ToastService } from "../routes/services/toastService";
 import { useTranslation } from "react-i18next";
@@ -106,10 +106,7 @@ function GoalsPage() {
         handleCloseDetail();
     };
 
-    // TODO: bổ sung update goal 
-
     const hasActiveFilters = statusFilter !== "ALL" || typeFilter !== "ALL";
-
     // Main UI
     return (
         <div className="flex flex-col gap-6 pb-24 md:pb-8 text-[var(--text)] animate-in fade-in duration-300">
