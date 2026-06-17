@@ -246,7 +246,8 @@
     "risk_at_risk": "Nguy cơ đứt chuỗi",
     "empty": "Chưa có dữ liệu để thống kê",
     "empty_hint": "Tạo thói quen và check-in mỗi ngày để xem thống kê tại đây",
-    "empty_action": "Tạo thói quen ngay"
+    "empty_action": "Tạo thói quen ngay",
+    "statistics.no_match": "Không có thói quen khớp bộ lọc"
   },
   "notifications": {
     "title": "Thông báo",

@@ -11,7 +11,7 @@ import { HabitHistoryPage } from "../features/habit/components/HabitHistoryPage"
 import GoalsPage from "../pages/GoalsPage";
 import { NotificationsPage } from "../pages/NotificationsPage";
 
-import StatisticsPage from "../pages/StatisticsPage";
+import StatisticsPage from "../features/statistics/page/StatisticsPage";
 import DashboardPage from "../pages/DashboardPage";
 import CommunityPage from "../features/community/CommunityPage"
 
