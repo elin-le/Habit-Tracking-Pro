@@ -211,21 +211,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
                                 )}
                             </span>
 
-                            {badge && (
-                                <span
-                                    className="
-                            relative z-10
-                            px-2 py-0.5
-                            rounded-full
-                            text-[10px]
-                            font-bold
-                            bg-white
-                            text-violet-700
-                        "
-                                >
-                                    {badge}
-                                </span>
-                            )}
+                            {badge}
                         </NavLink>
                     )
                 )}
