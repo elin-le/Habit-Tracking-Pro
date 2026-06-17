@@ -1,18 +1,52 @@
 import { useTranslation } from "react-i18next";
-import { Flame, Trophy, CheckCircle2, TrendingUp, BarChart3 } from "lucide-react";
-import { Link } from "react-router-dom";
+import {
+  Flame,
+  Trophy,
+  CheckCircle2,
+  TrendingUp,
+  BarChart3,
+  Download,
+} from "lucide-react";
+import { Link, useOutletContext } from "react-router-dom";
 import { useHabitStats } from "../shared/hooks/useHabitStats";
 import type { HabitStat, RiskLevel } from "../shared/types/Statistics";
+import { exportJson } from "@/shared/utils/exportJson";
+import type { Habit } from "@/shared/types/Habit";
+import type { Goal } from "@/shared/types/Goal";
+import type { CheckIn } from "@/shared/types/CheckIn";
+import { toast } from "sonner";
+
+type LayoutContext = {
+  habits: Habit[];
+  goals: Goal[];
+  checkIns: CheckIn[];
+};
 
 export default function StatisticsPage() {
   const { t } = useTranslation();
   const { stats } = useHabitStats();
 
   const total = stats.length;
-  const completedToday = stats.filter((s) => s.last7Days[s.last7Days.length - 1] === 100).length;
-  const completedTodayPct = total === 0 ? 0 : Math.round((completedToday / total) * 100);
+  const completedToday = stats.filter(
+    (s) => s.last7Days[s.last7Days.length - 1] === 100,
+  ).length;
+  const completedTodayPct =
+    total === 0 ? 0 : Math.round((completedToday / total) * 100);
   const activeHabits = stats.length;
   const atRisk = stats.filter((s) => s.riskLevel === "AT_RISK").length;
+
+  const { habits, goals, checkIns } = useOutletContext<LayoutContext>();
+
+  const handleExport = () => {
+    try {
+      exportJson(habits, goals, checkIns);
+
+      toast.success(`${t("statistics.ex_noti1")}`);
+    } catch (error) {
+      toast.error(`${t("statistics.ex_noti2")}`);
+      console.error(error);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-6 pb-24 md:pb-8 text-[var(--text)]">
@@ -26,10 +60,39 @@ export default function StatisticsPage() {
         <EmptyState />
       ) : (
         <>
+          {/* Export — đứng riêng, đẩy phải */}
+          <div className="flex justify-end">
+            <button
+              onClick={handleExport}
+              className="flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium transition-colors cursor-pointer"
+              style={{
+                borderColor:
+                  "color-mix(in srgb, var(--primary) 25%, transparent)",
+                color: "var(--text)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background =
+                  "color-mix(in srgb, var(--primary) 8%, transparent)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "transparent";
+              }}
+            >
+              <Download size={15} />
+              {t("statistics.btn_export")}
+            </button>
+          </div>
+
           {/* ---- 3 thẻ tổng quan ---- */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <OverviewCard label={t("statistics.completed_today")} value={`${completedTodayPct}%`} />
-            <OverviewCard label={t("statistics.active_habits")} value={activeHabits} />
+            <OverviewCard
+              label={t("statistics.completed_today")}
+              value={`${completedTodayPct}%`}
+            />
+            <OverviewCard
+              label={t("statistics.active_habits")}
+              value={activeHabits}
+            />
             <OverviewCard label={t("statistics.at_risk")} value={atRisk} />
           </div>
 
@@ -47,7 +110,13 @@ export default function StatisticsPage() {
 }
 
 //Thẻ tổng quan (3 ô trên cùng)
-function OverviewCard({ label, value }: { label: string; value: string | number }) {
+function OverviewCard({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number;
+}) {
   return (
     <div className="p-5 rounded-2xl border border-[var(--primary)]/15 bg-[var(--surface)]">
       <p className="text-2xl font-black">{value}</p>
@@ -55,7 +124,15 @@ function OverviewCard({ label, value }: { label: string; value: string | number 
     </div>
   );
 }
-function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function Metric({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
   return (
     <div className="flex flex-col gap-1">
       <span className="flex items-center gap-1.5 text-xs opacity-60">
@@ -107,30 +184,49 @@ function HabitStatCard({ stat }: { stat: HabitStat }) {
           <h3 className="font-semibold text-base">{stat.name}</h3>
           <p className="text-xs opacity-50 mt-0.5">{stat.category}</p>
         </div>
-        <span className={`shrink-0 px-2 py-0.5 rounded-full text-[11px] font-bold ${riskColor[stat.riskLevel]}`}>
+        <span
+          className={`shrink-0 px-2 py-0.5 rounded-full text-[11px] font-bold ${riskColor[stat.riskLevel]}`}
+        >
           {riskLabel[stat.riskLevel]}
         </span>
       </div>
       {/* 4 chỉ số */}
       <div className="grid grid-cols-2 gap-3 text-sm">
-        <Metric icon={<Flame size={15} />} label={t("statistics.current_streak")}
-          value={`${stat.currentStreak} ${t("statistics.days")}`} />
-        <Metric icon={<Trophy size={15} />} label={t("statistics.longest_streak")}
-          value={`${stat.longestStreak} ${t("statistics.days")}`} />
-        <Metric icon={<CheckCircle2 size={15} />} label={t("statistics.total_completions")}
-          value={`${stat.totalCompletions}`} />
-        <Metric icon={<TrendingUp size={15} />} label={t("statistics.completion_rate")}
-          value={`${stat.completionRate}%`} />
+        <Metric
+          icon={<Flame size={15} />}
+          label={t("statistics.current_streak")}
+          value={`${stat.currentStreak} ${t("statistics.days")}`}
+        />
+        <Metric
+          icon={<Trophy size={15} />}
+          label={t("statistics.longest_streak")}
+          value={`${stat.longestStreak} ${t("statistics.days")}`}
+        />
+        <Metric
+          icon={<CheckCircle2 size={15} />}
+          label={t("statistics.total_completions")}
+          value={`${stat.totalCompletions}`}
+        />
+        <Metric
+          icon={<TrendingUp size={15} />}
+          label={t("statistics.completion_rate")}
+          value={`${stat.completionRate}%`}
+        />
       </div>
       {/* Thanh 7 ngày gần nhất*/}
       <div>
-        <p className="text-xs font-semibold opacity-60 mb-2">{t("statistics.last_7_days")}</p>
+        <p className="text-xs font-semibold opacity-60 mb-2">
+          {t("statistics.last_7_days")}
+        </p>
         <div className="flex items-end gap-1 h-10">
           {stat.last7Days.map((v, i) => (
             <div
               key={i}
               className="flex-1 rounded-sm bg-[var(--primary)]"
-              style={{ height: `${Math.max(v, 6)}%`, opacity: v === 0 ? 0.2 : 0.4 + (v / 100) * 0.6 }}
+              style={{
+                height: `${Math.max(v, 6)}%`,
+                opacity: v === 0 ? 0.2 : 0.4 + (v / 100) * 0.6,
+              }}
               title={`${v}%`}
             />
           ))}

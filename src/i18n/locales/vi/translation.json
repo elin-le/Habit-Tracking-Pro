@@ -249,7 +249,10 @@
     "risk_at_risk": "Nguy cơ đứt chuỗi",
     "empty": "Chưa có dữ liệu để thống kê",
     "empty_hint": "Tạo thói quen và check-in mỗi ngày để xem thống kê tại đây",
-    "empty_action": "Tạo thói quen ngay"
+    "empty_action": "Tạo thói quen ngay",
+    "btn_export": "Xuất dữ liệu",
+    "ex_noti1": "Xuất dữ liệu thành công",
+    "ex_noti2": "Xuất dữ liệu thất bại"
   },
   "notifications": {
     "title": "Thông báo",
@@ -296,20 +299,20 @@
     "learning": "Học tập",
     "productivity": "Năng suất"
   },
-   "checkin": {
+  "checkin": {
     "history": "Lịch sử check-in",
     "no": "Không có lịch sử check-in.",
     "not_finished": "Chưa hoàn thành",
-    "completed":"Đạt mục tiêu",
+    "completed": "Đạt mục tiêu",
     "days": "Ngày"
   },
-  "setting":{
-    "setting":"Cài đặt",
-    "darkMode":"Chế độ tối",
-    "vietnamese":"Tiếng Việt",
-    "readOnly":"Chỉ đọc"
+  "setting": {
+    "setting": "Cài đặt",
+    "darkMode": "Chế độ tối",
+    "vietnamese": "Tiếng Việt",
+    "readOnly": "Chỉ đọc"
   },
   "heatmap": {
-    "more":"Thêm"
+    "more": "Thêm"
   }
 }
