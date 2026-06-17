@@ -17,6 +17,7 @@ import {
 } from "./shared/utils/seedData";
 import { ThemeProvider } from "./context/ThemeContext";
 import { NotificationProvider } from './features/notifications/context/NotificationContext';
+import { ReadOnlyProvider } from "./context/ReadOnlyContext"
 
 seedData();
 seedHabits();
@@ -28,14 +29,16 @@ seedCheckins();
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider >
-      <NotificationProvider> 
-        <RouterProvider router={router} />
-        <Toaster
-          richColors
-          position="top-right"
-          closeButton
-          expand
-        />
+      <NotificationProvider>
+        <ReadOnlyProvider>
+          <RouterProvider router={router} />
+          <Toaster
+            richColors
+            position="top-right"
+            closeButton
+            expand
+          />
+        </ReadOnlyProvider>
       </NotificationProvider>
     </ThemeProvider>
   </StrictMode>,

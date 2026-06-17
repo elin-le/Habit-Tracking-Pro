@@ -1,10 +1,5 @@
 import type { Goal } from "../../../shared/types/Goal";
-
-export interface CheckIn {
-    id: string;
-    habitId: string;
-    checkedAt: string;
-}
+import type { CheckIn } from "../../../shared/types/CheckIn"
 
 type DailySummary = {
     count: number;
@@ -35,38 +30,32 @@ const isDateInRange = (
     );
 };
 
-// Group checkins theo ngày
 export const getDailySummary = (
     habitCheckins: CheckIn[],
     targetPerDay: number
 ): Record<string, DailySummary> => {
-    const summary: Record<
-        string,
-        DailySummary
-    > = {};
+    return habitCheckins.reduce(
+        (summary, checkin) => {
+            const dateKey = getDateKey(
+                checkin.checkedAt
+            );
 
-    for (const checkin of habitCheckins) {
-        const dateKey = getDateKey(
-            checkin.checkedAt
-        );
-
-        if (!summary[dateKey]) {
-            summary[dateKey] = {
+            summary[dateKey] ??= {
                 count: 0,
                 completed: false,
             };
-        }
 
-        summary[dateKey].count++;
-    }
+            summary[dateKey].count +=
+                checkin.completionCount;
 
-    for (const date in summary) {
-        summary[date].completed =
-            summary[date].count >=
-            targetPerDay;
-    }
+            summary[dateKey].completed =
+                summary[dateKey].count >=
+                targetPerDay;
 
-    return summary;
+            return summary;
+        },
+        {} as Record<string, DailySummary>
+    );
 };
 
 export const getCurrentStreak = (
@@ -207,7 +196,7 @@ export const getStreakProgress = (
     checkins: CheckIn[]
 ): number => {
     if (
-        goal.goalType !== "STREAK" ||
+        goal.targetType !== "STREAK" ||
         goal.targetValue <= 0
     ) {
         return -1;
@@ -232,7 +221,7 @@ export const getTotalCompletion = (
     checkins: CheckIn[]
 ): number => {
     if (
-        goal.goalType !== "TOTAL_COMPLETIONS" ||
+        goal.targetType !== "TOTAL_COMPLETIONS" ||
         goal.targetValue <= 0
     ) {
         return -1;
@@ -262,7 +251,7 @@ export const getTotalCompletionProgress = (
     checkins: CheckIn[]
 ): number => {
     if (
-        goal.goalType !== "TOTAL_COMPLETIONS" ||
+        goal.targetType !== "TOTAL_COMPLETIONS" ||
         goal.targetValue <= 0
     ) {
         return -1;
@@ -327,4 +316,63 @@ export const getCompletionRate = (
         (completedDays / totalDays) *
         100
     );
+};
+type CompletionDto = {
+    day: string;
+    completion: number;
+    completionPercentage: number;
+};
+
+export const getLast7DaysCompletionProgress = (
+    goal: Goal,
+    habitCheckIns: CheckIn[],
+    targetPerDay: number
+): CompletionDto[] => {
+    const summary = getDailySummary(
+        habitCheckIns,
+        targetPerDay
+    );
+
+    const today = new Date();
+    const result: CompletionDto[] = [];
+
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+
+        const dateKey = getDateKey(date);
+
+        // Nếu ngày nằm ngoài khoảng goal thì trả về 0
+        if (
+            !isDateInRange(
+                dateKey,
+                goal.startedDate,
+                goal.endDate
+            )
+        ) {
+            result.push({
+                day: dateKey,
+                completion: 0,
+                completionPercentage: 0,
+            });
+            continue;
+        }
+
+        const completion =
+            summary[dateKey]?.count ?? 0;
+
+        result.push({
+            day: dateKey,
+            completion,
+            completionPercentage: Math.min(
+                Math.round(
+                    (completion / targetPerDay) *
+                    100
+                ),
+                100
+            ),
+        });
+    }
+
+    return result;
 };

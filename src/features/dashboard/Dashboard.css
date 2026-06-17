@@ -1,3 +1,7 @@
+/* ==========================================
+   DASHBOARD PAGE
+========================================== */
+
 .dashboard-page {
     display: flex;
     flex-direction: column;
@@ -6,62 +10,113 @@
     min-height: 100vh;
 }
 
-.dashboard-page__content {
-    display: grid;
-    grid-template-columns: repeat(
-        auto-fit,
-        minmax(420px, 1fr)
-    );
-    gap: 1.5rem;
+.dashboard-summary {
+    width: 100%;
 }
 
-/* CARD */
+/* ==========================================
+   SUMMARY
+========================================== */
+
+.summary-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.summary-card {
+    background: var(--surface-color);
+    border: 2px solid rgba(124, 58, 237, 0.15);
+    border-radius: 20px;
+    padding: 1rem;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.summary-card__label {
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.summary-card__value {
+    margin-top: 0.5rem;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* ==========================================
+   MAIN GRID
+========================================== */
+
+.dashboard-grid {
+    display: grid;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+/* ==========================================
+   COMMON CARD
+========================================== */
+
 .dashboard-card {
     background: var(--surface-color);
     color: var(--text-primary);
 
-    border: 2px solid rgba(124, 58, 237, 0.2);
-
+    border: 2px solid rgba(124, 58, 237, 0.15);
     border-radius: 20px;
+
     padding: 1.5rem;
 
     box-shadow:
-        0 4px 12px rgba(237, 131, 225, 0.05),
-        0 12px 30px rgba(235, 143, 215, 0.05);
+        0 4px 12px rgba(124, 58, 237, 0.05),
+        0 12px 30px rgba(124, 58, 237, 0.05);
 
-    transition: all 0.3s ease;
-}
-
-.dashboard-card:hover {
-    border-color: rgb(228, 179, 237);
-    box-shadow:
-        0 8px 20px rgba(124, 58, 237, 0.15),
-        0 16px 40px rgba(124, 58, 237, 0.08);
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease,
+        border-color 0.3s ease;
 }
 
 .dashboard-card:hover {
     transform: translateY(-4px);
+
+    border-color: rgba(168, 85, 247, 0.4);
+
     box-shadow:
         0 8px 20px rgba(124, 58, 237, 0.15),
         0 16px 40px rgba(124, 58, 237, 0.1);
 }
 
 .dashboard-card__title {
+    margin-bottom: 1rem;
+
     font-size: 1rem;
     font-weight: 600;
+
     color: #64748b;
-    margin-bottom: 1rem;
+
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
-/* PROGRESS BAR */
+/* ==========================================
+   TEXT
+========================================== */
+
+.text-secondary {
+    color: #64748b;
+}
+
+/* ==========================================
+   PROGRESS BAR
+========================================== */
+
 .dashboard-progress {
     width: 100%;
     height: 10px;
-
     background: #e2e8f0;
-
     border-radius: 9999px;
     overflow: hidden;
 }
@@ -79,20 +134,179 @@
     transition: width 0.4s ease;
 }
 
-/* TEXT */
-.text-secondary {
+/* ==========================================
+   CATEGORY OVERVIEW
+========================================== */
+
+.category-overview {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.category-chart {
+    width: 100%;
+    height: 260px;
+}
+
+.category-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.category-legend__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.category-legend__left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.category-legend__dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.category-legend__label {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+.category-legend__value {
+    margin-left: auto;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* ==========================================
+   COMPLETION RATE CHART
+========================================== */
+
+.completion-chart {
+    width: 100%;
+    height: 390px;
+}
+
+/* ==========================================
+   GOAL PROGRESS
+========================================== */
+
+.goal-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.goal-card {
+    padding: 1rem;
+
+    border-radius: 16px;
+
+    background: rgba(124, 58, 237, 0.04);
+    border: 1px solid rgba(124, 58, 237, 0.12);
+}
+
+.goal-card__title {
+    margin-bottom: 0.75rem;
+
+    font-size: 0.875rem;
     color: #64748b;
 }
 
-/* STAT NUMBER */
-.dashboard-stat-value {
-    font-size: 2.2rem;
+.goal-card__value {
+    margin-bottom: 0.75rem;
+
+    font-size: 1.5rem;
     font-weight: 700;
-    color: #1e293b;
+
+    color: var(--text-primary);
 }
 
-.dashboard-stat-label {
-    color: #94a3b8;
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 767px) {
+    .dashboard-page {
+        padding: 1rem;
+    }
+
+    .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .goal-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    .summary-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .dashboard-grid {
+        grid-template-columns: repeat(12, 1fr);
+    }
+
+    .dashboard-grid__category {
+        grid-column: span 5;
+    }
+
+    .dashboard-grid__statistics {
+        grid-column: span 7;
+    }
+
+    .dashboard-grid__goals {
+        grid-column: span 12;
+    }
+
+    .goal-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ==========================================
+   DESKTOP
+========================================== */
+
+@media (min-width: 1024px) {
+    .summary-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .dashboard-grid {
+        grid-template-columns: repeat(12, 1fr);
+    }
+
+    .dashboard-grid__category {
+        grid-column: span 4;
+    }
+
+    .dashboard-grid__statistics {
+        grid-column: span 8;
+    }
+
+    .dashboard-grid__goals {
+        grid-column: span 12;
+    }
+
+    .goal-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }

@@ -4,13 +4,18 @@ import { Button } from "../ui/Button";
 interface FilterChipProps {
   children: React.ReactNode;
   active?: boolean;
+  onClick?: () => void;
 }
 
-export function FilterChip({ children, active = false }: FilterChipProps) {
+export function FilterChip({
+  children,
+  active = false,
+  onClick,
+}: FilterChipProps) {
   return (
     <Button
       variant="ghost"
-      // onClick={onClick}
+      onClick={onClick}
       className={cn(
         "cursor-pointer rounded-full border px-3.5 py-1.5 text-sm font-medium transition-all",
         "focus-visible:ring-0 focus-visible:ring-offset-0", // bỏ focus ring mặc định shadcn
@@ -19,18 +24,18 @@ export function FilterChip({ children, active = false }: FilterChipProps) {
       style={
         active
           ? {
-              background: "var(--primary)",
-              borderColor: "var(--primary)",
-              color: "#fff",
-              boxShadow:
-                "0 0 0 2px color-mix(in srgb, var(--primary) 18%, transparent)",
-            }
+            background: "var(--primary)",
+            borderColor: "var(--primary)",
+            color: "#fff",
+            boxShadow:
+              "0 0 0 2px color-mix(in srgb, var(--primary) 18%, transparent)",
+          }
           : {
-              background: "transparent",
-              borderColor:
-                "color-mix(in srgb, var(--primary) 18%, transparent)",
-              color: "var(--sidebar-muted)",
-            }
+            background: "transparent",
+            borderColor:
+              "color-mix(in srgb, var(--primary) 18%, transparent)",
+            color: "var(--sidebar-muted)",
+          }
       }
       onMouseEnter={(e) => {
         if (!active) {

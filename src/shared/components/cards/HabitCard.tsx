@@ -5,34 +5,65 @@ import {
   Plus,
   Minus,
   History,
+  Trash2,
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { DropdownMenu } from "../common/DropdownMenu";
-import type { Habit } from "../../types/Habit";
-import { CATEGORY_ICONS, PRIORITY_COLORS } from "../../constants/appConstants";
-import { mockCategories } from "../../../data/category";
+import type { Habit, HabitStatus } from "../../types/Habit";
+import {
+  CATEGORY_ICONS,
+  PRIORITY_COLORS,
+  STATUS_COLORS,
+} from "../../constants/appConstants";
 import { useTranslation } from "react-i18next";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../ui/alert-dialog";
+import { toast } from "sonner";
 import { useCheckIns } from "../../hooks/useCheckIns";
+import type { Category } from "@/shared/types/Category";
+import { cn } from "@/shared/lib/utils";
 
 interface HabitCardProps {
   habit: Habit;
-  //onUpdate: () => void;
+  onUpdate: () => void;
+  onUpdateStatus: (status: HabitStatus) => void;
+  onDelete: () => void;
+  categories: Category[];
 }
 
-export function HabitCard({ habit }: HabitCardProps) {
+export function HabitCard({
+  habit,
+  onUpdate,
+  onUpdateStatus,
+  onDelete,
+  categories,
+}: HabitCardProps) {
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const navigate = useNavigate();
 
   const priorityColor = PRIORITY_COLORS[habit.priority];
-  const category = mockCategories.find((c) => c.id === habit.categoryId);
+  const statusColor = STATUS_COLORS[habit.status];
+  const category = categories.find((c) => c.id === habit.categoryId);
   const today = useMemo(() => new Date().toISOString().split("T")[0], []);
   const { getCheckIn, upsertCheckIn } = useCheckIns();
   const checkIn = getCheckIn(habit.id, today);
   const currentCount = checkIn?.completionCount ?? 0;
   const targetPerDay = habit.targetPerDay ?? 1;
   const isCompleted = currentCount >= targetPerDay;
+
+  const minusDisabled = habit.status !== "ACTIVE" || currentCount <= 0;
+  const plusDisabled = habit.status !== "ACTIVE" || isCompleted;
 
   return (
     <div
@@ -75,6 +106,7 @@ export function HabitCard({ habit }: HabitCardProps) {
             >
               {t(`habit_form.${category?.name}`) ?? habit.categoryId}
             </span>
+
             <span
               className="rounded-full px-2 py-1 text-xs capitalize"
               style={{
@@ -84,6 +116,17 @@ export function HabitCard({ habit }: HabitCardProps) {
             >
               {t(`habit_form.${habit.priority}`)}
             </span>
+
+            <span
+              className="rounded-full px-2 py-1 text-xs capitalize"
+              style={{
+                background: `color-mix(in srgb, ${statusColor} 12%, transparent)`,
+                color: statusColor,
+              }}
+            >
+              {t(`habit_form.${habit.status}`)}
+            </span>
+
             <span
               className="flex items-center gap-1 rounded-md px-2.5 py-0.5 text-xs"
               style={{
@@ -103,14 +146,15 @@ export function HabitCard({ habit }: HabitCardProps) {
           style={{ color: "var(--sidebar-muted)" }}
           onClick={(e) => {
             e.stopPropagation();
-            setMenuOpen(true);}
-          }
+            setMenuOpen(true);
+          }}
         >
           <MoreVertical size={16} />
         </button>
       </div>
 
       {/* Checkin */}
+
       <div
         className="rounded-md"
         style={{
@@ -120,7 +164,12 @@ export function HabitCard({ habit }: HabitCardProps) {
         {/* Hàng chính: ring + status + actions */}
         <div className="flex items-center gap-3 p-3">
           <div
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-[3px] text-sm font-medium"
+            className={cn(
+              "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-[3px] font-medium",
+              `${currentCount}/${targetPerDay}`.length > 4
+                ? "text-[10px]"
+                : "text-sm",
+            )}
             style={{ borderColor: "var(--primary)" }}
           >
             {currentCount}/{targetPerDay}
@@ -132,21 +181,34 @@ export function HabitCard({ habit }: HabitCardProps) {
               style={{ color: isCompleted ? "#22c55e" : "#f59e0b" }}
             >
               <CheckCircle size={14} className="shrink-0" />
-              {isCompleted ? "Completed today" : currentCount === 0 ? "Not started" : "In progress"}
+              <span className="truncate">
+                {isCompleted
+                  ? t("habit_card.status-1")
+                  : currentCount === 0
+                    ? t("habit_card.status-2")
+                    : t("habit_card.status-3")}
+              </span>
             </div>
           </div>
 
           <div className="flex shrink-0 gap-1.5">
             <button
               type="button"
-              className="flex h-7 w-7 items-center justify-center rounded-full border"
+              className="flex h-8 w-8 items-center justify-center rounded-full border transition-all duration-200 enabled:hover:scale-105 enabled:hover:shadow-md cursor-pointer disabled:cursor-not-allowed"
+              disabled={minusDisabled}
               style={{
-                borderColor: "var(--sidebar-muted)",
-                color: "var(--sidebar-muted)",
-                opacity: currentCount <= 0 ? 0.5 : 1,
-                pointerEvents: currentCount <= 0 ? "none" : "auto",
-              }}
+                borderColor: minusDisabled
+                  ? "var(--primary-light)"
+                  : "var(--primary)",
 
+                background: minusDisabled
+                  ? "color-mix(in srgb, var(--primary-light) 10%, transparent)"
+                  : "color-mix(in srgb, var(--primary) 15%, transparent)",
+
+                color: minusDisabled
+                  ? "var(--primary-light)"
+                  : "var(--primary)",
+              }}
               onClick={(e) => {
                 e.stopPropagation();
                 const next = Math.max(0, currentCount - 1);
@@ -158,28 +220,46 @@ export function HabitCard({ habit }: HabitCardProps) {
             </button>
             <button
               type="button"
-              className="flex h-7 w-7 items-center justify-center rounded-full border"
+              className="flex h-8 w-8 items-center justify-center rounded-full border transition-all duration-200 enabled:hover:scale-105 enabled:hover:shadow-md cursor-pointer disabled:cursor-not-allowed"
+              disabled={plusDisabled}
               style={{
-                borderColor: isCompleted ? "var(--sidebar-muted)" : "var(--primary)",
-                background: isCompleted
-                  ? "transparent"
-                  : "color-mix(in srgb, var(--primary) 12%, transparent)",
-                color: isCompleted ? "var(--sidebar-muted)" : "var(--primary)",
-                opacity: isCompleted ? 0.5 : 1,
-                pointerEvents: isCompleted ? "none" : "auto",
-              }}
+                borderColor: plusDisabled
+                  ? "var(--primary-light)"
+                  : "var(--primary)",
 
+                background: plusDisabled
+                  ? "color-mix(in srgb, var(--primary-light) 10%, transparent)"
+                  : "color-mix(in srgb, var(--primary) 15%, transparent)",
+
+                color: plusDisabled ? "var(--primary-light)" : "var(--primary)",
+              }}
               onClick={(e) => {
                 e.stopPropagation();
                 const next = Math.min(currentCount + 1, targetPerDay);
                 upsertCheckIn(habit.id, today, next);
-                //onUpdate();
+                // onUpdate();
               }}
             >
               <Plus size={13} />
             </button>
           </div>
         </div>
+
+        {/* <div
+            style={{
+              background: "var(--bg-deep)",
+              borderRadius: "var(--radius-sm)",
+              padding: "10px 12px",
+              fontSize: 12,
+              color: "var(--text-muted)",
+              textAlign: "center",
+              fontStyle: "italic",
+            }}
+          >
+            {t("habit_card.mess")}{" "}
+            {t(`habit_card.${habit.status.toLowerCase()}`)}
+            {" !"}
+          </div> */}
 
         {/* Footer: View history */}
         <div
@@ -190,7 +270,7 @@ export function HabitCard({ habit }: HabitCardProps) {
         >
           <button
             type="button"
-            className="flex w-full items-center justify-center gap-1.5 rounded text-xs transition-colors"
+            className="flex w-full items-center justify-center gap-1.5 rounded text-xs transition-colors cursor-pointer"
             style={{ color: "var(--primary)" }}
             onClick={(e) => {
               e.stopPropagation();
@@ -198,22 +278,119 @@ export function HabitCard({ habit }: HabitCardProps) {
             }}
           >
             <History size={13} />
-            View check-in history
+            {t("habit_card.btn_view")}
           </button>
         </div>
       </div>
 
       {menuOpen && (
         <DropdownMenu
+          habitName={habit.name}
           key={`menu-${habit.id}-${menuOpen}`}
           onClose={() => setMenuOpen(false)}
           status={habit.status}
           onUpdate={() => {
             setMenuOpen(false);
-            //onUpdate();
+            onUpdate();
+          }}
+          onUpdateStatus={(status) => {
+            onUpdateStatus(status);
+            setMenuOpen(false);
+          }}
+          onDelete={() => {
+            setMenuOpen(false);
+            setDeleteDialogOpen(true);
           }}
         />
       )}
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent
+          className="max-w-sm rounded-3xl border shadow-2xl"
+          style={{
+            background: "var(--surface)",
+            borderColor: "color-mix(in srgb, var(--primary) 25%, transparent)",
+            boxShadow:
+              "0 20px 60px color-mix(in srgb, var(--primary) 15%, transparent)",
+          }}
+        >
+          <AlertDialogHeader className="items-center text-center">
+            <div
+              className="mb-4 flex h-16 w-16 items-center justify-center rounded-full"
+              style={{
+                background: "color-mix(in srgb, #ef4444 12%, transparent)",
+              }}
+            >
+              <Trash2 size={28} className="text-red-500" />
+            </div>
+
+            <AlertDialogTitle
+              className="text-2xl font-semibold"
+              style={{ color: "var(--text)" }}
+            >
+              {t("habit_a-dialog.title")}
+            </AlertDialogTitle>
+
+            <AlertDialogDescription
+              className="mt-2 text-sm leading-relaxed"
+              style={{ color: "var(--sidebar-muted)" }}
+            >
+              {t("habit_a-dialog.content-1")}
+              <span
+                className="mx-1 font-semibold"
+                style={{ color: "var(--text)" }}
+              >
+                {habit.name}
+              </span>
+              ?<br />
+              {t("habit_a-dialog.content-2")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter className="mt-3 gap-2">
+            <AlertDialogCancel
+              className="cursor-pointer rounded-xl transition-all duration-200"
+              style={{
+                borderColor:
+                  "color-mix(in srgb, var(--primary) 20%, transparent)",
+                background:
+                  "color-mix(in srgb, var(--primary) 4%, transparent)",
+                color: "var(--text)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background =
+                  "color-mix(in srgb, var(--primary) 10%, transparent)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background =
+                  "color-mix(in srgb, var(--primary) 4%, transparent)";
+              }}
+            >
+              {t("habit_a-dialog.btn_1")}
+            </AlertDialogCancel>
+
+            <AlertDialogAction
+              className="cursor-pointer rounded-xl border-0 text-white transition-all duration-200"
+              style={{
+                background: "linear-gradient(135deg, #ef4444, #dc2626)",
+                boxShadow: "0 8px 24px rgba(239,68,68,0.25)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = "0.9";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = "1";
+              }}
+              onClick={() => {
+                onDelete();
+                toast.error(`"${habit.name}" has been deleted`);
+              }}
+            >
+              {t("habit_a-dialog.btn_2")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

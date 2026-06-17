@@ -2,7 +2,10 @@ import { NavLink } from "react-router-dom";
 import { ROUTES } from "../../shared/constants/appConstants"
 import { useTranslation } from "react-i18next"
 import { NotificationBadge } from '../../features/notifications/component/NotificationBadge';
+import type { User } from "../../shared/types/User"
+import { STORAGE_KEY } from "../../shared/constants/appConstants"
 
+const SIDEBAR_WIDTH = "260px";
 
 function HomeIcon({ className = "" }: { className?: string }) {
     return (
@@ -51,6 +54,33 @@ function BellIcon({ className = "" }: { className?: string }) {
     );
 }
 
+function CommunityIcon({ className = "" }: { className?: string }) {
+    return (
+        <svg
+            className={className}
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            {/* User giữa */}
+            <circle cx="12" cy="8" r="3" />
+            <path d="M7.5 19c0-2.5 2-4 4.5-4s4.5 1.5 4.5 4" />
+
+            {/* User trái */}
+            <circle cx="5.5" cy="10" r="2" />
+            <path d="M2.5 18c0-1.8 1.4-3 3.2-3" />
+
+            {/* User phải */}
+            <circle cx="18.5" cy="10" r="2" />
+            <path d="M21.5 18c0-1.8-1.4-3-3.2-3" />
+        </svg>
+    );
+}
 function CloseIcon() {
     return (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -74,14 +104,16 @@ interface SidebarProps {
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {
     const { t } = useTranslation();
-
+    const currentUser = JSON.parse(
+        localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "{}"
+    ) as User;
     const NAV_ITEMS = [
         { to: ROUTES.DASHBOARD, label: t("sidebar.dashboard"), icon: HomeIcon },
         { to: ROUTES.HABITS, label: t("sidebar.habits"), icon: HabitsIcon },
         { to: ROUTES.GOALS, label: t("sidebar.goals"), icon: GoalsIcon },
         { to: "/dashboard/statistics", label: t("sidebar.statistics"), icon: StatisticsIcon },
+        { to: ROUTES.COMMUNITY, label: t("sidebar.community"), icon: CommunityIcon, highlight: true, badge: "NEW", },
         { to: "/dashboard/notifications", label: t('sidebar.notifications'), icon: BellIcon, badge: <NotificationBadge /> },
-        // { to: "/settings", label: "Settings", icon: SettingsIcon },
     ];
 
 
@@ -89,10 +121,12 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
         <div className="flex flex-col h-full px-3 py-6">
             {/* Logo */}
             <div className="flex items-center gap-3 px-2 mb-8">
-                <div className="w-9 h-9 bg-violet-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
-                    </svg>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center flex-shrink-0">
+                    <img
+                        src="/favicon.svg"
+                        alt="Habit Tracking Pro"
+                        className="w-full h-full object-contain"
+                    />
                 </div>
                 <span className="text-lg font-semibold text-white tracking-tight">HabitPro</span>
                 {/* Close button - mobile only */}
@@ -108,41 +142,107 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
             </div>
 
             {/* Navigation */}
-            <nav className="flex flex-col gap-1 flex-1">
-                {NAV_ITEMS.map(({ to, label, icon: Icon, badge }) => (
-                    <NavLink
-                        key={to}
-                        to={to}
-                        end={to === ROUTES.DASHBOARD}
-                        onClick={onClose}
-                        className={({ isActive }) =>
-                            [
-                                "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
-                                isActive
-                                    ? "bg-violet-600 text-white"
-                                    : "text-violet-300 hover:bg-white/[0.06] hover:text-violet-100",
-                            ].join(" ")
-                        }
-                    >
-                        <Icon />
-                        <span className="flex-1">{label}</span>
-                        {badge !== undefined && (
-                            <span className="bg-red-500 text-white text-[11px] font-semibold min-w-[20px] h-5 rounded-full flex items-center justify-center px-1.5">
-                                {badge}
+            <nav className="flex flex-col gap-2 flex-1">
+                {NAV_ITEMS.map(
+                    ({ to, label, icon: Icon, badge, highlight }) => (
+                        <NavLink
+                            key={to}
+                            to={to}
+                            end={to === ROUTES.DASHBOARD}
+                            onClick={onClose}
+                            className={({ isActive }) =>
+                                [
+                                    "relative overflow-hidden flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-300",
+
+                                    isActive
+                                        ? "bg-violet-600 text-white"
+                                        : "text-violet-300 hover:bg-white/[0.06] hover:text-violet-100",
+
+                                    highlight &&
+                                    !isActive &&
+                                    `
+                            border border-violet-400/40
+                            bg-gradient-to-r
+                            from-violet-600/25
+                            via-violet-500/10
+                            to-violet-600/25
+                            shadow-[0_0_25px_rgba(139,92,246,0.35)]
+                            community-highlight
+                        `,
+                                ]
+                                    .filter(Boolean)
+                                    .join(" ")
+                            }
+                        >
+                            {/* Glow pulse */}
+                            {highlight && (
+                                <span
+                                    className="
+                            absolute inset-0
+                            rounded-xl
+                            bg-violet-500/10
+                            animate-pulse
+                            pointer-events-none
+                        "
+                                />
+                            )}
+
+                            {/* Sparkle */}
+                            {highlight && (
+                                <span
+                                    className="
+                            absolute right-2 top-2
+                            w-2 h-2
+                            rounded-full
+                            bg-yellow-300
+                            animate-ping
+                        "
+                                />
+                            )}
+
+                            <Icon className="relative z-10" />
+
+                            <span className="relative z-10 flex items-center gap-1 flex-1">
+                                {label}
+
+                                {highlight && (
+                                    <span className="text-yellow-300 text-xs">
+                                        ✨
+                                    </span>
+                                )}
                             </span>
-                        )}
-                    </NavLink>
-                ))}
+                            {badge && (
+                                <span
+                                    className="
+                            relative z-10
+                            px-2 py-0.5
+                            rounded-full
+                            text-[10px]
+                            font-bold
+                            bg-white
+                            text-violet-700
+                        "
+                                >
+                                    {badge}
+                                </span>
+                            )}
+                        </NavLink>
+                    )
+                )}
             </nav>
 
             {/* User Profile */}
             <div className="flex items-center gap-3 p-3 rounded-xl border border-white/10 mt-4">
-                <div className="w-9 h-9 rounded-full bg-violet-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
-                    AJ
+                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden shrink-0 bg-violet-600">
+                    <img
+                        src={currentUser.avt}
+                        alt={currentUser.username}
+                        className="w-full h-full object-cover"
+                    />
                 </div>
                 <div className="overflow-hidden">
-                    <p className="text-sm font-medium text-white truncate leading-tight">Alex Johnson</p>
-                    <p className="text-xs text-violet-400 truncate leading-tight">alex@email.com</p>
+                    <p className="text-sm font-medium text-white truncate leading-tight">{currentUser.username}</p>
+                    <p className="text-xs text-violet-400 truncate leading-tight">{currentUser.phone}</p>
                 </div>
             </div>
         </div>
@@ -153,7 +253,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     return (
         <>
             {/* Desktop Sidebar */}
-            <aside className="hidden lg:flex flex-col w-[220px] min-h-screen bg-[#1a1040] shrink-0">
+            <aside
+                className="hidden lg:flex flex-col min-h-screen bg-[#1a1040] shrink-0"
+                style={{ width: SIDEBAR_WIDTH }}
+            >
                 <SidebarContent />
             </aside>
 
@@ -168,8 +271,9 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
             {/* Mobile Drawer */}
             <aside
+                style={{ width: SIDEBAR_WIDTH }}
                 className={[
-                    "fixed top-0 left-0 bottom-0 z-50 w-[220px] bg-[#1a1040] flex flex-col transition-transform duration-300 lg:hidden",
+                    "fixed top-0 left-0 bottom-0 z-50 bg-[#1a1040] flex flex-col transition-transform duration-300 lg:hidden",
                     isOpen ? "translate-x-0" : "-translate-x-full",
                 ].join(" ")}
             >

@@ -1,5 +1,5 @@
 import type { HabitRisk } from "./riskDetector";
-import type { CheckIn } from "./GoalCalculator";
+import type { CheckIn } from "../../../shared/types/CheckIn";
 import { getCurrentStreak, getLongestStreak, getCompletionRate, getStreakProgress, getTotalCompletionProgress } from "./GoalCalculator";
 import { getHabitRisk } from "./riskDetector"
 import type { Goal } from "../../../shared/types/Goal"
@@ -35,7 +35,7 @@ export const getHabitDashboardMetrics = (
         getHabitRisk(completionRate);
 
     const goalProgress =
-        goal.goalType === "STREAK"
+        goal.targetType === "STREAK"
             ? getStreakProgress(
                 goal,
                 targetPerDay,

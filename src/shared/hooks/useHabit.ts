@@ -21,8 +21,9 @@ export function useHabits() {
     writeHabits(next);
   };
 
-  const updateHabit = (id: string, patch: Partial<Habit>) => {
-    const next = habits.map((h) => (h.id === id ? { ...h, ...patch } : h));
+  const updateHabit = (updated: Habit) => {
+    const next = habits.map((h) => (h.id === updated.id ? updated : h));
+    console.log(next);
     setHabits(next);
     writeHabits(next);
   };

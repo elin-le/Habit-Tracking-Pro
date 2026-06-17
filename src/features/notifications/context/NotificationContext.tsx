@@ -71,11 +71,11 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
         const habit = habits.find((h: any) => h.id === goal.habitId);
         const targetPerDay = habit ? habit.targetPerDay : 1;
         const habitName = habit ? habit.name : 'Mục tiêu';
-        
+
         let progressPercent = 0;
-        if (goal.goalType === 'STREAK') {
+        if (goal.targetType === 'STREAK') {
           progressPercent = getStreakProgress(goal, targetPerDay, checkins);
-        } else if (goal.goalType === 'TOTAL_COMPLETIONS') {
+        } else if (goal.targetType === 'TOTAL_COMPLETIONS') {
           progressPercent = getTotalCompletionProgress(goal, targetPerDay, checkins);
         }
 
@@ -114,7 +114,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       habits.forEach((habit: any) => {
         const habitCheckins = checkins.filter((c: any) => c.habitId === habit.id);
         const currentStreakVal = getCurrentStreak(habitCheckins, habit.targetPerDay);
-        
+
         if (currentStreakVal >= 3) {
           const todayKey = new Date().toISOString().split('T')[0];
           // Đếm số checkin hôm nay
@@ -200,7 +200,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 
   // Hàm đánh dấu 1 thông báo đã đọc
   const markAsRead = (id: string) => {
-    const updated = notifications.map(notif => 
+    const updated = notifications.map(notif =>
       notif.id === id ? { ...notif, isRead: true } : notif
     );
     setNotifications(updated);

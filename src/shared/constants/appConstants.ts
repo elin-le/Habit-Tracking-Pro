@@ -9,6 +9,7 @@ export const ROUTES = {
   AUTH: "/auth",
   LOGIN: "/auth/login",
   REGISTER: "/auth/register",
+  COMMUNITY: "/community"
 } as const;
 
 export const APP_NAME = "Habit Tracker Pro" as const;
@@ -50,13 +51,18 @@ export const PRIORITY_COLORS: Record<string, string> = {
   HIGH: "#ef4444",
 };
 
+export const STATUS_COLORS: Record<string, string> = {
+  ACTIVE: "#22c55e", // Green
+  PAUSED: "#f59e0b", // Amber
+  ARCHIVED: "#64748b", // Slate
+};
+
 export const DAYS = [
-  { key: 0, label: "All" },
-  { key: 1, label: "Su" },
-  { key: 2, label: "Mo" },
-  { key: 3, label: "Tu" },
-  { key: 4, label: "We" },
-  { key: 5, label: "Th" },
-  { key: 6, label: "Fr" },
-  { key: 7, label: "Sa" },
+  { key: 0, label: "Su" },
+  { key: 1, label: "Mo" },
+  { key: 2, label: "Tu" },
+  { key: 3, label: "We" },
+  { key: 4, label: "Th" },
+  { key: 5, label: "Fr" },
+  { key: 6, label: "Sa" },
 ];

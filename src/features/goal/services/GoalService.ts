@@ -2,7 +2,8 @@ import type { Goal, GoalWithDerived } from "../../../shared/types/Goal";
 import { STORAGE_KEY } from "../../../shared/constants/appConstants";
 import { calculateMilestones } from "../calculators/MilestoneCalculator";
 import type { Habit } from "../../../shared/types/Habit";
-import { getCurrentStreakInRange, getTotalCompletion, type CheckIn } from "../../habit/calculators/GoalCalculator";
+import { getCurrentStreakInRange, getTotalCompletion, getLongestStreak, getCompletionRate, getDailySummary } from "../../habit/calculators/GoalCalculator";
+import type { CheckIn } from "../../../shared/types/CheckIn";
 
 export const getGoals = (): Goal[] => {
     try {
@@ -38,7 +39,7 @@ export const createGoal = (goalData: Omit<Goal, 'id'>): Goal => {
 
     const newGoal: Goal = {
         ...goalData,
-        id: `goal-${crypto.randomUUID()}`,
+        id: `goal-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 9)}`,
     };
 
     goals.push(newGoal);
@@ -84,6 +85,21 @@ export const calculateGoalProgress = (goal: Goal, checkins: CheckIn[], targetPer
     }
 
     const milestones = calculateMilestones(goal.targetValue, progressPercent);
+    const bestStreak = getLongestStreak(checkins, targetPerDay);
+    const completionRate = getCompletionRate(goal.startedDate, goal.endDate || new Date().toISOString(), checkins, targetPerDay);
+    const summary = getDailySummary(checkins, targetPerDay);
+    const weeklyHistory = [];
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dateKey = d.toISOString().split("T")[0];
+        
+        const dayStr = new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(d);
+        weeklyHistory.push({
+            day: dayStr,
+            value: summary[dateKey]?.completed ? 100 : 0
+        });
+    }
 
     return {
         ...goal,
@@ -92,7 +108,12 @@ export const calculateGoalProgress = (goal: Goal, checkins: CheckIn[], targetPer
             progressPercent,
             status,
             milestones
-        }
+        },
+        stats: {
+            bestStreak,
+            completionRate
+        },
+        weeklyHistory
     };
 };
 

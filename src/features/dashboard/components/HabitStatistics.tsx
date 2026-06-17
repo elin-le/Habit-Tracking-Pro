@@ -1,8 +1,18 @@
 import { useTranslation } from "react-i18next";
-import { type HabitStatisticsType } from "../Dashboard.type";
+import {
+    ResponsiveContainer,
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    Tooltip,
+    CartesianGrid,
+} from "recharts";
+
+import type { HabitStatisticsType } from "../Dashboard.type";
 
 interface HabitStatisticsProps {
-    statistics: HabitStatisticsType;
+    statistics: HabitStatisticsType[];
 }
 
 const HabitStatistics = ({
@@ -10,37 +20,35 @@ const HabitStatistics = ({
 }: HabitStatisticsProps) => {
     const { t } = useTranslation();
 
-    const STATISTICS = [
-        {
-            label: t("dashboard.currentStreak"),
-            value: `${statistics.currentStreak} ${t("dashboard.days")}`,
-        },
-        {
-            label: t("dashboard.longestStreak"),
-            value: `${statistics.longestStreak} ${t("dashboard.days")}`,
-        },
-        {
-            label: t("dashboard.completionRate"),
-            value: `${statistics.completionRate}%`,
-        },
-    ];
-
     return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {STATISTICS.map((item) => (
-                <div
-                    key={item.label}
-                    className="dashboard-card"
-                >
-                    <p className="text-sm text-secondary">
-                        {item.label}
-                    </p>
+        <div className="dashboard-card">
+            <h2 className="dashboard-card__title">
+                {t("dashboard.completionRate")}
+            </h2>
 
-                    <h2 className="text-3xl font-bold mt-2">
-                        {item.value}
-                    </h2>
-                </div>
-            ))}
+            <div className="completion-chart">
+                <ResponsiveContainer
+                    width="100%"
+                    height={390}
+                >
+                    <LineChart data={statistics}>
+                        <CartesianGrid strokeDasharray="3 3" />
+
+                        <XAxis dataKey="day" />
+
+                        <YAxis />
+
+                        <Tooltip />
+
+                        <Line
+                            type="monotone"
+                            dataKey="rate"
+                            stroke="#8b5cf6"
+                            strokeWidth={3}
+                        />
+                    </LineChart>
+                </ResponsiveContainer>
+            </div>
         </div>
     );
 };

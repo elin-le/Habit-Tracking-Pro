@@ -1,14 +1,46 @@
 import { useTranslation } from "react-i18next";
-import { type CategoryOverviewType } from "../Dashboard.type";
+import {
+    PieChart,
+    Pie,
+    Cell,
+    ResponsiveContainer,
+    Tooltip,
+} from "recharts";
+
+import type { CategoryOverviewType } from "../Dashboard.type";
 
 interface CategoryOverviewProps {
     categories: CategoryOverviewType[];
 }
 
+const COLORS = [
+    "#8B5CF6",
+    "#EC4899",
+    "#3B82F6",
+    "#10B981",
+    "#F59E0B",
+];
+
 const CategoryOverview = ({
     categories,
 }: CategoryOverviewProps) => {
     const { t } = useTranslation();
+
+    const total = categories.reduce(
+        (sum, item) => sum + item.progress,
+        0,
+    );
+
+    const chartData = categories.map((item) => ({
+        name: item.category,
+        value: item.progress,
+        percent:
+            total > 0
+                ? Math.round(
+                      (item.progress / total) * 100,
+                  )
+                : 0,
+    }));
 
     return (
         <div className="dashboard-card">
@@ -16,29 +48,82 @@ const CategoryOverview = ({
                 {t("dashboard.categoryOverview")}
             </h2>
 
-            <div className="space-y-5">
-                {categories.map((item) => (
-                    <div key={item.id}>
-                        <div className="flex justify-between mb-2">
-                            <span>
-                                {t(item.category)}
-                            </span>
+            <div className="category-overview">
+                <div className="category-chart">
+                    <ResponsiveContainer
+                        width="100%"
+                        height={240}
+                    >
+                        <PieChart>
+                            <Pie
+                                data={chartData}
+                                dataKey="value"
+                                nameKey="name"
+                                innerRadius={60}
+                                outerRadius={90}
+                                paddingAngle={3}
+                            >
+                                {chartData.map(
+                                    (_, index) => (
+                                        <Cell
+                                            key={index}
+                                            fill={
+                                                COLORS[
+                                                    index %
+                                                        COLORS.length
+                                                ]
+                                            }
+                                        />
+                                    ),
+                                )}
+                            </Pie>
 
-                            <span>
-                                {item.progress}%
-                            </span>
-                        </div>
-
-                        <div className="dashboard-progress">
-                            <div
-                                className="dashboard-progress__fill"
-                                style={{
-                                    width: `${item.progress}%`,
-                                }}
+                            <Tooltip
+                                formatter={(
+                                    value,
+                                    _,
+                                    props,
+                                ) => [
+                                    `${value} Habits (${props.payload.percent}%)`,
+                                    props.payload.name,
+                                ]}
                             />
-                        </div>
-                    </div>
-                ))}
+                        </PieChart>
+                    </ResponsiveContainer>
+                </div>
+
+                <div className="category-legend">
+                    {chartData.map(
+                        (item, index) => (
+                            <div
+                                key={item.name}
+                                className="category-legend__item"
+                            >
+                                <div className="category-legend__left">
+                                    <div
+                                        className="category-legend__dot"
+                                        style={{
+                                            backgroundColor:
+                                                COLORS[
+                                                    index %
+                                                        COLORS.length
+                                                ],
+                                        }}
+                                    />
+
+                                    <span className="category-legend__label">
+                                        {item.name}
+                                    </span>
+                                </div>
+
+                                <span className="category-legend__value">
+                                    {item.value} (
+                                    {item.percent}%)
+                                </span>
+                            </div>
+                        ),
+                    )}
+                </div>
             </div>
         </div>
     );

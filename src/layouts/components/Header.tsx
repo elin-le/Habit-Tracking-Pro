@@ -4,9 +4,13 @@ import { useTheme } from "../../shared/hooks/useTheme";
 import { HabitForm } from "../../shared/components/forms/HabitForm";
 import type { Habit } from "../../shared/types/Habit";
 import type { HabitSchedule } from "../../shared/types/HabitSchedule";
-import { useState, useContext } from "react";
-import { Link } from "react-router-dom";
+import { useState, useContext, useRef, useEffect } from "react";
 import { NotificationContext } from "../../features/notifications/context/NotificationContext";
+import type { Category } from "../../shared/types/Category"
+import type { User } from "../../shared/types/User"
+import { STORAGE_KEY } from "../../shared/constants/appConstants"
+import SettingsPopover from "./SettingsPopover"
+
 
 interface HeaderProps {
   title?: string;
@@ -111,6 +115,25 @@ function AvatarBadge({ name, src }: { name: string; src?: string }) {
   );
 }
 
+function SettingsIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="3" />
+
+      <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33h.01a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51h.01a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v.01a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
+    </svg>
+  );
+}
 export default function Header({
   title,
   subtitle,
@@ -123,14 +146,29 @@ export default function Header({
   setShowAddForm,
   createHabit,
   createHabitSchedules,
-  userName = "Alex",
-  avatarUrl,
 }: HeaderProps) {
   const { t, i18n } = useTranslation();
   const { theme, toggleTheme } = useTheme();
-  const [lang, setLang] = useState<"EN" | "VI">("EN");
+  // const [lang, setLang] = useState<"EN" | "VI">("EN");
+  const categories = JSON.parse(localStorage.getItem(STORAGE_KEY.CATEGORYS) || "[]") as Category[];
+  const currentUser = JSON.parse(localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "{}") as User;
 
-  const { unreadCount } = useContext(NotificationContext);
+  // 1. Khai báo thêm hàm đọc thông báo
+  const { unreadCount, notifications, markAsRead, markAllAsRead } = useContext(NotificationContext);
+
+  // 2. State điều khiển mở popup & click ra ngoài tự đóng
+  const [showNotifications, setShowNotifications] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const greeting = (() => {
     const h = new Date().getHours();
@@ -139,11 +177,11 @@ export default function Header({
     return "Good evening";
   })();
 
-  const toggleLang = () => {
-    const newLang = lang === "EN" ? "VI" : "EN";
-    setLang(newLang);
-    i18n.changeLanguage(newLang.toLowerCase());
-  };
+  // const toggleLang = () => {
+  //   const newLang = lang === "EN" ? "VI" : "EN";
+  //   setLang(newLang);
+  //   i18n.changeLanguage(newLang.toLowerCase());
+  // };
 
   return (
     <header
@@ -154,20 +192,19 @@ export default function Header({
       <div className="flex md:hidden items-center justify-between gap-3 px-5 pt-8 pb-3">
         {/* Left: Avatar + greeting */}
         <div className="flex items-center gap-3 min-w-0">
-          <AvatarBadge name={title ?? userName} src={avatarUrl} />
+          <AvatarBadge name={currentUser.username} src={currentUser.avt} />
           <div className="min-w-0">
-            <p className="text-xs text-violet-400 font-medium truncate">
+            <p className="text-xs text-violet-400 font-medium truncate" style={{ fontFamily: "UVN Giong Song" }}>
               {subtitle ?? `${greeting},`}
             </p>
             <h1 className="text-lg font-bold leading-tight truncate">
-              {title ?? userName} 👋
+              {title + " " + currentUser.username}
             </h1>
           </div>
         </div>
 
         {/* Right: quick toggles, nổi hẳn lên so với nền để không bị lẫn vào body khi light mode */}
-        <div className="flex items-center gap-2 shrink-0">
-          {/* Language toggle */}
+        {/* <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={toggleLang}
             aria-label="Toggle language"
@@ -186,7 +223,6 @@ export default function Header({
             </span>
           </button>
 
-          {/* Dark/Light toggle */}
           <button
             onClick={toggleTheme}
             aria-label="Toggle dark mode"
@@ -210,6 +246,31 @@ export default function Header({
               {theme === "light" ? <MoonIcon /> : <SunIcon />}
             </span>
           </button>
+        </div> */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Notification */}
+          <button
+            onClick={() => setShowNotifications(!showNotifications)}
+            className="
+      relative
+      w-9 h-9
+      flex items-center justify-center
+      rounded-xl
+      text-violet-500
+      hover:bg-violet-50
+      transition
+    "
+          >
+            <BellIcon />
+
+            {unreadCount > 0 && (
+              <span className="absolute top-0 right-0 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
+          </button>
+
+          <SettingsPopover />
         </div>
       </div>
 
@@ -222,15 +283,15 @@ export default function Header({
         {/* Title */}
         <div className="flex-1 min-w-0">
           <h1 className="text-3xl font-bold leading-tight truncate">
-            {title ?? `${greeting}!`}
+            {title + " " + currentUser.username}
           </h1>
-          <p className="text-base text-violet-400 mt-1 leading-tight truncate">
+          <p className="text-base text-violet-400 mt-1 leading-tight truncate" style={{ fontFamily: "UVN Giong Song" }}>
             {subtitle ?? "Here's your progress overview"}
           </p>
         </div>
 
         {/* Right actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 relative">
           {/* Period selector */}
           {onPeriodChange && (
             <div className="flex items-center bg-violet-50 rounded-xl p-1 gap-0.5">
@@ -251,9 +312,8 @@ export default function Header({
             </div>
           )}
 
-          <div className="w-px h-6 bg-violet-100 mx-1" />
-
-          {/* Language toggle */}
+          {/* <div className="w-px h-6 bg-violet-100 mx-1" /> */}
+          {/* 
           <button
             onClick={toggleLang}
             aria-label="Toggle language"
@@ -272,7 +332,6 @@ export default function Header({
             </span>
           </button>
 
-          {/* Dark/Light toggle */}
           <button
             onClick={toggleTheme}
             aria-label="Toggle dark mode"
@@ -295,24 +354,110 @@ export default function Header({
             >
               {theme === "light" ? <MoonIcon /> : <SunIcon />}
             </span>
-          </button>
+          </button> */}
 
-          <div className="w-px h-6 bg-violet-100 mx-1" />
-
+          {/* <div className="w-px h-6 bg-violet-100 mx-1" /> */}
+          <SettingsPopover />
           {/* Bell */}
-          <Link
-            to="/dashboard/notifications"
-            aria-label="Notifications"
-            className="relative w-9 h-9 flex items-center justify-center rounded-xl text-violet-400 hover:bg-violet-50 hover:text-violet-600 transition-colors"
-          >
-            <BellIcon />
-            {/* Cục badge đỏ kiểu Facebook - Chỉ hiện ra khi có thông báo */}
-            {unreadCount > 0 && (
-              <span className="absolute top-0 right-0 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow-sm ring-2 ring-white">
-                {unreadCount > 99 ? "99+" : unreadCount}
-              </span>
+          <div ref={dropdownRef}>
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="relative w-9 h-9 flex items-center justify-center rounded-xl text-violet-400 hover:bg-violet-50 hover:text-violet-600 transition-colors cursor-pointer"
+            >
+              <BellIcon />
+              {unreadCount > 0 && (
+                <span className="absolute top-0 right-0 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow-sm ring-2 ring-white">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
+            </button>
+
+            {/* Khung Popup thả xuống */}
+            {showNotifications && (
+              <div
+                className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl shadow-xl border overflow-hidden z-50 flex flex-col"
+                style={{ background: 'var(--surface)', borderColor: 'color-mix(in srgb, var(--primary) 20%, transparent)' }}
+              >
+                <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: 'color-mix(in srgb, var(--primary) 10%, transparent)' }}>
+                  <h3 className="font-bold text-xl" style={{ color: 'var(--text)' }}>
+                    {t('notifications.title')}
+                  </h3>
+                  {unreadCount > 0 && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); markAllAsRead(); }}
+                      className="text-sm font-medium text-blue-600 hover:text-blue-700"
+                    >
+                      {t('notifications.markAllRead')}
+                    </button>
+                  )}
+                </div>
+
+                <div className="max-h-[400px] overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <div className="p-8 text-center opacity-60" style={{ color: 'var(--text)' }}>
+                      {t('notifications.empty')}
+                    </div>
+                  ) : (
+                    notifications.map((notif: any) => {
+                      const isDark = theme === "dark";
+                      const baseClass = "relative flex items-start gap-3 p-3 mx-2 my-1 rounded-xl cursor-pointer transition-colors";
+                      const hoverClass = notif.isRead
+                        ? isDark
+                          ? "hover:bg-white/5"
+                          : "hover:bg-black/5"
+                        : isDark
+                          ? "hover:bg-[rgba(255,255,255,0.04)]"
+                          : "hover:bg-blue-50";
+
+                      const itemStyle: React.CSSProperties = notif.isRead
+                        ? {}
+                        : (isDark
+                          ? { background: 'rgba(255,255,255,0.03)' }
+                          : { background: 'rgba(59,130,246,0.06)' }
+                        );
+
+                      const textColor = isDark ? 'rgba(255,255,255,0.94)' : 'var(--text)';
+
+                      const timeStyle: React.CSSProperties = notif.isRead
+                        ? { opacity: 0.6, color: isDark ? 'rgba(255,255,255,0.7)' : undefined }
+                        : { color: isDark ? '#93c5fd' : '#2563eb', fontWeight: 600 };
+
+                      return (
+                        <div
+                          key={notif.id}
+                          onClick={() => { if (!notif.isRead) markAsRead(notif.id); }}
+                          className={`${baseClass} ${hoverClass}`}
+                          style={itemStyle}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <h4 className={`text-[15px] ${notif.isRead ? 'font-normal' : 'font-semibold'}`} style={{ color: textColor }}>
+                              {t(notif.title, {
+                                ...(notif.params || {}),
+                                habitName: notif.params?.habitName ? t(String(notif.params.habitName)) : ''
+                              }) as string}
+                            </h4>
+                            <p className={`text-sm mt-0.5 leading-snug ${notif.isRead ? 'opacity-80' : 'opacity-90'}`} style={{ color: textColor }}>
+                              {t(notif.message, {
+                                ...(notif.params || {}),
+                                habitName: notif.params?.habitName ? t(String(notif.params.habitName)) : ''
+                              }) as string}
+                            </p>
+                            <span className={`text-[12px] mt-1 block`} style={timeStyle}>
+                              {new Date(notif.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                          {/* Chấm tròn xanh (Chưa đọc) */}
+                          {!notif.isRead && (
+                            <div className="w-3 h-3 rounded-full bg-blue-600 shrink-0 mt-2"></div>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
             )}
-          </Link>
+          </div>
 
           {/* New Habit */}
           <button
@@ -327,6 +472,7 @@ export default function Header({
               onClose={() => setShowAddForm(false)}
               onSubmit={createHabit}
               onSubmitSchedules={createHabitSchedules}
+              categories={categories}
             />
           )}
         </div>
