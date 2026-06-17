@@ -20,7 +20,8 @@
     "goals": "Goals",
     "statistics": "Statistics",
     "settings": "Settings",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "community":"Community"
   },
   "habit": {
     "create": "Create Habit",
@@ -68,7 +69,10 @@
     "val-name-1": "*Habit name is required",
     "val-name-2": "*Habit name must be at least 2 characters",
     "val-name-3": "*Habit name must be under 50 characters",
-    "paused-hint": "*This habit is paused. Resume the habit to edit its frequency and daily target."
+    "paused-hint": "*This habit is paused. Resume the habit to edit its frequency and daily target.",
+    "ACTIVE": "Active",
+    "PAUSED": "Paused",
+    "ARCHIVED": "Archived"
   },
   "days": {
     "sun": "Sun",
@@ -130,7 +134,11 @@
   "habit_card": {
     "mess": "This habit is ",
     "paused": "paused",
-    "archived": "archived"
+    "archived": "archived",
+    "status-1": "Completed today",
+    "status-2": "Not started",
+    "status-3": "In progress",
+    "btn_view": "View check-in history"
   },
   "habit_toast": {
     "toast-1": " has been paused",
