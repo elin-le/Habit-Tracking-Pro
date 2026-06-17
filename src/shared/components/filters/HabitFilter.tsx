@@ -231,7 +231,6 @@ export function HabitFilter({
                 {t(`habit_filter.${day.label}`)}
               </FilterChip>
             ))}
-
           </div>
         </div>
       </div>

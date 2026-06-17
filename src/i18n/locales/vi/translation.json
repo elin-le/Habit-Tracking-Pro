@@ -1,6 +1,4 @@
 {
- 
-
   "auth": {
     "welcome": "Chào mừng quay lại!",
     "phone": "Số điện thoại",
@@ -70,7 +68,10 @@
     "val-name-1": "*Tên thói quen là bắt buộc",
     "val-name-2": "*Tên thói quen phải có ít nhất 2 ký tự",
     "val-name-3": "*Tên thói quen phải dưới 50 ký tự",
-    "paused-hint": "*Thói quen đang tạm dừng. Hãy tiếp tục (Resume) để chỉnh sửa tần suất và mục tiêu mỗi ngày."
+    "paused-hint": "*Thói quen đang tạm dừng. Hãy tiếp tục (Resume) để chỉnh sửa tần suất và mục tiêu mỗi ngày.",
+    "ACTIVE": "Đang hoạt động",
+    "PAUSED": "Đã tạm dừng",
+    "ARCHIVED": "Đã lưu trữ"
   },
   "days": {
     "sun": "CN",
@@ -132,7 +133,11 @@
   "habit_card": {
     "mess": "Thói quen này ",
     "paused": "tạm dừng",
-    "archived": "đã được lưu trữ"
+    "archived": "đã được lưu trữ",
+    "status-1": "Đã hoàn thành",
+    "status-2": "Chưa bắt đầu",
+    "status-3": "Đang tiến hành",
+    "btn_view": "Xem lịch sử đăng ký"
   },
   "habit_toast": {
     "toast-1": " đã bị tạm dừng",
@@ -141,7 +146,7 @@
   },
   "habit_a-dialog": {
     "title": "Xóa Thói quen",
-    "content-1": "Bạn có chắc chắn muốn xóa không?",
+    "content-1": "Bạn có chắc chắn muốn xóa",
     "content-2": "Hành động này không thể hoàn tác.",
     "btn_1": "Hủy",
     "btn_2": "Xóa"
@@ -287,7 +292,7 @@
     "productivity": "Năng suất",
     "days": "Ngày"
   },
-   "checkin": {
+  "checkin": {
     "history": "Lịch sử check-in",
     "no": "Không có lịch sử check-in."
   }
