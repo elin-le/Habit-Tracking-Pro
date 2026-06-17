@@ -12,7 +12,8 @@ import {
   seedHabits,
   seedHabitSchedules,
   seedCategories,
-  seedGoals
+  seedGoals,
+  seedCheckins
 } from "./shared/utils/seedData";
 import { ThemeProvider } from "./context/ThemeContext";
 import { NotificationProvider } from './features/notifications/context/NotificationContext';
@@ -23,6 +24,8 @@ seedHabits();
 seedHabitSchedules();
 seedCategories();
 seedGoals();
+seedCheckins();
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider >

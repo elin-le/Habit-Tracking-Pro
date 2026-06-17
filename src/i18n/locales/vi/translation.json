@@ -292,11 +292,13 @@
     "health": "Sức khỏe",
     "learning": "Học tập",
     "productivity": "Năng suất",
-    "days": "Ngày"
   },
-  "checkin": {
+   "checkin": {
     "history": "Lịch sử check-in",
-    "no": "Không có lịch sử check-in."
+    "no": "Không có lịch sử check-in.",
+    "not_finished": "Chưa hoàn thành",
+    "completed":"Đạt mục tiêu"
+    "days": "Ngày"
   },
   "setting":{
     "setting":"Cài đặt",
