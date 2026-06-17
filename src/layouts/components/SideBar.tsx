@@ -7,6 +7,7 @@ import { STORAGE_KEY } from "../../shared/constants/appConstants"
 
 const SIDEBAR_WIDTH = "260px";
 
+
 function HomeIcon({ className = "" }: { className?: string }) {
     return (
         <svg className={className} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -141,94 +142,27 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
             </div>
 
             {/* Navigation */}
-            <nav className="flex flex-col gap-2 flex-1">
-                {NAV_ITEMS.map(
-                    ({ to, label, icon: Icon, badge, highlight }) => (
-                        <NavLink
-                            key={to}
-                            to={to}
-                            end={to === ROUTES.DASHBOARD}
-                            onClick={onClose}
-                            className={({ isActive }) =>
-                                [
-                                    "relative overflow-hidden flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-300",
-
-                                    isActive
-                                        ? "bg-violet-600 text-white"
-                                        : "text-violet-300 hover:bg-white/[0.06] hover:text-violet-100",
-
-                                    highlight &&
-                                    !isActive &&
-                                    `
-                            border border-violet-400/40
-                            bg-gradient-to-r
-                            from-violet-600/25
-                            via-violet-500/10
-                            to-violet-600/25
-                            shadow-[0_0_25px_rgba(139,92,246,0.35)]
-                            community-highlight
-                        `,
-                                ]
-                                    .filter(Boolean)
-                                    .join(" ")
-                            }
-                        >
-                            {/* Glow pulse */}
-                            {highlight && (
-                                <span
-                                    className="
-                            absolute inset-0
-                            rounded-xl
-                            bg-violet-500/10
-                            animate-pulse
-                            pointer-events-none
-                        "
-                                />
-                            )}
-
-                            {/* Sparkle */}
-                            {highlight && (
-                                <span
-                                    className="
-                            absolute right-2 top-2
-                            w-2 h-2
-                            rounded-full
-                            bg-yellow-300
-                            animate-ping
-                        "
-                                />
-                            )}
-
-                            <Icon className="relative z-10" />
-
-                            <span className="relative z-10 flex items-center gap-1 flex-1">
-                                {label}
-
-                                {highlight && (
-                                    <span className="text-yellow-300 text-xs">
-                                        ✨
-                                    </span>
-                                )}
-                            </span>
-
-                            {badge && (
-                                <span
-                                    className="
-                            relative z-10
-                            px-2 py-0.5
-                            rounded-full
-                            text-[10px]
-                            font-bold
-                            bg-white
-                            text-violet-700
-                        "
-                                >
-                                    {badge}
-                                </span>
-                            )}
-                        </NavLink>
-                    )
-                )}
+            <nav className="flex flex-col gap-1 flex-1">
+                {NAV_ITEMS.map(({ to, label, icon: Icon, badge }) => (
+                    <NavLink
+                        key={to}
+                        to={to}
+                        end={to === ROUTES.DASHBOARD}
+                        onClick={onClose}
+                        className={({ isActive }) =>
+                            [
+                                "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
+                                isActive
+                                    ? "bg-violet-600 text-white"
+                                    : "text-violet-300 hover:bg-white/[0.06] hover:text-violet-100",
+                            ].join(" ")
+                        }
+                    >
+                        <Icon />
+                        <span className="flex-1">{label}</span>
+                        {badge}
+                    </NavLink>
+                ))}
             </nav>
 
             {/* User Profile */}
