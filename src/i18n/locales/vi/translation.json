@@ -20,7 +20,7 @@
     "statistics": "Thống kê",
     "settings": "Cài đặt",
     "notifications": "Thông báo",
-    "community":"Cộng đồng"
+    "community": "Cộng đồng"
   },
   "habit": {
     "create": "Tạo thói quen",
@@ -68,10 +68,13 @@
     "val-name-1": "*Tên thói quen là bắt buộc",
     "val-name-2": "*Tên thói quen phải có ít nhất 2 ký tự",
     "val-name-3": "*Tên thói quen phải dưới 50 ký tự",
+    "val-name-4": "*Mục tiêu phải ít nhất là 1",
     "paused-hint": "*Thói quen đang tạm dừng. Hãy tiếp tục (Resume) để chỉnh sửa tần suất và mục tiêu mỗi ngày.",
     "ACTIVE": "Đang hoạt động",
     "PAUSED": "Đã tạm dừng",
-    "ARCHIVED": "Đã lưu trữ"
+    "ARCHIVED": "Đã lưu trữ",
+    "updated": "đã được cập nhật",
+    "created": "đã được tạo"
   },
   "days": {
     "sun": "CN",

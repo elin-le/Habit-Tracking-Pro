@@ -21,7 +21,7 @@
     "statistics": "Statistics",
     "settings": "Settings",
     "notifications": "Notifications",
-    "community":"Community"
+    "community": "Community"
   },
   "habit": {
     "create": "Create Habit",
@@ -69,10 +69,13 @@
     "val-name-1": "*Habit name is required",
     "val-name-2": "*Habit name must be at least 2 characters",
     "val-name-3": "*Habit name must be under 50 characters",
+    "val-name-4": "*Target must be at least 1",
     "paused-hint": "*This habit is paused. Resume the habit to edit its frequency and daily target.",
     "ACTIVE": "Active",
     "PAUSED": "Paused",
-    "ARCHIVED": "Archived"
+    "ARCHIVED": "Archived",
+    "updated": "has been updated",
+    "created": "has been created"
   },
   "days": {
     "sun": "Sun",

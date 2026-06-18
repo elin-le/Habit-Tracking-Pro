@@ -9,7 +9,7 @@ export const mockHabits: Habit[] = [
     status: "ACTIVE",
     priority: "HIGH",
     categoryId: "cat_health",
-    userId: "user-1",
+    userId: "0767181815",
   },
   {
     id: "habit-2",
@@ -19,7 +19,7 @@ export const mockHabits: Habit[] = [
     status: "ACTIVE",
     priority: "MEDIUM",
     categoryId: "cat_health",
-    userId: "user-1",
+    userId: "0767181815",
   },
   {
     id: "habit-3",
@@ -29,7 +29,7 @@ export const mockHabits: Habit[] = [
     status: "ACTIVE",
     priority: "LOW",
     categoryId: "cat_study",
-    userId: "user-1",
+    userId: "0767181815",
   },
   {
     id: "habit-4",
@@ -39,7 +39,7 @@ export const mockHabits: Habit[] = [
     status: "PAUSED",
     priority: "MEDIUM",
     categoryId: "cat_mindfulness",
-    userId: "user-1",
+    userId: "0767181815",
   },
   {
     id: "habit-5",
@@ -49,7 +49,7 @@ export const mockHabits: Habit[] = [
     status: "ACTIVE",
     priority: "HIGH",
     categoryId: "cat_health",
-    userId: "user-1",
+    userId: "0767181815",
   },
   {
     id: "habit-6",
@@ -59,7 +59,7 @@ export const mockHabits: Habit[] = [
     status: "ACTIVE",
     priority: "MEDIUM",
     categoryId: "cat_health",
-    userId: "user-1",
+    userId: "0767181815",
   },
   {
     id: "habit-7",
@@ -69,7 +69,7 @@ export const mockHabits: Habit[] = [
     status: "ACTIVE",
     priority: "LOW",
     categoryId: "cat_mindfulness",
-    userId: "user-1",
+    userId: "0767181815",
   },
   {
     id: "habit-8",
@@ -79,6 +79,6 @@ export const mockHabits: Habit[] = [
     status: "ARCHIVED",
     priority: "LOW",
     categoryId: "cat_study",
-    userId: "user-1",
+    userId: "0767181815",
   },
 ];
