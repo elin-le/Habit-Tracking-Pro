@@ -308,7 +308,8 @@
     "history": "Check-in History",
     "no": "Empty",
     "not_finished": "Not finished",
-    "completed": "Completed"
+    "completed": "Completed",
+    "toast_update": "Completed {{count}} {{name}}"
   },
   "setting": {
     "setting": "Setting",
