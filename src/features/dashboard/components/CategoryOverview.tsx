@@ -94,16 +94,24 @@ const CategoryOverview = ({
                                 )}
                             </Pie>
 
-                            <Tooltip
-                                formatter={(
-                                    value,
-                                    _,
-                                    item,
-                                ) => [
-                                    `${value} Habits (${item.payload.percent}%)`,
-                                    item.payload.name,
-                                ]}
-                            />
+                        <Tooltip
+                            formatter={(value, _, item) => [
+                                `${value} Habits (${item.payload.percent}%)`,
+                                item.payload.name,
+                            ]}
+                            contentStyle={{
+                                padding: "6px 8px",
+                                fontSize: "12px",
+                            }}
+                            itemStyle={{
+                                padding: 0,
+                                margin: 0,
+                            }}
+                            labelStyle={{
+                                margin: 0,
+                                padding: 0,
+                            }}
+                        />
                         </PieChart>
                     </ResponsiveContainer>
                 </div>

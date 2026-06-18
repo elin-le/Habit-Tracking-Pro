@@ -71,16 +71,22 @@ const HabitStatistics = ({
                             tickLine={false}
                             domain={[0, 100]}
                         />
-
                         <Tooltip
-                            formatter={(value) => [
-                                `${value}%`,
-                                t(
-                                    "dashboard.completionRate",
-                                ),
-                            ]}
+                            contentStyle={{
+                                padding: "6px 10px",
+                                fontSize: "12px",
+                            }}
+                            labelStyle={{
+                                margin: 0,
+                                padding: 0,
+                                lineHeight: "14px",
+                            }}
+                            itemStyle={{
+                                margin: 0,
+                                padding: 0,
+                                lineHeight: "14px",
+                            }}
                         />
-
                         <Line
                             type="monotone"
                             dataKey="rate"
