@@ -1,17 +1,16 @@
-import { useState, useEffect, useCallback } from "react";
-import type { HabitStat } from "../types/Statistics";
+import { useMemo } from "react";
 import { getHabitStats } from "../../features/statistics/services/StatisticsService";
+import type { Habit } from "../types/Habit";
+import type { CheckIn } from "../types/CheckIn";
+import type { Category } from "../types/Category";
 
-export const useHabitStats = () => {
-  const [stats, setStats] = useState<HabitStat[]>([]);
-
-  const refreshStats = useCallback(() => {
-    setStats(getHabitStats());
-  }, []);
-
-  useEffect(() => {
-    refreshStats();
-  }, [refreshStats]);
-
-  return { stats, refreshStats };
+export const useHabitStats = (
+  habits: Habit[],
+  checkIns: CheckIn[],
+  categories: Category[]
+) => {
+  return useMemo(
+    () => getHabitStats(habits, checkIns, categories),
+    [habits, checkIns, categories]
+  );
 };

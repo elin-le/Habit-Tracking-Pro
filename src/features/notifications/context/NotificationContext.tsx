@@ -1,16 +1,18 @@
 // src/features/notifications/context/NotificationContext.tsx
 import { createContext, useState, useEffect, type ReactNode } from 'react';
 import type { AppNotification } from '../types';
-import { mockNotifications } from '../../../data/notifications';
 import { useTranslation } from 'react-i18next';
 import { ToastService } from '../../../routes/services/toastService';
-import {
-  getCurrentStreak,
-  getStreakProgress,
-  getTotalCompletionProgress
-} from '../../habit/calculators/GoalCalculator';
+
 
 export const NotificationContext = createContext<any>(null);
+
+const generateUUID = () => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+};
 
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
@@ -25,7 +27,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     relatedEntityType: AppNotification['relatedEntityType']
   ) => {
     const newNotif: AppNotification = {
-      id: `notif-${crypto.randomUUID()}`,
+      id: `notif-${generateUUID()}`,
       title: titleKey,
       message: messageKey,
       type,
@@ -54,97 +56,6 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const checkAndGenerateNotifications = (currentNotifications: AppNotification[] = []) => {
-    try {
-      const goalsStr = localStorage.getItem('htp_current_user_goals');
-      const habitsStr = localStorage.getItem('htp_current_user_habits');
-      const checkinsStr = localStorage.getItem('htp_current_user_checkins');
-
-      const goals = goalsStr ? JSON.parse(goalsStr) : [];
-      const habits = habitsStr ? JSON.parse(habitsStr) : [];
-      const checkins = checkinsStr ? JSON.parse(checkinsStr) : [];
-
-      const listToCheck = currentNotifications.length > 0 ? currentNotifications : notifications;
-
-      // 1. Quét Goals để tạo thông báo 80% hoặc 100%
-      goals.forEach((goal: any) => {
-        const habit = habits.find((h: any) => h.id === goal.habitId);
-        const targetPerDay = habit ? habit.targetPerDay : 1;
-        const habitName = habit ? habit.name : 'Mục tiêu';
-
-        let progressPercent = 0;
-        if (goal.targetType === 'STREAK') {
-          progressPercent = getStreakProgress(goal, targetPerDay, checkins);
-        } else if (goal.targetType === 'TOTAL_COMPLETIONS') {
-          progressPercent = getTotalCompletionProgress(goal, targetPerDay, checkins);
-        }
-
-        if (progressPercent >= 100) {
-          const hasAchievedNotif = listToCheck.some(
-            (n: any) => n.relatedEntityId === goal.id && n.type === 'GOAL_ACHIEVED'
-          );
-          if (!hasAchievedNotif) {
-            addNotification(
-              'GOAL_ACHIEVED',
-              'notifications.goal_achieved.title',
-              'notifications.goal_achieved.message',
-              { habitName },
-              goal.id,
-              'GOAL'
-            );
-          }
-        } else if (progressPercent >= 80) {
-          const has80Notif = listToCheck.some(
-            (n: any) => n.relatedEntityId === goal.id && n.type === 'GOAL_80'
-          );
-          if (!has80Notif) {
-            addNotification(
-              'GOAL_80',
-              'notifications.goal_80.title',
-              'notifications.goal_80.message',
-              { habitName },
-              goal.id,
-              'GOAL'
-            );
-          }
-        }
-      });
-
-      // 2. Quét Habits để kiểm tra nguy cơ đứt chuỗi (Streak Risk)
-      habits.forEach((habit: any) => {
-        const habitCheckins = checkins.filter((c: any) => c.habitId === habit.id);
-        const currentStreakVal = getCurrentStreak(habitCheckins, habit.targetPerDay);
-
-        if (currentStreakVal >= 3) {
-          const todayKey = new Date().toISOString().split('T')[0];
-          // Đếm số checkin hôm nay
-          const todaySummary = habitCheckins.filter((c: any) => c.checkedAt === todayKey).length;
-          const isCompletedToday = todaySummary >= habit.targetPerDay;
-
-          if (!isCompletedToday) {
-            const todayNotifExists = listToCheck.some(
-              (n: any) =>
-                n.relatedEntityId === habit.id &&
-                n.type === 'STREAK_RISK' &&
-                n.createdAt.startsWith(todayKey)
-            );
-            if (!todayNotifExists) {
-              addNotification(
-                'STREAK_RISK',
-                'notifications.streak_risk.title',
-                'notifications.streak_risk.message',
-                { habitName: habit.name, streakCount: currentStreakVal },
-                habit.id,
-                'HABIT'
-              );
-            }
-          }
-        }
-      });
-    } catch (error) {
-      console.error('Failed to run checkAndGenerateNotifications', error);
-    }
-  };
 
   // Lấy dữ liệu từ localStorage hoặc dùng mockData 
   useEffect(() => {
@@ -184,18 +95,15 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
         }
       } catch (e) {
         console.error('Failed to parse saved notifications', e);
-        loadedNotifications = mockNotifications;
-        setNotifications(mockNotifications);
+        loadedNotifications = [];
+        setNotifications([]);
       }
     } else {
-      loadedNotifications = mockNotifications;
-      setNotifications(mockNotifications);
+      loadedNotifications = [];
+      setNotifications([]);
     }
 
-    // Tự động kiểm tra trạng thái ngay sau khi load
-    setTimeout(() => {
-      checkAndGenerateNotifications(loadedNotifications);
-    }, 200);
+
   }, []);
 
   // Hàm đánh dấu 1 thông báo đã đọc
@@ -218,7 +126,8 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
   return (
-    <NotificationContext.Provider value={{ notifications, unreadCount, markAsRead, markAllAsRead, addNotification, checkAndGenerateNotifications }}>
+    <NotificationContext.Provider value={{ notifications, unreadCount, markAsRead, markAllAsRead, addNotification }}>
+
       {children}
     </NotificationContext.Provider>
   );

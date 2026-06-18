@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { type GoalProgressType } from "../Dashboard.type";
+
+import type { GoalProgressType } from "../../../shared/types/Dashboard";
 
 interface GoalProgressProps {
     goals: GoalProgressType[];
@@ -10,6 +12,27 @@ const GoalProgress = ({
 }: GoalProgressProps) => {
     const { t } = useTranslation();
 
+    const [expanded, setExpanded] =
+        useState(false);
+
+    if (!goals.length) {
+        return (
+            <div className="dashboard-card">
+                <h2 className="dashboard-card__title">
+                    {t("dashboard.goalProgress")}
+                </h2>
+
+                <p className="text-secondary">
+                    {t("dashboard.noGoals")}
+                </p>
+            </div>
+        );
+    }
+
+    const displayedGoals = expanded
+        ? goals
+        : goals.slice(0, 3);
+
     return (
         <div className="dashboard-card">
             <h2 className="dashboard-card__title">
@@ -17,30 +40,60 @@ const GoalProgress = ({
             </h2>
 
             <div className="goal-grid">
-                {goals.map((goal) => (
-                    <div
-                        key={goal.id}
-                        className="goal-card"
-                    >
-                        <p className="goal-card__title">
-                            {goal.title}
-                        </p>
+                {displayedGoals.map((goal) => {
+                    const progress = Math.min(
+                        Math.max(goal.progress, 0),
+                        100,
+                    );
 
-                        <h3 className="goal-card__value">
-                            {goal.progress}%
-                        </h3>
+                    return (
+                        <div
+                            key={goal.id}
+                            className="goal-card"
+                        >
+                            <p
+                                className="goal-card__title"
+                                title={goal.title}
+                            >
+                                {goal.title}
+                            </p>
 
-                        <div className="dashboard-progress">
-                            <div
-                                className="dashboard-progress__fill"
-                                style={{
-                                    width: `${goal.progress}%`,
-                                }}
-                            />
+                            <h3 className="goal-card__value">
+                                {progress}%
+                            </h3>
+
+                            <div className="dashboard-progress">
+                                <div
+                                    className="dashboard-progress__fill"
+                                    style={{
+                                        width: `${progress}%`,
+                                    }}
+                                />
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
+
+            {goals.length > 3 && (
+                <button
+                    type="button"
+                    className="goal-toggle-btn"
+                    onClick={() =>
+                        setExpanded(
+                            (prev) => !prev,
+                        )
+                    }
+                >
+                    {expanded
+                        ? t(
+                              "dashboard.showLess",
+                          )
+                        : t(
+                              "dashboard.showMore",
+                          )}
+                </button>
+            )}
         </div>
     );
 };

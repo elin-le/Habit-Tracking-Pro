@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useOutletContext } from "react-router-dom";
@@ -11,9 +11,14 @@ import {
   Activity,
   AlertTriangle,
   Download,
+  SlidersHorizontal,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { useHabitStats } from "../../../shared/hooks/useHabitStats";
 import { useCategories } from "../../../shared/hooks/useCategory";
+import { usePagination } from "../../../shared/hooks/usePagination";
+import { Pagination } from "../../../shared/components/common/Pagination";
 import type { HabitStat, RiskLevel } from "../../../shared/types/Statistics";
 import type { Habit, Priority } from "../../../shared/types/Habit";
 import { StatisticsFilter } from "../component/StatisticsFilter";
@@ -31,9 +36,10 @@ type LayoutContext = {
   checkIns: CheckIn[];
 };
 
+const STATS_PER_PAGE = 6;
+
 export default function StatisticsPage() {
   const { t } = useTranslation();
-  const { stats } = useHabitStats();
   const { categories } = useCategories();
   const navigate = useNavigate()
 
@@ -45,13 +51,11 @@ export default function StatisticsPage() {
     );
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
   const [filterPriority, setFilterPriority] = useState<Priority | null>(null);
-
-  const { habits, goals, checkIns } = useOutletContext<LayoutContext>();
+  const [showFilter, setShowFilter] = useState(false);
 
   const handleExport = () => {
     try {
       exportJson(habits, goals, checkIns);
-
       toast.success(`${t("statistics.ex_noti1")}`);
     } catch (error) {
       toast.error(`${t("statistics.ex_noti2")}`);
@@ -62,14 +66,13 @@ export default function StatisticsPage() {
   // chỉ số tổng quan luôn tính trên TẤT CẢ habit (không theo bộ lọc)
   const total = stats.length;
   const completedToday = stats.filter(
-    (s) => s.last7Days[s.last7Days.length - 1] === 100,
+    (s) => s.last7Days[s.last7Days.length - 1] === 100
   ).length;
-  const completedTodayPct =
-    total === 0 ? 0 : Math.round((completedToday / total) * 100);
+  const completedTodayPct = total === 0 ? 0 : Math.round((completedToday / total) * 100);
   const activeHabits = stats.length;
   const atRisk = stats.filter((s) => s.riskLevel === "AT_RISK").length;
 
-  // lọc danh sách habit
+  // lọc theo category + priority
   const visibleStats = useMemo(() => {
     return stats.filter((s) => {
       const catOk = !filterCategory || s.categoryId === filterCategory;
@@ -77,6 +80,12 @@ export default function StatisticsPage() {
       return catOk && priOk;
     });
   }, [stats, filterCategory, filterPriority]);
+
+  // phân trang (dùng chung usePagination + Pagination với trang Habit)
+  const { paginatedItems, currentPage, totalPages, handlePageChange, getPageNumbers } =
+    usePagination<HabitStat>(visibleStats, "", () => true, STATS_PER_PAGE);
+
+  const activeFilterCount = (filterCategory ? 1 : 0) + (filterPriority ? 1 : 0);
 
   const handleClearAll = () => {
     setFilterCategory(null);
@@ -102,22 +111,11 @@ export default function StatisticsPage() {
     <div className="flex flex-col gap-6 pb-24 md:pb-8 text-[var(--text)]">
       <PageHeading />
 
-      {/* Export — đứng riêng, đẩy phải */}
+      {/* Export */}
       <div className="flex justify-end">
         <button
           onClick={handleExport}
-          className="flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium transition-colors cursor-pointer"
-          style={{
-            borderColor: "color-mix(in srgb, var(--primary) 25%, transparent)",
-            color: "var(--text)",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background =
-              "color-mix(in srgb, var(--primary) 8%, transparent)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "transparent";
-          }}
+          className="flex items-center gap-1.5 rounded-xl border border-[var(--primary)]/25 px-4 py-2 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--primary)]/8 cursor-pointer"
         >
           <Download size={15} />
           {t("statistics.btn_export")}
@@ -147,32 +145,62 @@ export default function StatisticsPage() {
         />
       </div>
 
-      {/* ---- Bộ lọc ---- */}
-      <StatisticsFilter
-        categories={categories}
-        selectedCategory={filterCategory}
-        onCategoryChange={setFilterCategory}
-        selectedPriority={filterPriority}
-        onPriorityChange={setFilterPriority}
-        onClearAll={handleClearAll}
-      />
+      {/* ---- Nút bật/tắt bộ lọc ---- */}
+      <div>
+        <button
+          onClick={() => setShowFilter((v) => !v)}
+          className="flex items-center gap-2 rounded-xl border border-[var(--primary)]/20 px-4 py-2 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--primary)]/8 cursor-pointer"
+        >
+          <SlidersHorizontal size={15} className="text-[var(--primary)]" />
+          {t("habit_filter.title")}
+          {activeFilterCount > 0 && (
+            <span className="rounded-full bg-[var(--primary)] px-1.5 text-[10px] font-bold text-white">
+              {activeFilterCount}
+            </span>
+          )}
+          {showFilter ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+        </button>
 
-      {/* ---- Danh sách habit (đã lọc) ---- */}
+        {showFilter && (
+          <div className="mt-3">
+            <StatisticsFilter
+              categories={categories}
+              selectedCategory={filterCategory}
+              onCategoryChange={setFilterCategory}
+              selectedPriority={filterPriority}
+              onPriorityChange={setFilterPriority}
+              onClearAll={handleClearAll}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* ---- Danh sách habit (đã lọc + phân trang) ---- */}
       <h2 className="text-base font-bold">{t("statistics.per_habit")}</h2>
       {visibleStats.length === 0 ? (
         <p className="opacity-60 text-sm">{t("statistics.no_match")}</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {visibleStats.map((s) => (
-            <HabitStatCard key={s.id} stat={s} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {paginatedItems.map((s) => (
+              <HabitStatCard key={s.id} stat={s} />
+            ))}
+          </div>
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              handlePageChange={handlePageChange}
+              getPageNumbers={getPageNumbers}
+            />
+          )}
+        </>
       )}
     </div>
   );
 }
 
-/* ---- Số đếm tăng dần (hiệu ứng động) ---- */
+/* ---- Số đếm tăng dần ---- */
 function useCountUp(target: number, duration = 700) {
   const [val, setVal] = useState(0);
   useEffect(() => {
@@ -180,7 +208,7 @@ function useCountUp(target: number, duration = 700) {
     const start = performance.now();
     const tick = (now: number) => {
       const p = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+      const eased = 1 - Math.pow(1 - p, 3);
       setVal(Math.round(target * eased));
       if (p < 1) raf = requestAnimationFrame(tick);
     };
@@ -190,20 +218,16 @@ function useCountUp(target: number, duration = 700) {
   return val;
 }
 
-/* ---- Tiêu đề trang ---- */
 function PageHeading() {
   const { t } = useTranslation();
   return (
     <div>
-      <h1 className="text-3xl sm:text-4xl font-light">
-        {t("statistics.title")}
-      </h1>
+      <h1 className="text-3xl sm:text-4xl font-light">{t("statistics.title")}</h1>
       <p className="mt-1 text-sm opacity-60">{t("statistics.subtitle")}</p>
     </div>
   );
 }
 
-/* ---- Thẻ tổng quan: số to, nổi bật, đếm tăng dần ---- */
 function OverviewCard({
   icon,
   accent,
@@ -220,9 +244,7 @@ function OverviewCard({
   const animated = useCountUp(value);
   return (
     <div className="flex items-center gap-4 p-5 rounded-2xl border border-[var(--primary)]/15 bg-[var(--surface)] transition-shadow duration-200 hover:shadow-lg">
-      <div
-        className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${accent}`}
-      >
+      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${accent}`}>
         {icon}
       </div>
       <div className="min-w-0">
@@ -230,24 +252,13 @@ function OverviewCard({
           {animated}
           <span className="text-2xl">{suffix}</span>
         </p>
-        <p className="text-xs opacity-60 font-semibold mt-1.5 truncate">
-          {label}
-        </p>
+        <p className="text-xs opacity-60 font-semibold mt-1.5 truncate">{label}</p>
       </div>
     </div>
   );
 }
 
-/* ---- 1 chỉ số nhỏ trong thẻ habit ---- */
-function Metric({
-  icon,
-  label,
-  value,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: string;
-}) {
+function Metric({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
   return (
     <div className="flex flex-col gap-1">
       <span className="flex items-center gap-1.5 text-xs opacity-60">
@@ -259,7 +270,6 @@ function Metric({
   );
 }
 
-/* ---- Trạng thái rỗng ---- */
 function EmptyState() {
   const { t } = useTranslation();
   return (
@@ -279,7 +289,6 @@ function EmptyState() {
   );
 }
 
-/* ---- Thẻ thống kê 1 habit ---- */
 function HabitStatCard({ stat }: { stat: HabitStat }) {
   const { t, i18n } = useTranslation();
 
@@ -294,7 +303,6 @@ function HabitStatCard({ stat }: { stat: HabitStat }) {
     AT_RISK: t("statistics.risk_at_risk"),
   };
 
-  // nhãn thứ cho 7 cột (theo ngôn ngữ hiện tại, không hardcode)
   const locale = i18n.language?.startsWith("vi") ? "vi-VN" : "en-US";
   const dayLabels = useMemo(() => {
     const fmt = new Intl.DateTimeFormat(locale, { weekday: "narrow" });
@@ -310,7 +318,6 @@ function HabitStatCard({ stat }: { stat: HabitStat }) {
 
   return (
     <div className="flex flex-col gap-4 p-5 rounded-2xl border border-[var(--primary)]/15 bg-[var(--surface)] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-      {/* Tên habit + category + nhãn risk */}
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <h3 className="font-semibold text-base truncate">{stat.name}</h3>
@@ -323,31 +330,17 @@ function HabitStatCard({ stat }: { stat: HabitStat }) {
         </span>
       </div>
 
-      {/* 4 chỉ số */}
       <div className="grid grid-cols-2 gap-3 text-sm">
-        <Metric
-          icon={<Flame size={15} />}
-          label={t("statistics.current_streak")}
-          value={`${stat.currentStreak} ${t("statistics.days")}`}
-        />
-        <Metric
-          icon={<Trophy size={15} />}
-          label={t("statistics.longest_streak")}
-          value={`${stat.longestStreak} ${t("statistics.days")}`}
-        />
-        <Metric
-          icon={<CheckCircle2 size={15} />}
-          label={t("statistics.total_completions")}
-          value={`${stat.totalCompletions}`}
-        />
-        <Metric
-          icon={<TrendingUp size={15} />}
-          label={t("statistics.completion_rate")}
-          value={`${stat.completionRate}%`}
-        />
+        <Metric icon={<Flame size={15} />} label={t("statistics.current_streak")}
+          value={`${stat.currentStreak} ${t("statistics.days")}`} />
+        <Metric icon={<Trophy size={15} />} label={t("statistics.longest_streak")}
+          value={`${stat.longestStreak} ${t("statistics.days")}`} />
+        <Metric icon={<CheckCircle2 size={15} />} label={t("statistics.total_completions")}
+          value={`${stat.totalCompletions}`} />
+        <Metric icon={<TrendingUp size={15} />} label={t("statistics.completion_rate")}
+          value={`${stat.completionRate}%`} />
       </div>
 
-      {/* Thanh tiến độ tỷ lệ hoàn thành */}
       <div>
         <div className="flex items-center justify-between text-xs opacity-60 mb-1">
           <span>{t("statistics.completion_rate")}</span>
@@ -361,29 +354,21 @@ function HabitStatCard({ stat }: { stat: HabitStat }) {
         </div>
       </div>
 
-      {/* Biểu đồ 7 ngày + nhãn thứ */}
       <div>
-        <p className="text-xs font-semibold opacity-60 mb-2">
-          {t("statistics.last_7_days")}
-        </p>
+        <p className="text-xs font-semibold opacity-60 mb-2">{t("statistics.last_7_days")}</p>
         <div className="flex items-end gap-1 h-12">
           {stat.last7Days.map((v, i) => (
             <div
               key={i}
               className="flex-1 rounded-sm bg-[var(--primary)] transition-[height] duration-500 ease-out"
-              style={{
-                height: `${Math.max(v, 6)}%`,
-                opacity: v === 0 ? 0.2 : 0.4 + (v / 100) * 0.6,
-              }}
+              style={{ height: `${Math.max(v, 6)}%`, opacity: v === 0 ? 0.2 : 0.4 + (v / 100) * 0.6 }}
               title={`${v}%`}
             />
           ))}
         </div>
         <div className="flex gap-1 mt-1">
           {dayLabels.map((d, i) => (
-            <span key={i} className="flex-1 text-center text-[10px] opacity-40">
-              {d}
-            </span>
+            <span key={i} className="flex-1 text-center text-[10px] opacity-40">{d}</span>
           ))}
         </div>
       </div>

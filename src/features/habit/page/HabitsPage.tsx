@@ -4,7 +4,7 @@ import { HabitFilter } from "../../../shared/components/filters/HabitFilter";
 import { usePagination } from "../../../shared/hooks/usePagination";
 import { Pagination } from "../../../shared/components/common/Pagination";
 import { useTranslation } from "react-i18next";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import type { Habit, HabitStatus, Priority } from "../../../shared/types/Habit";
 import type {
   DaysOfWeek,
@@ -35,6 +35,7 @@ type LayoutContext = {
 
 export function HabitsPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const {
     habits,
     showAddForm,
@@ -69,6 +70,10 @@ export function HabitsPage() {
   const [frequencyFilter, setFrequencyFilter] = useState<DaysOfWeek | null>(
     DAY_OF_WEEK_MAP[new Date().getDay()],
   );
+
+  const todayDow = DAY_OF_WEEK_MAP[new Date().getDay()];
+  const isViewingToday =
+    frequencyFilter === null || frequencyFilter === todayDow;
 
   const handleClearAll = () => {
     setFilterCategory(null);
@@ -233,6 +238,7 @@ export function HabitsPage() {
                 deleteHabitSchedulesByHabitId(habit.id);
               }}
               categories={categories}
+              isViewingToday={isViewingToday}
             />
           ))}
         </div>
