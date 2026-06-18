@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { ArrowLeft, Search, Phone, Users, UserRound, X } from "lucide-react"
 
@@ -146,6 +146,12 @@ function EmptyState({ query }: { query: string }) {
 ───────────────────────────────────────── */
 const CommunityPage = () => {
     const users = JSON.parse(localStorage.getItem(STORAGE_KEY.USERS) || "[]") as User[]
+    const currentUser: User | null =
+        JSON.parse(
+            localStorage.getItem(
+                STORAGE_KEY.CURRENT_USER
+            ) || "null"
+        );
     const { setReadOnly } = useReadOnly()
     const navigate = useNavigate()
     const [search, setSearch] = useState("")
@@ -162,6 +168,12 @@ const CommunityPage = () => {
     const handleUserClick = (user: User) => {
         setReadOnly(true)
     }
+
+    useEffect(() => {
+        if (!currentUser) {
+            navigate(ROUTES.AUTH);
+        }
+    }, [])
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
