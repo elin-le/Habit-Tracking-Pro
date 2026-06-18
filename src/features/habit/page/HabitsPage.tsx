@@ -4,17 +4,22 @@ import { HabitFilter } from "../../../shared/components/filters/HabitFilter";
 import { usePagination } from "../../../shared/hooks/usePagination";
 import { Pagination } from "../../../shared/components/common/Pagination";
 import { useTranslation } from "react-i18next";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import type { Habit, HabitStatus, Priority } from "../../../shared/types/Habit";
 import type {
   DaysOfWeek,
   HabitSchedule,
 } from "../../../shared/types/HabitSchedule";
 import { HabitForm } from "../../../shared/components/forms/HabitForm";
-import { useMemo, useState } from "react";
-import { DAY_OF_WEEK_MAP } from "@/shared/constants/appConstants";
+import { useEffect, useMemo, useState } from "react";
+import {
+  DAY_OF_WEEK_MAP,
+  ROUTES,
+  STORAGE_KEY,
+} from "@/shared/constants/appConstants";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import type { Category } from "@/shared/types/Category";
+import type { User } from "@/shared/types/User";
 
 type LayoutContext = {
   habits: Habit[];
@@ -32,6 +37,7 @@ type LayoutContext = {
 
 export function HabitsPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const {
     habits,
     showAddForm,
@@ -46,6 +52,16 @@ export function HabitsPage() {
     deleteHabitSchedulesByHabitId,
   } = useOutletContext<LayoutContext>();
 
+  const currentUser: User | null = JSON.parse(
+    localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "null",
+  );
+
+  useEffect(() => {
+    if (!currentUser) {
+      navigate(ROUTES.AUTH);
+    }
+  }, []);
+
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
@@ -59,6 +75,10 @@ export function HabitsPage() {
   const [frequencyFilter, setFrequencyFilter] = useState<DaysOfWeek | null>(
     DAY_OF_WEEK_MAP[new Date().getDay()],
   );
+
+  const todayDow = DAY_OF_WEEK_MAP[new Date().getDay()];
+  const isViewingToday =
+    frequencyFilter === null || frequencyFilter === todayDow;
 
   const handleClearAll = () => {
     setFilterCategory(null);
@@ -233,6 +253,7 @@ export function HabitsPage() {
                 deleteHabitSchedulesByHabitId(habit.id);
               }}
               categories={categories}
+              isViewingToday={isViewingToday}
             />
           ))}
         </div>
