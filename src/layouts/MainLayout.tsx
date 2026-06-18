@@ -10,6 +10,8 @@ import { useHabits } from "../shared/hooks/useHabit";
 import { useCategories } from "@/shared/hooks/useCategory";
 import { STORAGE_KEY } from "@/shared/constants/appConstants";
 import type { User } from "@/shared/types/User";
+import { useGoals } from "@/shared/hooks/useGoals";
+import { useCheckIns } from "@/shared/hooks/useCheckIns";
 
 export default function MainLayout() {
   const currentUser = JSON.parse(
@@ -21,8 +23,11 @@ export default function MainLayout() {
   const { t } = useTranslation();
 
   const habitData = useHabits(currentUser.phone);
-  const habitSchedule = useHabitSchedule(habitData.habits);
+  const habitSchedule = useHabitSchedule(currentUser.phone);
   const categoryData = useCategories();
+
+  const goalData = useGoals();
+  const checkInData = useCheckIns();
 
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--bg)] playfair-display-normal">
@@ -54,6 +59,8 @@ export default function MainLayout() {
               categories: categoryData.categories,
               showAddForm,
               setShowAddForm,
+              goals: goalData.goals, // Sửa nhé
+              checkIns: checkInData.checkIns, // Sửa nhé
             }}
           />
         </main>

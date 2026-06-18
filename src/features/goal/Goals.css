@@ -1,0 +1,58 @@
+/* GoalsPage.tsx */
+.goals-empty-state {
+  background: var(--surface);
+  border-color: color-mix(in srgb, var(--primary) 20%, transparent);
+}
+
+/* RewardBanner.tsx */
+.reward-banner-card {
+  background: color-mix(in srgb, var(--reward-color) 6%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--reward-color) 22%, transparent);
+}
+
+.reward-banner-bg {
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--reward-color) 18%, transparent) 1px, transparent 1px);
+  background-size: 18px 18px;
+  opacity: 0.6;
+}
+
+.reward-banner-top-line {
+  background: linear-gradient(90deg, var(--reward-color), var(--reward-dark-color));
+}
+
+.reward-banner-icon-container {
+  border-right: 1px solid color-mix(in srgb, var(--reward-color) 15%, transparent);
+}
+
+.reward-banner-icon-box {
+  background: color-mix(in srgb, var(--reward-color) 12%, var(--surface));
+  color: var(--reward-color);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--reward-color) 25%, transparent);
+}
+
+.reward-banner-eyebrow {
+  color: var(--reward-color);
+}
+
+/* SummaryCard.tsx */
+.goal-summary-card {
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+/* StatCard.tsx */
+.goal-stat-card {
+  background: color-mix(in srgb, var(--surface) 50%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+
+/* WeeklyPerformanceChart.tsx */
+.goal-weekly-chart {
+  background: color-mix(in srgb, var(--surface) 50%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+/* DetailRing.tsx */
+.goal-ring-progress {
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}

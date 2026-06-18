@@ -62,6 +62,8 @@ export function HabitCard({
   const targetPerDay = Number(habit.targetPerDay ?? 1) || 1;
   const isCompleted = currentCount >= targetPerDay;
 
+  
+
   const minusDisabled = habit.status !== "ACTIVE" || currentCount <= 0;
   const plusDisabled = habit.status !== "ACTIVE" || isCompleted;
 
@@ -213,6 +215,7 @@ export function HabitCard({
                 e.stopPropagation();
                 const next = Math.max(0, currentCount - 1);
                 upsertCheckIn(habit.id, today, next);
+                toast.success(t("checkin.toast_update", { name: habit.name, count: next }));
                 //onUpdate();
               }}
             >
@@ -237,6 +240,7 @@ export function HabitCard({
                 e.stopPropagation();
                 const next = Math.min(currentCount + 1, Number(targetPerDay) || 1);
                 upsertCheckIn(habit.id, today, next);
+                toast.success(t("checkin.toast_update", { name: habit.name, count: next }));
                 // onUpdate();
               }}
             >

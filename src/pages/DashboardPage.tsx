@@ -13,10 +13,13 @@ import { HeatMap } from "@/shared/components/heatmap/HeatMap";
 import { buildHeatMapData } from "@/shared/components/heatmap/heatmap.util"
 import type { CheckIn } from "@/shared/types/CheckIn"
 import { STORAGE_KEY } from "@/shared/constants/appConstants"
+import { useTranslation } from "react-i18next"
 
 const DashboardPage = () => {
-    const [selectedCategory, setSelectedCategory] =
+    const [selectedCategory] =
         useState("ALL");
+
+    const { t } = useTranslation()
 
     const {
         summaryCards,
@@ -50,7 +53,7 @@ const DashboardPage = () => {
             </section>
 
             <section className="dashboard-heatmap">
-                <HeatMap data={buildHeatMapData(checkins)} weeks={20} />
+                <HeatMap data={buildHeatMapData(checkins)} weeks={20} title={t("heatmap.title")} />
             </section>
 
             <section className="dashboard-goals">

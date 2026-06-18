@@ -338,18 +338,14 @@ export function HabitForm({
 
                 if (value === "") {
                   setForm((f) => ({ ...f, targetPerDay: "" })); // ✅ callback form
+                  setTargetPerDayError(validateTargetPerDay(""));
                   return;
                 }
 
-                if (targetPerDayError) {
-                  setTargetPerDayError(validateTargetPerDay(Number(value)));
-                }
+                const numValue = Math.min(999, Number(value));
 
-                setForm((f) => ({
-                  ...f,
-                  targetPerDay: Math.min(999, Number(value)),
-                })); // ✅ callback form
-                setTargetPerDayError(validateTargetPerDay(form.targetPerDay));
+                setForm((f) => ({ ...f, targetPerDay: numValue }));
+                setTargetPerDayError(validateTargetPerDay(numValue));
               }}
               onFocus={(e) => {
                 if (!targetPerDayError)
@@ -406,7 +402,21 @@ export function HabitForm({
           <Button
             variant="outline"
             onClick={onClose}
-            className="cursor-pointer text-black dark:text-white"
+            className="cursor-pointer"
+            style={{
+              borderColor:
+                "color-mix(in srgb, var(--primary) 20%, transparent)",
+              background: "color-mix(in srgb, var(--primary) 4%, transparent)",
+              color: "var(--text)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background =
+                "color-mix(in srgb, var(--primary) 10%, transparent)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background =
+                "color-mix(in srgb, var(--primary) 4%, transparent)";
+            }}
           >
             {t("habit_form.btn_cancel")}
           </Button>

@@ -95,7 +95,7 @@ export default function Header({
   createHabitSchedules,
 }: HeaderProps) {
   const { t } = useTranslation();
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   // const [lang, setLang] = useState<"EN" | "VI">("EN");
   const categories = JSON.parse(localStorage.getItem(STORAGE_KEY.CATEGORYS) || "[]") as Category[];
   const currentUser = JSON.parse(localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "{}") as User;

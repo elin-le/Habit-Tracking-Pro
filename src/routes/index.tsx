@@ -2,13 +2,12 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import MainLayout from "../layouts/MainLayout";
 import AuthLayout from "../layouts/AuthLayout";
-import CommunityLayout from "../layouts/CommunityLayout"
 
 import { ROUTES } from "../shared/constants/appConstants";
 
 import { HabitsPage } from "../features/habit/page/HabitsPage";
 import { HabitHistoryPage } from "../features/habit/components/HabitHistoryPage";
-import GoalsPage from "../pages/GoalsPage";
+import GoalsPage from "../features/goal/page/GoalsPage";
 import { NotificationsPage } from "../pages/NotificationsPage";
 
 import StatisticsPage from "../features/statistics/page/StatisticsPage";
@@ -57,16 +56,10 @@ export const router = createBrowserRouter([
         path: "notifications",
         element: <NotificationsPage />,
       },
-    ],
-  },
-  {
-    path: ROUTES.COMMUNITY,
-    element: <CommunityLayout />,
-    children: [
       {
-        index: true,
+        path: ROUTES.COMMUNITY,
         element: <CommunityPage />
       }
-    ]
-  }
+    ],
+  },
 ]);
