@@ -47,13 +47,22 @@ function getDateKey(date: Date): string {
     return `${year}-${month}-${day}`;
 }
 
-function readHabits(): Habit[] {
+function readHabits(userId?: string): Habit[] {
     try {
         const raw = localStorage.getItem(
             STORAGE_KEY.USER_HABITS,
         );
 
-        return raw ? JSON.parse(raw) : [];
+        const habits: Habit[] = raw
+            ? JSON.parse(raw)
+            : [];
+
+        return userId
+            ? habits.filter(
+                  (habit) =>
+                      habit.userId === userId,
+              )
+            : habits;
     } catch {
         return [];
     }
@@ -351,10 +360,14 @@ export function computeDashboardData(
 }
 
 export function getDashboardData(
+    userId?: string,
     selectedCategory?: string,
 ): DashboardData {
-    const habits = readHabits();
-    const checkIns = readCheckIns();
+    const habits = readHabits(userId);
+
+    const checkIns =
+        readCheckInsByHabits(habits);
+
     const categories =
         readCategories();
 
@@ -362,7 +375,14 @@ export function getDashboardData(
 
     try {
         goals =
-            getAllGoalsWithProgress();
+            getAllGoalsWithProgress()
+                .filter((goal) =>
+                    habits.some(
+                        (habit) =>
+                            habit.id ===
+                            goal.habitId,
+                    ),
+                );
     } catch {
         goals = [];
     }
@@ -374,4 +394,28 @@ export function getDashboardData(
         categories,
         selectedCategory,
     );
+}
+
+function readCheckInsByHabits(
+    habits: Habit[],
+): CheckIn[] {
+    try {
+        const raw = localStorage.getItem(
+            STORAGE_KEY.USER_CHECKINS,
+        );
+
+        const checkIns: CheckIn[] = raw
+            ? JSON.parse(raw)
+            : [];
+
+        const habitIds = habits.map(
+            (habit) => habit.id,
+        );
+
+        return checkIns.filter((item) =>
+            habitIds.includes(item.habitId),
+        );
+    } catch {
+        return [];
+    }
 }
