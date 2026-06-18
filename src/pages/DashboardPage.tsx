@@ -11,7 +11,6 @@ import { buildHeatMapData } from "@/shared/components/heatmap/heatmap.util";
 import type { CheckIn } from "@/shared/types/CheckIn";
 import { STORAGE_KEY } from "@/shared/constants/appConstants";
 import { useTranslation } from "react-i18next";
-
 import { useNavigate } from "react-router-dom"
 import type { User } from "@/shared/types/User"
 import { ROUTES } from "@/shared/constants/appConstants"

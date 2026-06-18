@@ -269,24 +269,19 @@ function buildGoalProgress(
     return goals
         .filter(
             (goal) =>
-                goal.progress.status !==
-                "COMPLETED",
+                goal.progress.status !== "COMPLETED",
         )
         .map((goal) => {
             const habit = habits.find(
-                (item) =>
-                    item.id === goal.habitId,
+                (item) => item.id === goal.habitId,
             );
 
             return {
                 id: goal.id,
-                title:
-                    habit?.name ??
-                    goal.habitId,
+                title: habit?.name || "Unknown Habit",
                 progress: Math.min(
                     Math.max(
-                        goal.progress
-                            .progressPercent,
+                        goal.progress.progressPercent,
                         0,
                     ),
                     100,
