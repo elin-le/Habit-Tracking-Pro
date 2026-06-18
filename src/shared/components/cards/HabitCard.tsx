@@ -232,7 +232,28 @@ export function HabitCard({
                 e.stopPropagation();
                 const next = Math.max(0, currentCount - 1);
                 upsertCheckIn(habit.id, today, next);
-                toast.error(`-1 ${habit.name}`, {description: `${next}/${targetPerDay} completed today`,});
+                toast.error(
+                  <div className="w-full text-left" style={{ minWidth: '220px', maxWidth: '100%' }}>
+                    <div className="flex justify-between items-center gap-2 w-full">
+                      <span className="font-bold text-slate-800 text-sm truncate flex-1">
+                        {habit.name}
+                      </span>
+                      <span className="font-bold text-red-600 text-sm shrink-0">
+                        {next}/{targetPerDay}
+                      </span>
+                    </div>
+
+                    <div 
+                      className="overflow-hidden rounded-full bg-slate-100 mt-2" 
+                      style={{ width: '100%', height: '8px' }}
+                    >
+                      <div
+                        className="h-full bg-red-500 rounded-full transition-all duration-300"
+                        style={{ width: `${Math.min((next / targetPerDay) * 100, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                );
                 //onUpdate();
               }}
             >
@@ -260,8 +281,32 @@ export function HabitCard({
                   Number(targetPerDay) || 1,
                 );
                 upsertCheckIn(habit.id, today, next);
-                toast.success(`+1 ${habit.name}`, {description: `${next}/${targetPerDay} completed today`,});
+                //toast.success(`+1 ${habit.name}`, {description: `${next}/${targetPerDay} completed today`,});
                 // onUpdate();
+                toast.success(
+                  <div className="w-full text-left" style={{ minWidth: '220px', maxWidth: '100%' }}>
+                    {/* Dòng 1: Tên và Chỉ số tách biệt hoàn toàn */}
+                    <div className="flex justify-between items-center gap-2 w-full">
+                      <span className="font-bold text-slate-800 text-sm truncate flex-1">
+                        {habit.name}
+                      </span>
+                      <span className="font-bold text-green-600 text-sm shrink-0">
+                        {next}/{targetPerDay}
+                      </span>
+                    </div>
+
+                    <div 
+                      className="overflow-hidden rounded-full bg-slate-100 mt-2" 
+                      style={{ width: '100%', height: '8px' }}
+                    >
+                      <div
+                        className="h-full bg-green-500 rounded-full transition-all duration-300"
+                        style={{ width: `${Math.min((next / targetPerDay) * 100, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+
               }}
             >
               <Plus size={13} />
