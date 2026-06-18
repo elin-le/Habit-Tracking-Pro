@@ -5,19 +5,14 @@ import HabitStatistics from "../features/dashboard/components/HabitStatistics";
 import CategoryOverview from "../features/dashboard/components/CategoryOverview";
 import GoalProgress from "../features/dashboard/components/GoalProgress";
 import { getDashboardData } from "../features/dashboard/services/DashboardService";
-
 import "../features/dashboard/Dashboard.css";
-
 import { HeatMap } from "@/shared/components/heatmap/HeatMap";
 import { buildHeatMapData } from "@/shared/components/heatmap/heatmap.util";
-
 import type { CheckIn } from "@/shared/types/CheckIn";
 import type { Habit } from "@/shared/types/Habit";
 import type { User } from "@/shared/types/User";
-
 import { STORAGE_KEY } from "@/shared/constants/appConstants";
 import { ROUTES } from "@/shared/constants/appConstants";
-
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 

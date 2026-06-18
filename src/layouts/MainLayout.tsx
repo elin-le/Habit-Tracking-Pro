@@ -1,5 +1,5 @@
 // MainLayout.tsx
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { useState, useContext, useEffect } from "react";
 import SideBar from "./components/SideBar";
 import Header from "./components/Header";
@@ -8,13 +8,12 @@ import { useTranslation } from "react-i18next";
 import { useHabitSchedule } from "../shared/hooks/useHabitSchedule";
 import { useHabits } from "../shared/hooks/useHabit";
 import { useCategories } from "@/shared/hooks/useCategory";
-import { ROUTES, STORAGE_KEY } from "@/shared/constants/appConstants";
+import { STORAGE_KEY } from "@/shared/constants/appConstants";
 import type { User } from "@/shared/types/User";
 import { useGoals } from "@/shared/hooks/useGoals";
 import { useCheckIns } from "@/shared/hooks/useCheckIns";
 import { NotificationContext } from "../features/notifications/context/NotificationContext";
 import { getCurrentStreak, getStreakProgress, getTotalCompletionProgress } from "../features/habit/calculators/GoalCalculator";
-
 
 export default function MainLayout() {
   const currentUser = JSON.parse(localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "{}") as User
