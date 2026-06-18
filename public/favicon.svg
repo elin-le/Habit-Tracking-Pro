@@ -1,46 +1,32 @@
-<svg width="512" height="512" viewBox="0 0 512 512" role="img" xmlns="http://www.w3.org/2000/svg">
-  <title>Habit Track App Icon</title>
-  <desc>Logo icon ứng dụng Habit Track, tông màu tím</desc>
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
 
-  <!-- Shadow -->
-  <rect fill="#1a1740" x="24" y="32" width="464" height="464" rx="116" opacity="0.35"/>
+    <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#7B42F6"></stop>
+            <stop offset="100%" stop-color="#5A22CC"></stop>
+        </linearGradient>
+    </defs>
 
-  <!-- Main background -->
-  <rect fill="#534AB7" x="16" y="16" width="480" height="480" rx="112"/>
+    <!-- Background -->
+    <rect width="512" height="512" rx="110" fill="url(#bg)"></rect>
 
-  <!-- Inner top overlay -->
-  <rect fill="#3C3489" x="16" y="16" width="480" height="240" rx="112" opacity="0.3"/>
+    <!-- Icon -->
+    <g fill="none" stroke="#FFFFFF" stroke-width="18" stroke-linecap="round" stroke-linejoin="round">
 
-  <!-- Outer ring track -->
-  <circle stroke="#CECBF6" cx="256" cy="256" r="160" fill="none" stroke-width="16" opacity="0.3"/>
+        <!-- Top Left -->
+        <rect x="152" y="136" width="80" height="80" rx="14"></rect>
 
-  <!-- Progress arc ~78% -->
-  <circle stroke="#EEEDFE" cx="256" cy="256" r="160"
-    fill="none"
-    stroke-width="16"
-    stroke-linecap="round"
-    stroke-dasharray="785 222"
-    stroke-dashoffset="0"
-    transform="rotate(-90 256 256)"/>
+        <!-- Top Right -->
+        <rect x="280" y="136" width="80" height="80" rx="14"></rect>
 
-  <!-- Center subtle circle -->
-  <circle cx="256" cy="256" r="88" fill="#EEEDFE" opacity="0.08"/>
+        <!-- Bottom Left -->
+        <rect x="152" y="264" width="80" height="80" rx="14"></rect>
 
-  <!-- Checkmark -->
-  <path stroke="#EEEDFE"
-    d="M192 256 L236 302 L324 208"
-    fill="none"
-    stroke-width="20"
-    stroke-linecap="round"
-    stroke-linejoin="round"/>
+        <!-- Check -->
+        <path d="M286 301
+               L318 333
+               L374 270"></path>
+    </g>
 
-  <!-- Spark top-right -->
-  <polygon fill="#EF9F27"
-    points="400,80  406,100  426,106  406,112  400,132  394,112  374,106  394,100"
-    opacity="0.95"/>
-
-  <!-- Spark bottom-left small -->
-  <polygon fill="#EF9F27"
-    points="118,378  122,390  134,394  122,398  118,410  114,398  102,394  114,390"
-    opacity="0.75"/>
 </svg>
