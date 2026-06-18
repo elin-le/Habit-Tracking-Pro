@@ -374,15 +374,15 @@ export function getDashboardData(
     let goals: GoalWithDerived[] = [];
 
     try {
-        goals =
-            getAllGoalsWithProgress()
-                .filter((goal) =>
-                    habits.some(
-                        (habit) =>
-                            habit.id ===
-                            goal.habitId,
-                    ),
-                );
+        goals = getAllGoalsWithProgress(
+            habits,
+            checkIns,
+        ).filter((goal) =>
+            habits.some(
+                (habit) =>
+                    habit.id === goal.habitId,
+            ),
+        );
     } catch {
         goals = [];
     }
@@ -395,7 +395,6 @@ export function getDashboardData(
         selectedCategory,
     );
 }
-
 function readCheckInsByHabits(
     habits: Habit[],
 ): CheckIn[] {
