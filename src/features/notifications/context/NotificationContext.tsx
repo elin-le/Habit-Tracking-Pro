@@ -7,6 +7,13 @@ import { ToastService } from '../../../routes/services/toastService';
 
 export const NotificationContext = createContext<any>(null);
 
+const generateUUID = () => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+};
+
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const { t } = useTranslation();
@@ -20,7 +27,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     relatedEntityType: AppNotification['relatedEntityType']
   ) => {
     const newNotif: AppNotification = {
-      id: `notif-${crypto.randomUUID()}`,
+      id: `notif-${generateUUID()}`,
       title: titleKey,
       message: messageKey,
       type,

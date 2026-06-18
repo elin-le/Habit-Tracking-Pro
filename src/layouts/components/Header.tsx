@@ -10,6 +10,8 @@ import type { Category } from "../../shared/types/Category"
 import type { User } from "../../shared/types/User"
 import { STORAGE_KEY } from "../../shared/constants/appConstants"
 import SettingsPopover from "./SettingsPopover"
+import { NotificationTime } from "../../features/notifications/component/NotificationTime"
+
 
 
 interface HeaderProps {
@@ -399,7 +401,7 @@ export default function Header({
                               }) as string}
                             </p>
                             <span className={`text-[12px] mt-1 block`} style={timeStyle}>
-                              {new Date(notif.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              <NotificationTime createdAt={notif.createdAt || new Date().toISOString()} />
                             </span>
                           </div>
                           {/* Chấm tròn xanh (Chưa đọc) */}
