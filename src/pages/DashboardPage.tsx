@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-
 import SummaryCard from "../features/dashboard/components/SummaryCard";
 import HabitStatistics from "../features/dashboard/components/HabitStatistics";
 import CategoryOverview from "../features/dashboard/components/CategoryOverview";
@@ -14,7 +13,7 @@ import type { User } from "@/shared/types/User";
 import { STORAGE_KEY } from "@/shared/constants/appConstants";
 import { ROUTES } from "@/shared/constants/appConstants";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation } from "react-router-dom";
 
 const DashboardPage = () => {
     const [selectedCategory] =
@@ -22,7 +21,7 @@ const DashboardPage = () => {
 
     const { t } = useTranslation();
     const navigate = useNavigate();
-
+    const location = useLocation();
     const currentUser: User | null =
         JSON.parse(
             localStorage.getItem(
@@ -41,8 +40,12 @@ const DashboardPage = () => {
      * Nếu có user được search thì lấy user đó
      * Không có thì lấy current user
      */
+    const searchedUserId =
+        location.state?.userId;
+
     const dashboardUserId =
-        currentUser?.id;
+        searchedUserId ||
+        currentUser?.phone;
 
     const {
         summaryCards,

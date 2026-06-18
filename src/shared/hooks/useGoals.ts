@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import type { Goal, GoalWithDerived } from "../types/Goal";
+import type { Habit } from "../types/Habit";
+import type { CheckIn } from "../types/CheckIn";
 import {
   getAllGoalsWithProgress,
   createGoal as serviceCreateGoal,
@@ -16,7 +18,7 @@ export type StatusFilter =
   | "NEAR_COMPLETION";
 export type TypeFilter = "ALL" | "STREAK" | "TOTAL_COMPLETIONS";
 
-export const useGoals = () => {
+export const useGoals = (userHabits: Habit[] = [], checkIns: CheckIn[] = []) => {
   const [goals, setGoals] = useState<GoalWithDerived[]>([]);
 
   const [statusFilters, setStatusFilters] = useState<StatusFilter[]>(["ALL"]);
@@ -61,8 +63,8 @@ export const useGoals = () => {
 
   // hàm load lại dữ liệu
   const refreshGoals = useCallback(() => {
-    setGoals(getAllGoalsWithProgress());
-  }, []);
+    setGoals(getAllGoalsWithProgress(userHabits, checkIns));
+  }, [userHabits, checkIns]);
 
   //tự động load lần đầu khi mở app
   useEffect(() => {
@@ -109,7 +111,7 @@ export const useGoals = () => {
 
   // các hàm CRUD, gọi xong tự động refresh lại màn hình
   const createGoal = (goalData: Omit<Goal, "id">) => {
-    const newGoal = serviceCreateGoal(goalData);
+    const newGoal = serviceCreateGoal(goalData, userHabits, checkIns);
     refreshGoals();
     return newGoal;
   };

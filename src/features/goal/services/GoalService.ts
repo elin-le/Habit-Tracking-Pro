@@ -1,20 +1,33 @@
-import type { Goal, GoalWithDerived } from "../../../shared/types/Goal";
+import type { Goal, GoalDerived, GoalWithDerived } from "../../../shared/types/Goal";
 import { STORAGE_KEY } from "../../../shared/constants/appConstants";
 import { calculateMilestones } from "../calculators/MilestoneCalculator";
 import type { Habit } from "../../../shared/types/Habit";
 import { getCurrentStreakInRange, getTotalCompletion, getLongestStreak, getCompletionRate, getDailySummary } from "../../habit/calculators/GoalCalculator";
 import type { CheckIn } from "../../../shared/types/CheckIn";
 
-export const getGoals = (): Goal[] => {
+// Hàm lấy tất cả goals
+const getAllGoals = (): Goal[] => {
     try {
-        const data = localStorage.getItem(STORAGE_KEY.USER_GOALS);
-        return data ? JSON.parse(data) : [];
+        return JSON.parse(localStorage.getItem(STORAGE_KEY.USER_GOALS) || "[]");
+    } catch (error) {
+        console.error("Failed to parse goals", error);
+        return [] as Goal[];
+    }
+}
+
+// Hàm lấy goals của user hiện tại dựa vào habitIds
+export const getGoals = (userHabitIds: string[]): Goal[] => {
+    try {
+        const allGoals : Goal[] = getAllGoals();
+        // lọc ra goal của user hiện tại
+        return allGoals.filter((goal : Goal) => userHabitIds.includes(goal.habitId));
     } catch (e) {
         console.error("Failed to parse goals", e);
         return [];
     }
 };
 
+// Hàm lưu tất cả goals
 export const setGoals = (goals: Goal[]): void => {
     try {
         localStorage.setItem(STORAGE_KEY.USER_GOALS, JSON.stringify(goals))
@@ -23,47 +36,51 @@ export const setGoals = (goals: Goal[]): void => {
     }
 };
 
-export const getGoalById = (id: string): Goal | undefined => {
-    return getGoals().find(g => g.id === id);
+// Hàm lấy goal theo id của goal và habit
+export const getGoalById = (id: string, userHabitIds: string[]): Goal | undefined => {
+    return getGoals(userHabitIds).find(g => g.id === id);
 };
 
-export const createGoal = (goalData: Omit<Goal, 'id'>): Goal => {
-    const goals = getGoals();
-    const allCheckIns: CheckIn[] = JSON.parse(localStorage.getItem(STORAGE_KEY.USER_CHECKINS) || "[]");
-    const allHabits: Habit[] = JSON.parse(localStorage.getItem(STORAGE_KEY.USER_HABITS) || "[]");
-    const habit = allHabits.find(h => h.id === goalData.habitId);
-    const targetPerDay = habit ? habit.targetPerDay : 1;
+// Hàm tạo goal mới
+export const createGoal = (goalData: Omit<Goal, 'id'>, userHabits: Habit[], checkIns: CheckIn[]): Goal => {
+    const allGoals = getAllGoals();
+    
+    const habit = userHabits.find(h => h.id === goalData.habitId);
+    const targetPerDay = Number(habit?.targetPerDay || 1);
 
     // validate mỗi habit chỉ có 1 goal đang thực hiện
-    validateNoActiveGoalForHabit(goalData.habitId, goals, allCheckIns, targetPerDay);
+    validateNoActiveGoalForHabit(goalData.habitId, allGoals, checkIns, targetPerDay);
 
     const newGoal: Goal = {
         ...goalData,
-        id: `goal-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 9)}`,
+        id: crypto.randomUUID(),
     };
 
-    goals.push(newGoal);
-    setGoals(goals);
+    allGoals.push(newGoal);
+    setGoals(allGoals);
     return newGoal;
 };
 
+// Hàm update goal
 export const updateGoal = (id: string, goalData: Partial<Goal>): Goal | undefined => {
-    const goals = getGoals();
-    const index = goals.findIndex(g => g.id === id);
+    const allGoals = getAllGoals();
+    const index = allGoals.findIndex(g => g.id === id);
     if (index === -1) return undefined;
 
-    goals[index] = { ...goals[index], ...goalData };
-    setGoals(goals);
-    return goals[index];
+    allGoals[index] = { ...allGoals[index], ...goalData };
+    setGoals(allGoals);
+    return allGoals[index];
 };
 
+// Hàm delete goal
 export const deleteGoal = (id: string): void => {
-    const goals = getGoals();
-    const newGoals = goals.filter(g => g.id !== id);
+    const allGoals = getAllGoals();
+    const newGoals = allGoals.filter(g => g.id !== id);
     setGoals(newGoals);
 }
 
-export const calculateGoalProgress = (goal: Goal, checkins: CheckIn[], targetPerDay: number): GoalWithDerived => {
+// Hàm tính goal progress (bao gồm currentProgress, %, status) và danh sách các milestone của goal này
+export const calculateCoreGoalProgress = (goal: Goal, checkins: CheckIn[], targetPerDay: number): GoalDerived => {
     let currentProgress = 0;
 
     if (goal.targetType === 'STREAK') {
@@ -85,15 +102,27 @@ export const calculateGoalProgress = (goal: Goal, checkins: CheckIn[], targetPer
     }
 
     const milestones = calculateMilestones(goal.targetValue, progressPercent);
+
+    return {
+        currentProgress,
+        progressPercent,
+        status,
+        milestones
+    };
+};
+
+// Hàm tính goal stats (bao gồm bestStreak, completionRate) và weeklyHistory của goal đó
+export const calculateGoalStats = (goal: Goal, checkins: CheckIn[], targetPerDay:number) => {
     const bestStreak = getLongestStreak(checkins, targetPerDay);
     const completionRate = getCompletionRate(goal.startedDate, goal.endDate || new Date().toISOString(), checkins, targetPerDay);
     const summary = getDailySummary(checkins, targetPerDay);
     const weeklyHistory = [];
+    
     for (let i = 6; i >= 0; i--) {
         const d = new Date();
         d.setDate(d.getDate() - i);
         const dateKey = d.toISOString().split("T")[0];
-        
+            
         const dayStr = new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(d);
         weeklyHistory.push({
             day: dayStr,
@@ -102,23 +131,30 @@ export const calculateGoalProgress = (goal: Goal, checkins: CheckIn[], targetPer
     }
 
     return {
-        ...goal,
-        progress: {
-            currentProgress,
-            progressPercent,
-            status,
-            milestones
-        },
         stats: {
             bestStreak,
             completionRate
         },
         weeklyHistory
     };
+}
+
+// Hàm tính toàn bộ dữ liệu liên quan đến goal
+export const calculateGoalProgress = (goal: Goal, checkins: CheckIn[], targetPerDay: number) : GoalWithDerived => {
+    const progress = calculateCoreGoalProgress(goal, checkins, targetPerDay);
+    const stats = calculateGoalStats(goal, checkins, targetPerDay);
+
+    // trả về 1 goal có thêm progress và stats -> GoalWithDerived
+    return {
+        ...goal,
+        progress : progress,
+        ...stats
+    };
 };
 
-export const validateNoActiveGoalForHabit = (habitId: string, goasl: Goal[], checkins: CheckIn[], targetPerDay: number): void => {
-    const habitGoals = goasl.filter(g => g.habitId === habitId);
+// Hàm validate không cho phép habit có nhiều goal cùng thực hiện
+export const validateNoActiveGoalForHabit = (habitId: string, goals: Goal[], checkins: CheckIn[], targetPerDay: number): void => {
+    const habitGoals = goals.filter(g => g.habitId === habitId);
 
     for (const rawGoal of habitGoals) {
         const goalWithProgress = calculateGoalProgress(rawGoal, checkins, targetPerDay);
@@ -128,15 +164,15 @@ export const validateNoActiveGoalForHabit = (habitId: string, goasl: Goal[], che
     }
 }
 
+// Hàm lấy toàn bộ goal của user hiện tại kèm theo progress và stats
+export const getAllGoalsWithProgress = (userHabits: Habit[], checkIns: CheckIn[]): GoalWithDerived[] => {
+    const userHabitIds = userHabits.map(h => h.id);
+    const goals = getGoals(userHabitIds);
 
-export const getAllGoalsWithProgress = (): GoalWithDerived[] => {
-    const goals = getGoals();
-    const allCheckIns: CheckIn[] = JSON.parse(localStorage.getItem(STORAGE_KEY.USER_CHECKINS) || "[]");
-    const allHabits: Habit[] = JSON.parse(localStorage.getItem(STORAGE_KEY.USER_HABITS) || "[]");
-
+    // loop qua từng goal để tính progress và stats -> GoalWithDerived
     return goals.map(goal => {
-        const habit = allHabits.find(h => h.id === goal.habitId);
-        const targetPerDay = habit ? habit.targetPerDay : 1;
-        return calculateGoalProgress(goal, allCheckIns, targetPerDay);
+        const habit = userHabits.find(h => h.id === goal.habitId);
+        const targetPerDay = Number(habit?.targetPerDay || 1);
+        return calculateGoalProgress(goal, checkIns, targetPerDay);
     });
 };
