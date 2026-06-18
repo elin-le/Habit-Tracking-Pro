@@ -8,7 +8,7 @@ export const ROUTES = {
   NOTIFICATIONS: "/notifications",
   AUTH: "/auth",
   LOGIN: "/auth/login",
-  COMMUNITY: "/community"
+  COMMUNITY: "community"
 } as const;
 
 export const APP_NAME = "Habit Tracker Pro" as const;
