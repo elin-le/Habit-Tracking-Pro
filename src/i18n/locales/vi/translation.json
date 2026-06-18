@@ -307,7 +307,8 @@
     "no": "Không có lịch sử check-in.",
     "not_finished": "Chưa hoàn thành",
     "completed": "Đạt mục tiêu",
-    "days": "Ngày"
+    "days": "Ngày",
+    "toast_update": "Đã thực hiện {{name}} {{count}} lần "
   },
   "setting": {
     "setting": "Cài đặt",
