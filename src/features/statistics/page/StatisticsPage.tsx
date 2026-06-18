@@ -26,9 +26,9 @@ import type { Goal } from "@/shared/types/Goal";
 import type { CheckIn } from "@/shared/types/CheckIn";
 import { exportJson } from "@/shared/utils/exportJson";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom"
-import type { User } from "@/shared/types/User"
-import { ROUTES, STORAGE_KEY } from "@/shared/constants/appConstants"
+import { useNavigate } from "react-router-dom";
+import type { User } from "@/shared/types/User";
+import { ROUTES, STORAGE_KEY } from "@/shared/constants/appConstants";
 
 type LayoutContext = {
   habits: Habit[];
@@ -41,14 +41,20 @@ const STATS_PER_PAGE = 6;
 export default function StatisticsPage() {
   const { t } = useTranslation();
   const { categories } = useCategories();
-  const navigate = useNavigate()
+  const { habits, goals, checkIns } = useOutletContext<LayoutContext>();
+  const navigate = useNavigate();
 
-  const currentUser: User | null =
-    JSON.parse(
-      localStorage.getItem(
-        STORAGE_KEY.CURRENT_USER
-      ) || "null"
-    );
+  // Guard: chưa đăng nhập thì đá về trang Auth (Đan yêu cầu để trong page)
+  const currentUser: User | null = JSON.parse(
+    localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "null"
+  );
+  useEffect(() => {
+    if (!currentUser) navigate(ROUTES.AUTH, { replace: true });
+  }, []);
+
+  // Thống kê tính TỪ outlet context (cùng nguồn Goal/Dashboard) -> đồng bộ
+  const stats = useHabitStats(habits, checkIns, categories);
+
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
   const [filterPriority, setFilterPriority] = useState<Priority | null>(null);
   const [showFilter, setShowFilter] = useState(false);
@@ -100,12 +106,6 @@ export default function StatisticsPage() {
       </div>
     );
   }
-
-  useEffect(() => {
-    if (!currentUser) {
-      navigate(ROUTES.AUTH);
-    }
-  }, [])
 
   return (
     <div className="flex flex-col gap-6 pb-24 md:pb-8 text-[var(--text)]">
