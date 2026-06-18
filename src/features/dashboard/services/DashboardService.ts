@@ -3,17 +3,20 @@ import type { Habit } from "../../../shared/types/Habit";
 import type { CheckIn } from "../../../shared/types/CheckIn";
 import type { Category } from "../../../shared/types/Category";
 import type { GoalWithDerived } from "../../../shared/types/Goal";
+
 import {
     getCurrentStreak,
     getLongestStreak,
 } from "../../habit/calculators/GoalCalculator";
+
 import { getAllGoalsWithProgress } from "../../goal/services/GoalService";
+
 import type {
     SummaryCardType,
     HabitStatisticsType,
     CategoryOverviewType,
     GoalProgressType,
-} from "../Dashboard.type";
+} from "../../../shared/types/Dashboard";
 
 export type DashboardData = {
     summaryCards: SummaryCardType[];
@@ -22,15 +25,34 @@ export type DashboardData = {
     goalProgress: GoalProgressType[];
 };
 
-const DAY_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const DAY_SHORT = [
+    "Sun",
+    "Mon",
+    "Tue",
+    "Wed",
+    "Thu",
+    "Fri",
+    "Sat",
+];
 
 function getDateKey(date: Date): string {
-    return date.toISOString().split("T")[0];
+    const year = date.getFullYear();
+    const month = String(
+        date.getMonth() + 1,
+    ).padStart(2, "0");
+    const day = String(
+        date.getDate(),
+    ).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
 }
 
 function readHabits(): Habit[] {
     try {
-        const raw = localStorage.getItem(STORAGE_KEY.USER_HABITS);
+        const raw = localStorage.getItem(
+            STORAGE_KEY.USER_HABITS,
+        );
+
         return raw ? JSON.parse(raw) : [];
     } catch {
         return [];
@@ -39,7 +61,10 @@ function readHabits(): Habit[] {
 
 function readCheckIns(): CheckIn[] {
     try {
-        const raw = localStorage.getItem(STORAGE_KEY.USER_CHECKINS);
+        const raw = localStorage.getItem(
+            STORAGE_KEY.USER_CHECKINS,
+        );
+
         return raw ? JSON.parse(raw) : [];
     } catch {
         return [];
@@ -48,15 +73,22 @@ function readCheckIns(): CheckIn[] {
 
 function readCategories(): Category[] {
     try {
-        const raw = localStorage.getItem(STORAGE_KEY.CATEGORYS);
+        const raw = localStorage.getItem(
+            STORAGE_KEY.CATEGORYS,
+        );
+
         return raw ? JSON.parse(raw) : [];
     } catch {
         return [];
     }
 }
 
-function getActiveHabits(habits: Habit[]): Habit[] {
-    return habits.filter((habit) => habit.status === "ACTIVE");
+function getActiveHabits(
+    habits: Habit[],
+): Habit[] {
+    return habits.filter(
+        (habit) => habit.status === "ACTIVE",
+    );
 }
 
 function isHabitCompletedOnDate(
@@ -65,61 +97,76 @@ function isHabitCompletedOnDate(
     dateKey: string,
 ): boolean {
     const checkIn = checkIns.find(
-        (c) => c.habitId === habit.id && c.checkedAt === dateKey,
+        (c) =>
+            c.habitId === habit.id &&
+            c.checkedAt === dateKey,
     );
 
-    return (checkIn?.completionCount ?? 0) >= habit.targetPerDay;
+    const target =
+        typeof habit.targetPerDay === "number"
+            ? habit.targetPerDay
+            : 0;
+
+    return (
+        (checkIn?.completionCount ?? 0) >= target
+    );
 }
 
-// function getHabitWeeklyCompletionRate(
-//     habit: Habit,
-//     checkIns: CheckIn[],
-// ): number {
-//     let completed = 0;
-
-//     for (let i = 0; i < 7; i++) {
-//         const date = new Date();
-//         date.setDate(date.getDate() - i);
-
-//         if (isHabitCompletedOnDate(habit, checkIns, getDateKey(date))) {
-//             completed++;
-//         }
-//     }
-
-//     return Math.round((completed / 7) * 100);
-// }
-
 function buildSummaryCards(
+    habits: Habit[],
     activeHabits: Habit[],
     checkIns: CheckIn[],
 ): SummaryCardType[] {
     const todayKey = getDateKey(new Date());
 
-    const completedToday = activeHabits.filter((habit) =>
-        isHabitCompletedOnDate(habit, checkIns, todayKey),
+    const completedToday = activeHabits.filter(
+        (habit) =>
+            isHabitCompletedOnDate(
+                habit,
+                checkIns,
+                todayKey,
+            ),
     ).length;
 
-    const currentStreak = activeHabits.reduce((max, habit) => {
-        const habitCheckIns = checkIns.filter(
-            (checkIn) => checkIn.habitId === habit.id,
-        );
+    const currentStreak = activeHabits.reduce(
+        (max, habit) => {
+            const habitCheckIns =
+                checkIns.filter(
+                    (checkIn) =>
+                        checkIn.habitId ===
+                        habit.id,
+                );
 
-        return Math.max(
-            max,
-            getCurrentStreak(habitCheckIns, habit.targetPerDay),
-        );
-    }, 0);
+            return Math.max(
+                max,
+                getCurrentStreak(
+                    habitCheckIns,
+                    Number(habit.targetPerDay) || 1,
+                ),
+            );
+        },
+        0,
+    );
 
-    const longestStreak = activeHabits.reduce((max, habit) => {
-        const habitCheckIns = checkIns.filter(
-            (checkIn) => checkIn.habitId === habit.id,
-        );
+    const longestStreak = activeHabits.reduce(
+        (max, habit) => {
+            const habitCheckIns =
+                checkIns.filter(
+                    (checkIn) =>
+                        checkIn.habitId ===
+                        habit.id,
+                );
 
-        return Math.max(
-            max,
-            getLongestStreak(habitCheckIns, habit.targetPerDay),
-        );
-    }, 0);
+            return Math.max(
+                max,
+                getLongestStreak(
+                    habitCheckIns,
+                    Number(habit.targetPerDay) || 1,
+                ),
+            );
+        },
+        0,
+    );
 
     return [
         {
@@ -161,18 +208,28 @@ function buildHabitStatistics(
 
     for (let i = 6; i >= 0; i--) {
         const date = new Date();
-        date.setDate(date.getDate() - i);
+
+        date.setDate(
+            date.getDate() - i,
+        );
 
         const dateKey = getDateKey(date);
 
-        const completed = activeHabits.filter((habit) =>
-            isHabitCompletedOnDate(habit, checkIns, dateKey),
-        ).length;
+        const completed =
+            activeHabits.filter((habit) =>
+                isHabitCompletedOnDate(
+                    habit,
+                    checkIns,
+                    dateKey,
+                ),
+            ).length;
 
         stats.push({
             day: DAY_SHORT[date.getDay()],
             rate: Math.round(
-                (completed / activeHabits.length) * 100,
+                (completed /
+                    activeHabits.length) *
+                    100,
             ),
         });
     }
@@ -186,9 +243,12 @@ function buildCategoryOverview(
 ): CategoryOverviewType[] {
     return categories
         .map((category) => {
-            const habitCount = activeHabits.filter(
-                (habit) => habit.categoryId === category.id,
-            ).length;
+            const habitCount =
+                activeHabits.filter(
+                    (habit) =>
+                        habit.categoryId ===
+                        category.id,
+                ).length;
 
             return {
                 id: category.id,
@@ -196,7 +256,10 @@ function buildCategoryOverview(
                 progress: habitCount,
             };
         })
-        .filter((category) => category.progress > 0);
+        .filter(
+            (category) =>
+                category.progress > 0,
+        );
 }
 
 function buildGoalProgress(
@@ -204,17 +267,30 @@ function buildGoalProgress(
     habits: Habit[],
 ): GoalProgressType[] {
     return goals
-        .filter((goal) => goal.progress.status !== "COMPLETED")
-        .slice(0, 6)
+        .filter(
+            (goal) =>
+                goal.progress.status !==
+                "COMPLETED",
+        )
         .map((goal) => {
             const habit = habits.find(
-                (item) => item.id === goal.habitId,
+                (item) =>
+                    item.id === goal.habitId,
             );
 
             return {
                 id: goal.id,
-                title: habit?.name ?? goal.habitId,
-                progress: goal.progress.progressPercent,
+                title:
+                    habit?.name ??
+                    goal.habitId,
+                progress: Math.min(
+                    Math.max(
+                        goal.progress
+                            .progressPercent,
+                        0,
+                    ),
+                    100,
+                ),
             };
         });
 }
@@ -226,14 +302,16 @@ export function computeDashboardData(
     categories: Category[],
     selectedCategory?: string,
 ): DashboardData {
-    const activeHabits = getActiveHabits(habits);
+    const activeHabits =
+        getActiveHabits(habits);
 
     const filteredHabits =
         selectedCategory &&
         selectedCategory !== "ALL"
             ? activeHabits.filter(
                   (habit) =>
-                      habit.categoryId === selectedCategory,
+                      habit.categoryId ===
+                      selectedCategory,
               )
             : activeHabits;
 
@@ -242,31 +320,38 @@ export function computeDashboardData(
         selectedCategory !== "ALL"
             ? goals.filter((goal) =>
                   filteredHabits.some(
-                      (habit) => habit.id === goal.habitId,
+                      (habit) =>
+                          habit.id ===
+                          goal.habitId,
                   ),
               )
             : goals;
 
     return {
-        summaryCards: buildSummaryCards(
-            filteredHabits,
-            checkIns,
-        ),
+        summaryCards:
+            buildSummaryCards(
+                habits,
+                filteredHabits,
+                checkIns,
+            ),
 
-        habitStatistics: buildHabitStatistics(
-            filteredHabits,
-            checkIns,
-        ),
+        habitStatistics:
+            buildHabitStatistics(
+                filteredHabits,
+                checkIns,
+            ),
 
-        categoryOverview: buildCategoryOverview(
-            activeHabits,
-            categories,
-        ),
+        categoryOverview:
+            buildCategoryOverview(
+                activeHabits,
+                categories,
+            ),
 
-        goalProgress: buildGoalProgress(
-            filteredGoals,
-            habits,
-        ),
+        goalProgress:
+            buildGoalProgress(
+                filteredGoals,
+                habits,
+            ),
     };
 }
 
@@ -275,8 +360,17 @@ export function getDashboardData(
 ): DashboardData {
     const habits = readHabits();
     const checkIns = readCheckIns();
-    const categories = readCategories();
-    const goals = getAllGoalsWithProgress();
+    const categories =
+        readCategories();
+
+    let goals: GoalWithDerived[] = [];
+
+    try {
+        goals =
+            getAllGoalsWithProgress();
+    } catch {
+        goals = [];
+    }
 
     return computeDashboardData(
         habits,

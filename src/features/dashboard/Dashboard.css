@@ -24,14 +24,11 @@
 }
 
 .summary-card {
-    background: var(--surface-color);
-    border: 2px solid rgba(124, 58, 237, 0.15);
-    border-radius: 20px;
-    padding: 1rem;
-    min-height: 100px;
+    min-height: 110px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    text-align: center;
 }
 
 .summary-card__label {
@@ -41,7 +38,7 @@
 
 .summary-card__value {
     margin-top: 0.5rem;
-    font-size: 2rem;
+    font-size: clamp(1.5rem, 3vw, 2rem);
     font-weight: 700;
     color: var(--text-primary);
 }
@@ -63,40 +60,31 @@
 .dashboard-card {
     background: var(--surface-color);
     color: var(--text-primary);
-
     border: 2px solid rgba(124, 58, 237, 0.15);
     border-radius: 20px;
-
     padding: 1.5rem;
-
     box-shadow:
         0 4px 12px rgba(124, 58, 237, 0.05),
         0 12px 30px rgba(124, 58, 237, 0.05);
-
     transition:
-        transform 0.3s ease,
-        box-shadow 0.3s ease,
-        border-color 0.3s ease;
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
 }
 
 .dashboard-card:hover {
     transform: translateY(-4px);
-
-    border-color: rgba(168, 85, 247, 0.4);
-
+    border-color: rgba(168, 85, 247, 0.35);
     box-shadow:
         0 8px 20px rgba(124, 58, 237, 0.15),
-        0 16px 40px rgba(124, 58, 237, 0.1);
+        0 16px 40px rgba(124, 58, 237, 0.08);
 }
 
 .dashboard-card__title {
     margin-bottom: 1rem;
-
     font-size: 1rem;
     font-weight: 600;
-
     color: #64748b;
-
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -116,21 +104,19 @@
 .dashboard-progress {
     width: 100%;
     height: 10px;
+    overflow: hidden;
     background: #e2e8f0;
     border-radius: 9999px;
-    overflow: hidden;
 }
 
 .dashboard-progress__fill {
     height: 100%;
     border-radius: inherit;
-
     background: linear-gradient(
         90deg,
         #7c3aed,
         #a855f7
     );
-
     transition: width 0.4s ease;
 }
 
@@ -141,12 +127,12 @@
 .category-overview {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1.5rem;
 }
 
 .category-chart {
     width: 100%;
-    height: 260px;
+    height: clamp(220px, 30vw, 300px);
 }
 
 .category-legend {
@@ -159,13 +145,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
+    gap: 1rem;
 }
 
 .category-legend__left {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    min-width: 0;
 }
 
 .category-legend__dot {
@@ -176,23 +163,26 @@
 }
 
 .category-legend__label {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     font-size: 0.95rem;
     color: var(--text-primary);
 }
 
 .category-legend__value {
-    margin-left: auto;
+    flex-shrink: 0;
     font-weight: 600;
     color: var(--text-primary);
 }
 
 /* ==========================================
-   COMPLETION RATE CHART
+   HABIT STATISTICS
 ========================================== */
 
 .completion-chart {
     width: 100%;
-    height: 390px;
+    height: clamp(260px, 35vw, 390px);
 }
 
 /* ==========================================
@@ -206,27 +196,43 @@
 
 .goal-card {
     padding: 1rem;
-
     border-radius: 16px;
-
     background: rgba(124, 58, 237, 0.04);
     border: 1px solid rgba(124, 58, 237, 0.12);
 }
 
 .goal-card__title {
     margin-bottom: 0.75rem;
-
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     font-size: 0.875rem;
     color: #64748b;
 }
 
 .goal-card__value {
     margin-bottom: 0.75rem;
-
     font-size: 1.5rem;
     font-weight: 700;
-
     color: var(--text-primary);
+}
+
+.goal-toggle-btn {
+    width: 100%;
+    margin-top: 1rem;
+    border: none;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    background: rgba(124, 58, 237, 0.08);
+    color: #7c3aed;
+    transition: all 0.25s ease;
+}
+
+.goal-toggle-btn:hover {
+    background: rgba(124, 58, 237, 0.15);
 }
 
 /* ==========================================
@@ -236,6 +242,7 @@
 @media (max-width: 767px) {
     .dashboard-page {
         padding: 1rem;
+        gap: 1rem;
     }
 
     .summary-grid {
@@ -248,6 +255,35 @@
 
     .goal-grid {
         grid-template-columns: 1fr;
+    }
+
+    .dashboard-card {
+        padding: 1rem;
+    }
+
+    .dashboard-card:hover {
+        transform: none;
+    }
+
+    .dashboard-card__title {
+        font-size: 0.875rem;
+    }
+
+    .category-chart {
+        height: 220px;
+    }
+
+    .completion-chart {
+        height: 260px;
+    }
+
+    .category-legend__label,
+    .category-legend__value {
+        font-size: 0.8rem;
+    }
+
+    .summary-card__value {
+        font-size: 1.4rem;
     }
 }
 
@@ -270,10 +306,6 @@
 
     .dashboard-grid__statistics {
         grid-column: span 7;
-    }
-
-    .dashboard-grid__goals {
-        grid-column: span 12;
     }
 
     .goal-grid {
@@ -300,10 +332,6 @@
 
     .dashboard-grid__statistics {
         grid-column: span 8;
-    }
-
-    .dashboard-grid__goals {
-        grid-column: span 12;
     }
 
     .goal-grid {
