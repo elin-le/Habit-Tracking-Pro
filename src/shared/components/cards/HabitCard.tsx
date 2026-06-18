@@ -232,9 +232,7 @@ export function HabitCard({
                 e.stopPropagation();
                 const next = Math.max(0, currentCount - 1);
                 upsertCheckIn(habit.id, today, next);
-                toast.success(
-                  t("checkin.toast_update", { name: habit.name, count: next }),
-                );
+                toast.error(`-1 ${habit.name}`, {description: `${next}/${targetPerDay} completed today`,});
                 //onUpdate();
               }}
             >
@@ -262,9 +260,7 @@ export function HabitCard({
                   Number(targetPerDay) || 1,
                 );
                 upsertCheckIn(habit.id, today, next);
-                toast.success(
-                  t("checkin.toast_update", { name: habit.name, count: next }),
-                );
+                toast.success(`+1 ${habit.name}`, {description: `${next}/${targetPerDay} completed today`,});
                 // onUpdate();
               }}
             >
