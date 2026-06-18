@@ -1,4 +1,3 @@
-import { STORAGE_KEY } from "../../../shared/constants/appConstants";
 import type { Habit } from "../../../shared/types/Habit";
 import type { CheckIn } from "../../../shared/types/CheckIn";
 import type { Category } from "../../../shared/types/Category";
@@ -10,20 +9,9 @@ import {
 } from "../../habit/calculators/GoalCalculator";
 import { getHabitRisk } from "../../habit/calculators/riskDetector";
 
-const readList = <T>(key: string): T[] => {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T[]) : [];
-  } catch (e) {
-    console.error("Failed to parse", key, e);
-    return [];
-  }
-};
-
 const pad = (n: number) => String(n).padStart(2, "0");
 const toKey = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
-// 7 ngày gần nhất (cũ → mới), dạng "YYYY-MM-DD"
 const last7DateKeys = (): string[] => {
   const out: string[] = [];
   const today = new Date();
@@ -35,7 +23,6 @@ const last7DateKeys = (): string[] => {
   return out;
 };
 
-// 1 ngày xem là hoàn thành nếu đủ target (giống DashboardService.isHabitCompletedOnDate)
 const isCompletedOnDate = (
   habitCheckIns: CheckIn[],
   target: number,
@@ -50,10 +37,11 @@ const deriveHabitStat = (
   allCheckIns: CheckIn[],
   categories: Category[]
 ): HabitStat => {
-  const target = Math.max(1, habit.targetPerDay);
+  // targetPerDay có thể là "" (form cho nhập rỗng) -> ép về số
+  const target = Math.max(1, Number(habit.targetPerDay) || 1);
   const habitCheckIns = allCheckIns.filter((c) => c.habitId === habit.id);
 
-  // streak — dùng engine của Đan (đã đọc completionCount)
+  // streak — dùng engine của Đan
   const currentStreak = getCurrentStreak(habitCheckIns, target);
   const longestStreak = getLongestStreak(habitCheckIns, target);
 
@@ -73,7 +61,10 @@ const deriveHabitStat = (
   ).length;
   const completionRate = Math.round((completedInLast7 / 7) * 100);
 
-  const riskLevel = getHabitRisk(completionRate); // engine của Đan
+  // "at risk" = có chuỗi nhưng hôm nay chưa hoàn thành 
+  const completedToday = isCompletedOnDate(habitCheckIns, target, toKey(new Date()));
+  const riskLevel = getHabitRisk(completionRate, currentStreak, completedToday);
+
   const category = categories.find((c) => c.id === habit.categoryId)?.name ?? "—";
 
   return {
@@ -91,13 +82,12 @@ const deriveHabitStat = (
   };
 };
 
-// đọc raw từ localStorage + suy ra thống kê (giống getAllGoalsWithProgress / getDashboardData)
-export const getHabitStats = (): HabitStat[] => {
-  const habits = readList<Habit>(STORAGE_KEY.USER_HABITS).filter(
-    (h) => h.status === "ACTIVE"
-  );
-  const checkIns = readList<CheckIn>(STORAGE_KEY.USER_CHECKINS);
-  const categories = readList<Category>(STORAGE_KEY.CATEGORYS);
-
-  return habits.map((h) => deriveHabitStat(h, checkIns, categories));
+export const getHabitStats = (
+  habits: Habit[],
+  checkIns: CheckIn[],
+  categories: Category[]
+): HabitStat[] => {
+  return habits
+    .filter((h) => h.status === "ACTIVE")
+    .map((h) => deriveHabitStat(h, checkIns, categories));
 };

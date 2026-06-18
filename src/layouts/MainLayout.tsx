@@ -1,5 +1,5 @@
 // MainLayout.tsx
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useState, useContext, useEffect } from "react";
 import SideBar from "./components/SideBar";
 import Header from "./components/Header";
@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 import { useHabitSchedule } from "../shared/hooks/useHabitSchedule";
 import { useHabits } from "../shared/hooks/useHabit";
 import { useCategories } from "@/shared/hooks/useCategory";
-import { STORAGE_KEY } from "@/shared/constants/appConstants";
+import { ROUTES, STORAGE_KEY } from "@/shared/constants/appConstants";
 import type { User } from "@/shared/types/User";
 import { useGoals } from "@/shared/hooks/useGoals";
 import { useCheckIns } from "@/shared/hooks/useCheckIns";
@@ -16,16 +16,23 @@ import { NotificationContext } from "../features/notifications/context/Notificat
 import { getCurrentStreak, getStreakProgress, getTotalCompletionProgress } from "../features/habit/calculators/GoalCalculator";
 
 export default function MainLayout() {
-  const currentUser = JSON.parse(
-    localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "{}",
-  ) as User;
+  const navigate = useNavigate();
+
+  // Chặn truy cập khi chưa đăng nhập (guard cho toàn bộ khu /dashboard)
+  const currentUser: User | null = JSON.parse(
+    localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "null",
+  );
+
+  useEffect(() => {
+    if (!currentUser) navigate(ROUTES.AUTH, { replace: true });
+  }, []);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const { t } = useTranslation();
 
-  const habitData = useHabits(currentUser.phone);
-  const habitSchedule = useHabitSchedule(currentUser.phone);
+  const habitData = useHabits(currentUser?.phone ?? "");
+  const habitSchedule = useHabitSchedule(currentUser?.phone ?? "");
   const categoryData = useCategories();
 
   const goalData = useGoals();
