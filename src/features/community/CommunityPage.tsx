@@ -6,7 +6,7 @@ import type { User } from "@/shared/types/User"
 import { STORAGE_KEY } from "@/shared/constants/appConstants"
 import { ROUTES } from "@/shared/constants/appConstants"
 import { useReadOnly } from "@/context/ReadOnlyContext"
-
+import DashboardPage from "@/pages/DashboardPage"
 /* ─────────────────────────────────────────
    Avatar with graceful fallback
 ───────────────────────────────────────── */
@@ -145,6 +145,7 @@ function EmptyState({ query }: { query: string }) {
    CommunityPage
 ───────────────────────────────────────── */
 const CommunityPage = () => {
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const users = JSON.parse(localStorage.getItem(STORAGE_KEY.USERS) || "[]") as User[]
     const currentUser: User | null =
         JSON.parse(
@@ -166,7 +167,8 @@ const CommunityPage = () => {
         : users
 
     const handleUserClick = (user: User) => {
-        setReadOnly(true)
+        setReadOnly(true);
+        setSelectedUser(user);
     }
 
     useEffect(() => {
@@ -174,7 +176,22 @@ const CommunityPage = () => {
             navigate(ROUTES.AUTH);
         }
     }, [])
+    if (selectedUser) {
+        return (
+            <>
+                <button
+                    onClick={() => {
+                        setSelectedUser(null);
+                        setReadOnly(false);
+                    }}
+                >
+                    Back
+                </button>
 
+                <DashboardPage userId={selectedUser.phone} />
+            </>
+        );
+    }
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
             <div className="max-w-5xl mx-auto px-4 pt-5 pb-10 sm:px-6 sm:pt-7">

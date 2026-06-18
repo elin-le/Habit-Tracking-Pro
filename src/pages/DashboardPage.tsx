@@ -13,15 +13,18 @@ import type { User } from "@/shared/types/User";
 import { STORAGE_KEY } from "@/shared/constants/appConstants";
 import { ROUTES } from "@/shared/constants/appConstants";
 import { useTranslation } from "react-i18next";
-import { useNavigate,useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
-const DashboardPage = () => {
+interface DashboardPageProps {
+    userId?: string;
+}
+const DashboardPage = ({ userId }: DashboardPageProps) => {
     const [selectedCategory] =
         useState("ALL");
 
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const location = useLocation();
+    // const location = useLocation();
     const currentUser: User | null =
         JSON.parse(
             localStorage.getItem(
@@ -40,8 +43,8 @@ const DashboardPage = () => {
      * Nếu có user được search thì lấy user đó
      * Không có thì lấy current user
      */
-    const searchedUserId =
-        location.state?.userId;
+    const searchedUserId = userId
+        // location.state?.userId;
 
     const dashboardUserId =
         searchedUserId ||

@@ -11,6 +11,7 @@ import type { User } from "../../shared/types/User"
 import { STORAGE_KEY } from "../../shared/constants/appConstants"
 import SettingsPopover from "./SettingsPopover"
 import { ROUTES } from "@/shared/constants/appConstants"
+import { NotificationTime } from "@/features/notifications/component/NotificationTime"
 
 import { useNavigate } from "react-router-dom"
 
@@ -122,7 +123,7 @@ export default function Header({
     }
   }, [showNotifications]);
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {  
+    function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setShowNotifications(false);
       }
@@ -264,8 +265,8 @@ export default function Header({
                   )}
                 </div>
 
-                <div 
-                  className="overflow-y-auto transition-all duration-200" 
+                <div
+                  className="overflow-y-auto transition-all duration-200"
                   style={{ maxHeight: showAllDropdownNotifs ? '456px' : '400px' }}
                 >
                   {notifications.length === 0 ? (
@@ -344,7 +345,7 @@ export default function Header({
                       {t('notifications.viewMore')}
                     </button>
                   </div>
-                )}                
+                )}
               </div>
             )}
           </div>
