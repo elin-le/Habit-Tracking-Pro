@@ -1,6 +1,8 @@
 import {
   MoreVertical,
   CheckCircle,
+  CircleDashed,
+  Clock4,
   Calendar,
   Plus,
   Minus,
@@ -38,6 +40,7 @@ interface HabitCardProps {
   onUpdateStatus: (status: HabitStatus) => void;
   onDelete: () => void;
   categories: Category[];
+  isViewingToday: boolean;
 }
 
 export function HabitCard({
@@ -46,6 +49,7 @@ export function HabitCard({
   onUpdateStatus,
   onDelete,
   categories,
+  isViewingToday,
 }: HabitCardProps) {
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -62,10 +66,10 @@ export function HabitCard({
   const targetPerDay = Number(habit.targetPerDay ?? 1) || 1;
   const isCompleted = currentCount >= targetPerDay;
 
-  
-
-  const minusDisabled = habit.status !== "ACTIVE" || currentCount <= 0;
-  const plusDisabled = habit.status !== "ACTIVE" || isCompleted;
+  const minusDisabled =
+    habit.status !== "ACTIVE" || currentCount <= 0 || !isViewingToday;
+  const plusDisabled =
+    habit.status !== "ACTIVE" || isCompleted || !isViewingToday;
 
   return (
     <div
@@ -180,9 +184,22 @@ export function HabitCard({
           <div className="min-w-0 flex-1">
             <div
               className="flex items-center gap-1.5 whitespace-nowrap text-sm font-medium"
-              style={{ color: isCompleted ? "#22c55e" : "#f59e0b" }}
+              style={{
+                color: isCompleted
+                  ? "#22c55e"
+                  : currentCount === 0
+                    ? "#94a3b8"
+                    : "#f59e0b",
+              }}
             >
-              <CheckCircle size={14} className="shrink-0" />
+              {" "}
+              {isCompleted ? (
+                <CheckCircle size={14} className="shrink-0" />
+              ) : currentCount === 0 ? (
+                <CircleDashed size={14} className="shrink-0" />
+              ) : (
+                <Clock4 size={14} className="shrink-0" />
+              )}
               <span className="truncate">
                 {isCompleted
                   ? t("habit_card.status-1")
@@ -215,7 +232,9 @@ export function HabitCard({
                 e.stopPropagation();
                 const next = Math.max(0, currentCount - 1);
                 upsertCheckIn(habit.id, today, next);
-                toast.success(t("checkin.toast_update", { name: habit.name, count: next }));
+                toast.success(
+                  t("checkin.toast_update", { name: habit.name, count: next }),
+                );
                 //onUpdate();
               }}
             >
@@ -238,9 +257,14 @@ export function HabitCard({
               }}
               onClick={(e) => {
                 e.stopPropagation();
-                const next = Math.min(currentCount + 1, Number(targetPerDay) || 1);
+                const next = Math.min(
+                  currentCount + 1,
+                  Number(targetPerDay) || 1,
+                );
                 upsertCheckIn(habit.id, today, next);
-                toast.success(t("checkin.toast_update", { name: habit.name, count: next }));
+                toast.success(
+                  t("checkin.toast_update", { name: habit.name, count: next }),
+                );
                 // onUpdate();
               }}
             >
