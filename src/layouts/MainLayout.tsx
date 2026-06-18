@@ -25,8 +25,8 @@ export default function MainLayout() {
   const habitSchedule = useHabitSchedule(currentUser?.phone);
   const categoryData = useCategories();
 
-  const goalData = useGoals();
   const checkInData = useCheckIns();
+  const goalData = useGoals(habitData.habits, checkInData.checkIns);
 
   const { addNotification, notifications } = useContext(NotificationContext);
 
@@ -161,6 +161,7 @@ export default function MainLayout() {
         <main className="flex-1 p-6 overflow-auto mb-13">
           <Outlet
             context={{
+              // Habit
               habits: habitData.habits,
               createHabit: habitData.createHabit,
               updateHabit: habitData.updateHabit,
@@ -173,8 +174,22 @@ export default function MainLayout() {
               categories: categoryData.categories,
               showAddForm,
               setShowAddForm,
-              goals: goalData.goals, // Sửa nhé
-              checkIns: checkInData.checkIns, // Sửa nhé
+              
+              // Goal
+              goals: goalData.goals,
+              filteredGoals: goalData.filteredGoals,
+              statusFilters: goalData.statusFilters,
+              setStatusFilters: goalData.setStatusFilters,
+              toggleStatusFilter: goalData.toggleStatusFilter,
+              typeFilter: goalData.typeFilter,
+              setTypeFilter: goalData.setTypeFilter,
+              createGoal: goalData.createGoal,
+              updateGoal: goalData.updateGoal,
+              deleteGoal: goalData.deleteGoal,
+              refreshGoals: goalData.refreshGoals,
+              
+              // Checkin
+              checkIns: checkInData.checkIns,
             }}
           />
         </main>
