@@ -68,7 +68,7 @@ const DashboardPage = () => {
             <section className="dashboard-heatmap">
                 <HeatMap
                     data={buildHeatMapData(
-                        checkIns,
+                        checkins,
                     )}
                     weeks={20}
                     title={t("heatmap.title")}

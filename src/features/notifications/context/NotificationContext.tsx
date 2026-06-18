@@ -27,7 +27,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     relatedEntityType: AppNotification['relatedEntityType']
   ) => {
     const newNotif: AppNotification = {
-      id: `notif-${generateUUID()}`,
+      id: `notif-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
       title: titleKey,
       message: messageKey,
       type,

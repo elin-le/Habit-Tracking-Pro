@@ -15,7 +15,6 @@ import { useMemo, useState, useEffect } from "react";
 import { DAY_OF_WEEK_MAP } from "@/shared/constants/appConstants";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import type { Category } from "@/shared/types/Category";
-import { useNavigate } from "react-router-dom"
 import type { User } from "@/shared/types/User"
 import { ROUTES, STORAGE_KEY } from "@/shared/constants/appConstants"
 
@@ -35,7 +34,6 @@ type LayoutContext = {
 
 export function HabitsPage() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const {
     habits,
     showAddForm,
