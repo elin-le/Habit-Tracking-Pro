@@ -30,24 +30,78 @@ export default function MainLayout() {
 
   const { addNotification, notifications } = useContext(NotificationContext);
 
+  const [storageTrigger, setStorageTrigger] = useState(0);
+
+  // Hook into localStorage.setItem to dispatch custom event on same-window updates
   useEffect(() => {
-    if (!habitData.habits || !goalData.goals || !checkInData.checkIns || !notifications) return;
+    const originalSetItem = localStorage.setItem;
+    localStorage.setItem = function (key, value) {
+      originalSetItem.apply(this, [key, value]);
+      window.dispatchEvent(new CustomEvent('local-storage-update', { detail: { key, value } }));
+    };
+    return () => {
+      localStorage.setItem = originalSetItem;
+    };
+  }, []);
+
+  // Listen to storage changes to trigger re-evaluation of notifications
+  useEffect(() => {
+    const handleStorageUpdate = (e: any) => {
+      if (
+        e.detail.key === STORAGE_KEY.USER_CHECKINS ||
+        e.detail.key === STORAGE_KEY.USER_GOALS ||
+        e.detail.key === STORAGE_KEY.USER_HABITS ||
+        e.detail.key === 'notifications'
+      ) {
+        setStorageTrigger(prev => prev + 1);
+      }
+    };
+    window.addEventListener('local-storage-update', handleStorageUpdate);
+    return () => window.removeEventListener('local-storage-update', handleStorageUpdate);
+  }, []);
+
+  useEffect(() => {
+    // Read directly from localStorage to guarantee absolute freshness across hook instances
+    const rawHabits = localStorage.getItem(STORAGE_KEY.USER_HABITS);
+    const rawGoals = localStorage.getItem(STORAGE_KEY.USER_GOALS);
+    const rawCheckins = localStorage.getItem(STORAGE_KEY.USER_CHECKINS);
+
+    if (!rawHabits || !rawGoals || !rawCheckins) return;
+
+    const allHabits = JSON.parse(rawHabits) as any[];
+    const habits = allHabits.filter((h: any) => h.userId === currentUser?.phone);
+    const goals = JSON.parse(rawGoals) as any[];
+    const checkIns = JSON.parse(rawCheckins) as any[];
+
+    // Helper to get notifications list directly from localStorage to avoid stale state and race conditions
+    const getFreshNotifications = () => {
+      try {
+        return JSON.parse(localStorage.getItem('notifications') || '[]') as any[];
+      } catch {
+        return [];
+      }
+    };
 
     // 1. Goal 80% & Goal Achieved
-    goalData.goals.forEach((goal: any) => {
-      const habit = habitData.habits.find((h: any) => h.id === goal.habitId);
-      const targetPerDay = habit && typeof habit.targetPerDay === 'number' ? habit.targetPerDay : 1;
-      const habitName = habit ? habit.name : 'Mục tiêu';
+    goals.forEach((goal: any) => {
+      const habit = habits.find((h: any) => h.id === goal.habitId);
+      if (!habit) return; // Defensive check: Skip goals not belonging to current user's habits
 
+      const targetPerDay = typeof habit.targetPerDay === 'number' ? habit.targetPerDay : 1;
+      const habitName = habit.name;
+
+      const goalCheckins = checkIns.filter((c: any) => c.habitId === goal.habitId);
       let progressPercent = 0;
       if (goal.targetType === 'STREAK') {
-        progressPercent = getStreakProgress(goal, targetPerDay, checkInData.checkIns);
+        progressPercent = getStreakProgress(goal, targetPerDay, goalCheckins);
       } else if (goal.targetType === 'TOTAL_COMPLETIONS') {
-        progressPercent = getTotalCompletionProgress(goal, targetPerDay, checkInData.checkIns);
+        progressPercent = getTotalCompletionProgress(goal, targetPerDay, goalCheckins);
       }
 
+      const currentNotifs = getFreshNotifications();
+
       if (progressPercent >= 100) {
-        const hasAchievedNotif = notifications.some(
+        const hasAchievedNotif = currentNotifs.some(
           (n: any) => n.relatedEntityId === goal.id && n.type === 'GOAL_ACHIEVED'
         );
         if (!hasAchievedNotif) {
@@ -61,7 +115,7 @@ export default function MainLayout() {
           );
         }
       } else if (progressPercent >= 80) {
-        const has80Notif = notifications.some(
+        const has80Notif = currentNotifs.some(
           (n: any) => n.relatedEntityId === goal.id && n.type === 'GOAL_80'
         );
         if (!has80Notif) {
@@ -78,8 +132,10 @@ export default function MainLayout() {
     });
 
     // 2. Streak Risk
-    habitData.habits.forEach((habit: any) => {
-      const habitCheckins = checkInData.checkIns.filter((c: any) => c.habitId === habit.id);
+    habits.forEach((habit: any) => {
+      if (habit.status !== 'ACTIVE') return; // Defensive check: Skip inactive habits
+
+      const habitCheckins = checkIns.filter((c: any) => c.habitId === habit.id);
       const targetPerDay = typeof habit.targetPerDay === 'number' ? habit.targetPerDay : 1;
       const currentStreakVal = getCurrentStreak(habitCheckins, targetPerDay);
 
@@ -89,7 +145,8 @@ export default function MainLayout() {
         const isCompletedToday = todaySummary >= targetPerDay;
 
         if (!isCompletedToday) {
-          const todayNotifExists = notifications.some(
+          const currentNotifs = getFreshNotifications();
+          const todayNotifExists = currentNotifs.some(
             (n: any) =>
               n.relatedEntityId === habit.id &&
               n.type === 'STREAK_RISK' &&
@@ -115,15 +172,18 @@ export default function MainLayout() {
     const yesterdayKey = yesterday.toISOString().split('T')[0];
     const todayKey = new Date().toISOString().split('T')[0];
 
-    habitData.habits.forEach((habit: any) => {
-      const habitCheckins = checkInData.checkIns.filter((c: any) => c.habitId === habit.id);
+    habits.forEach((habit: any) => {
+      if (habit.status !== 'ACTIVE') return; // Defensive check: Skip inactive habits
+
+      const habitCheckins = checkIns.filter((c: any) => c.habitId === habit.id);
       const targetPerDay = typeof habit.targetPerDay === 'number' ? habit.targetPerDay : 1;
       const yesterdaySummary = habitCheckins.filter((c: any) => c.checkedAt === yesterdayKey).length;
       const isCompletedYesterday = yesterdaySummary >= targetPerDay;
       
       // Only fire missed habit if they have at least checked in once (not new habit)
       if (habitCheckins.length > 0 && !isCompletedYesterday) {
-        const yesterdayNotifExists = notifications.some(
+        const currentNotifs = getFreshNotifications();
+        const yesterdayNotifExists = currentNotifs.some(
           (n: any) =>
             n.relatedEntityId === habit.id &&
             n.type === 'MISSED_HABIT' &&
@@ -141,7 +201,7 @@ export default function MainLayout() {
         }
       }
     });
-  }, [habitData.habits, goalData.goals, checkInData.checkIns, notifications, addNotification]);
+  }, [currentUser?.phone, notifications, addNotification, storageTrigger]);
 
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--bg)] playfair-display-normal">
