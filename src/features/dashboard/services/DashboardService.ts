@@ -47,13 +47,22 @@ function getDateKey(date: Date): string {
     return `${year}-${month}-${day}`;
 }
 
-function readHabits(): Habit[] {
+function readHabits(userId?: string): Habit[] {
     try {
         const raw = localStorage.getItem(
             STORAGE_KEY.USER_HABITS,
         );
 
-        return raw ? JSON.parse(raw) : [];
+        const habits: Habit[] = raw
+            ? JSON.parse(raw)
+            : [];
+
+        return userId
+            ? habits.filter(
+                  (habit) =>
+                      habit.userId === userId,
+              )
+            : habits;
     } catch {
         return [];
     }
@@ -269,24 +278,19 @@ function buildGoalProgress(
     return goals
         .filter(
             (goal) =>
-                goal.progress.status !==
-                "COMPLETED",
+                goal.progress.status !== "COMPLETED",
         )
         .map((goal) => {
             const habit = habits.find(
-                (item) =>
-                    item.id === goal.habitId,
+                (item) => item.id === goal.habitId,
             );
 
             return {
                 id: goal.id,
-                title:
-                    habit?.name ??
-                    goal.habitId,
+                title: habit?.name || "Unknown Habit",
                 progress: Math.min(
                     Math.max(
-                        goal.progress
-                            .progressPercent,
+                        goal.progress.progressPercent,
                         0,
                     ),
                     100,
@@ -356,18 +360,29 @@ export function computeDashboardData(
 }
 
 export function getDashboardData(
+    userId?: string,
     selectedCategory?: string,
 ): DashboardData {
-    const habits = readHabits();
-    const checkIns = readCheckIns();
+    const habits = readHabits(userId);
+
+    const checkIns =
+        readCheckInsByHabits(habits);
+
     const categories =
         readCategories();
 
     let goals: GoalWithDerived[] = [];
 
     try {
-        goals =
-            getAllGoalsWithProgress();
+        goals = getAllGoalsWithProgress(
+            habits,
+            checkIns,
+        ).filter((goal) =>
+            habits.some(
+                (habit) =>
+                    habit.id === goal.habitId,
+            ),
+        );
     } catch {
         goals = [];
     }
@@ -379,4 +394,27 @@ export function getDashboardData(
         categories,
         selectedCategory,
     );
+}
+function readCheckInsByHabits(
+    habits: Habit[],
+): CheckIn[] {
+    try {
+        const raw = localStorage.getItem(
+            STORAGE_KEY.USER_CHECKINS,
+        );
+
+        const checkIns: CheckIn[] = raw
+            ? JSON.parse(raw)
+            : [];
+
+        const habitIds = habits.map(
+            (habit) => habit.id,
+        );
+
+        return checkIns.filter((item) =>
+            habitIds.includes(item.habitId),
+        );
+    } catch {
+        return [];
+    }
 }

@@ -11,9 +11,10 @@ import type { User } from "../../shared/types/User"
 import { STORAGE_KEY } from "../../shared/constants/appConstants"
 import SettingsPopover from "./SettingsPopover"
 import { ROUTES } from "@/shared/constants/appConstants"
+import { NotificationTime } from "@/features/notifications/component/NotificationTime"
 
 import { useNavigate } from "react-router-dom"
-import { NotificationTime } from "../../features/notifications/component/NotificationTime";
+
 
 interface HeaderProps {
   title?: string;

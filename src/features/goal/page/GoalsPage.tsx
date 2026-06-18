@@ -1,9 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
-import {
-  useGoals,
-  type StatusFilter,
-  type TypeFilter,
-} from "../../../shared/hooks/useGoals.ts";
+import { useNavigate, useOutletContext } from "react-router-dom";
+import type { TypeFilter, StatusFilter } from "../../../shared/hooks/useGoals.ts";
 import { ToastService } from "../../../routes/services/toastService.ts";
 import { useTranslation } from "react-i18next";
 import GoalCard from "../../../shared/components/cards/GoalCard.tsx";
@@ -22,7 +19,7 @@ import {
 import GoalForm, {
   type GoalFormData,
 } from "../../../shared/components/forms/GoalForm";
-import { STORAGE_KEY } from "../../../shared/constants/appConstants";
+import { STORAGE_KEY, ROUTES } from "../../../shared/constants/appConstants";
 import { Modal } from "../../../shared/components/ui/Modal.tsx";
 import type { Habit } from "../../../shared/types/Habit.ts";
 import type { Goal, GoalWithDerived } from "../../../shared/types/Goal.ts";
@@ -30,16 +27,38 @@ import { removeAccents } from "../../../shared/utils/stringUtils.ts";
 import { usePagination } from "../../../shared/hooks/usePagination";
 import { Pagination } from "../../../shared/components/common/Pagination";
 import "../Goals.css";
+import type { User } from "../../../shared/types/User.ts";
 
-
-import { useNavigate } from "react-router-dom"
-import type { User } from "@/shared/types/User"
-import { ROUTES } from "@/shared/constants/appConstants"
-
+type LayoutContext = {
+  habits: Habit[];
+  goals: GoalWithDerived[];
+  filteredGoals: GoalWithDerived[];
+  statusFilters: StatusFilter[];
+  setStatusFilters: React.Dispatch<React.SetStateAction<StatusFilter[]>>;
+  toggleStatusFilter: (filter: StatusFilter) => void;
+  typeFilter: TypeFilter;
+  setTypeFilter: React.Dispatch<React.SetStateAction<TypeFilter>>;
+  createGoal: (goalData: Omit<Goal, "id">) => Goal;
+  updateGoal: (id: string, goalData: Partial<Goal>) => Goal | undefined;
+  deleteGoal: (id: string) => void;
+  refreshGoals: () => void;
+};
 
 function GoalsPage() {
   const { t } = useTranslation();
 
+  // Kiểm tra nếu hiện tại kh có dữ liệu current user thì navigate về trang auth
+  const navigate = useNavigate();
+
+  const currentUserRaw = localStorage.getItem(STORAGE_KEY.CURRENT_USER);
+  const currentUser: User | null = currentUserRaw ? JSON.parse(currentUserRaw) : null;
+
+  useEffect(() => {
+    if(!currentUser || !currentUser.phone) {
+      navigate(ROUTES.AUTH);
+    }
+  }, [currentUser, navigate]);
+  
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedHabit, setSelectedHabit] = useState({ id: "", name: "" });
   const [selectedGoalDetail, setSelectedGoalDetail] =
@@ -47,8 +66,9 @@ function GoalsPage() {
   const [editingGoal, setEditingGoal] = useState<GoalWithDerived | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [search, setSearch] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const {
+    habits: allHabits,
     goals,
     filteredGoals,
     statusFilters,
@@ -59,21 +79,7 @@ function GoalsPage() {
     createGoal,
     updateGoal,
     deleteGoal,
-  } = useGoals();
-  const navigate = useNavigate()
-
-  const currentUser: User | null =
-    JSON.parse(
-      localStorage.getItem(
-        STORAGE_KEY.CURRENT_USER
-      ) || "null"
-    );
-  // Get all habits from local storage
-  const allHabits = useMemo(() => {
-    return JSON.parse(
-      localStorage.getItem(STORAGE_KEY.USER_HABITS) || "[]",
-    ) as Habit[];
-  }, []);
+  } = useOutletContext<LayoutContext>();
 
   const habitsWithoutGoal = useMemo(() => {
     const activeGoalHabitIds = new Set(
@@ -106,8 +112,8 @@ function GoalsPage() {
   const displayedGoals = useMemo(() => {
     let result = filteredGoals;
 
-    if (search.trim()) {
-      const normalizedSearch = removeAccents(search);
+    if (searchQuery.trim()) {
+      const normalizedSearch = removeAccents(searchQuery);
       result = result.filter((g) => {
         const habit = allHabits.find((h: Habit) => h.id === g.habitId);
         const habitName = habit ? removeAccents(habit.name) : "";
@@ -136,7 +142,7 @@ function GoalsPage() {
 
       return priorityB - priorityA;
     });
-  }, [filteredGoals, search, allHabits]);
+  }, [filteredGoals, searchQuery, allHabits]);
 
 
   // Pagination logic
@@ -195,7 +201,7 @@ function GoalsPage() {
 
   const handleDeleteGoal = (goalId: string) => {
     deleteGoal(goalId);
-    ToastService.error(t("goals.delete_success"));
+    ToastService.success(t("goals.delete_success"));
     handleCloseDetail();
   };
 
@@ -299,8 +305,8 @@ function GoalsPage() {
               />
               <input
                 type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t("goals.search_placeholder")}
                 className="
                                     h-9 w-full pl-9 pr-4
@@ -341,12 +347,12 @@ function GoalsPage() {
             </button>
 
             {/* Clear Filters / Search */}
-            {(hasActiveFilters || search.trim() !== "") && (
+            {(hasActiveFilters || searchQuery.trim() !== "") && (
               <button
                 onClick={() => {
                   setStatusFilters(["ALL"]);
                   setTypeFilter("ALL");
-                  setSearch("");
+                  setSearchQuery("");
                 }}
                 className="flex items-center gap-1.5 h-9 px-3 rounded-full text-[var(--text)]/60 bg-[var(--text)]/5 hover:bg-[var(--text)]/10 transition-colors text-sm font-medium"
                 title={t("goals.clear_filters")}
@@ -508,7 +514,7 @@ function GoalsPage() {
                 {t("goals.empty_title")}
               </p>
               <p className="text-sm opacity-60 mt-1">
-                {search || hasActiveFilters
+                {searchQuery || hasActiveFilters
                   ? t("goals.empty_filter_hint")
                   : t("goals.empty_hint")}
               </p>
@@ -518,7 +524,7 @@ function GoalsPage() {
                 onClick={() => {
                   setStatusFilters(["ALL"]);
                   setTypeFilter("ALL");
-                  setSearch("");
+                  setSearchQuery("");
                 }}
                 className="text-sm font-semibold text-[var(--primary)] hover:underline mt-2"
               >
