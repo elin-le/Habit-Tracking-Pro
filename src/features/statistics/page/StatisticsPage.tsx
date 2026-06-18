@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 import {
   Flame,
   Trophy,
@@ -10,12 +10,23 @@ import {
   BarChart3,
   Activity,
   AlertTriangle,
+  Download,
 } from "lucide-react";
 import { useHabitStats } from "../../../shared/hooks/useHabitStats";
 import { useCategories } from "../../../shared/hooks/useCategory";
 import type { HabitStat, RiskLevel } from "../../../shared/types/Statistics";
-import type { Priority } from "../../../shared/types/Habit";
+import type { Habit, Priority } from "../../../shared/types/Habit";
 import { StatisticsFilter } from "../component/StatisticsFilter";
+import type { Goal } from "@/shared/types/Goal";
+import type { CheckIn } from "@/shared/types/CheckIn";
+import { exportJson } from "@/shared/utils/exportJson";
+import { toast } from "sonner";
+
+type LayoutContext = {
+  habits: Habit[];
+  goals: Goal[];
+  checkIns: CheckIn[];
+};
 
 export default function StatisticsPage() {
   const { t } = useTranslation();
@@ -25,12 +36,26 @@ export default function StatisticsPage() {
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
   const [filterPriority, setFilterPriority] = useState<Priority | null>(null);
 
+  const { habits, goals, checkIns } = useOutletContext<LayoutContext>();
+
+  const handleExport = () => {
+    try {
+      exportJson(habits, goals, checkIns);
+
+      toast.success(`${t("statistics.ex_noti1")}`);
+    } catch (error) {
+      toast.error(`${t("statistics.ex_noti2")}`);
+      console.error(error);
+    }
+  };
+
   // chỉ số tổng quan luôn tính trên TẤT CẢ habit (không theo bộ lọc)
   const total = stats.length;
   const completedToday = stats.filter(
-    (s) => s.last7Days[s.last7Days.length - 1] === 100
+    (s) => s.last7Days[s.last7Days.length - 1] === 100,
   ).length;
-  const completedTodayPct = total === 0 ? 0 : Math.round((completedToday / total) * 100);
+  const completedTodayPct =
+    total === 0 ? 0 : Math.round((completedToday / total) * 100);
   const activeHabits = stats.length;
   const atRisk = stats.filter((s) => s.riskLevel === "AT_RISK").length;
 
@@ -60,6 +85,28 @@ export default function StatisticsPage() {
   return (
     <div className="flex flex-col gap-6 pb-24 md:pb-8 text-[var(--text)]">
       <PageHeading />
+
+      {/* Export — đứng riêng, đẩy phải */}
+      <div className="flex justify-end">
+        <button
+          onClick={handleExport}
+          className="flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium transition-colors cursor-pointer"
+          style={{
+            borderColor: "color-mix(in srgb, var(--primary) 25%, transparent)",
+            color: "var(--text)",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background =
+              "color-mix(in srgb, var(--primary) 8%, transparent)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "transparent";
+          }}
+        >
+          <Download size={15} />
+          {t("statistics.btn_export")}
+        </button>
+      </div>
 
       {/* ---- Tổng quan ---- */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -132,7 +179,9 @@ function PageHeading() {
   const { t } = useTranslation();
   return (
     <div>
-      <h1 className="text-3xl sm:text-4xl font-light">{t("statistics.title")}</h1>
+      <h1 className="text-3xl sm:text-4xl font-light">
+        {t("statistics.title")}
+      </h1>
       <p className="mt-1 text-sm opacity-60">{t("statistics.subtitle")}</p>
     </div>
   );
@@ -155,7 +204,9 @@ function OverviewCard({
   const animated = useCountUp(value);
   return (
     <div className="flex items-center gap-4 p-5 rounded-2xl border border-[var(--primary)]/15 bg-[var(--surface)] transition-shadow duration-200 hover:shadow-lg">
-      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${accent}`}>
+      <div
+        className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${accent}`}
+      >
         {icon}
       </div>
       <div className="min-w-0">
@@ -163,14 +214,24 @@ function OverviewCard({
           {animated}
           <span className="text-2xl">{suffix}</span>
         </p>
-        <p className="text-xs opacity-60 font-semibold mt-1.5 truncate">{label}</p>
+        <p className="text-xs opacity-60 font-semibold mt-1.5 truncate">
+          {label}
+        </p>
       </div>
     </div>
   );
 }
 
 /* ---- 1 chỉ số nhỏ trong thẻ habit ---- */
-function Metric({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
+function Metric({
+  icon,
+  label,
+  value,
+}: {
+  icon: ReactNode;
+  label: string;
+  value: string;
+}) {
   return (
     <div className="flex flex-col gap-1">
       <span className="flex items-center gap-1.5 text-xs opacity-60">
@@ -248,14 +309,26 @@ function HabitStatCard({ stat }: { stat: HabitStat }) {
 
       {/* 4 chỉ số */}
       <div className="grid grid-cols-2 gap-3 text-sm">
-        <Metric icon={<Flame size={15} />} label={t("statistics.current_streak")}
-          value={`${stat.currentStreak} ${t("statistics.days")}`} />
-        <Metric icon={<Trophy size={15} />} label={t("statistics.longest_streak")}
-          value={`${stat.longestStreak} ${t("statistics.days")}`} />
-        <Metric icon={<CheckCircle2 size={15} />} label={t("statistics.total_completions")}
-          value={`${stat.totalCompletions}`} />
-        <Metric icon={<TrendingUp size={15} />} label={t("statistics.completion_rate")}
-          value={`${stat.completionRate}%`} />
+        <Metric
+          icon={<Flame size={15} />}
+          label={t("statistics.current_streak")}
+          value={`${stat.currentStreak} ${t("statistics.days")}`}
+        />
+        <Metric
+          icon={<Trophy size={15} />}
+          label={t("statistics.longest_streak")}
+          value={`${stat.longestStreak} ${t("statistics.days")}`}
+        />
+        <Metric
+          icon={<CheckCircle2 size={15} />}
+          label={t("statistics.total_completions")}
+          value={`${stat.totalCompletions}`}
+        />
+        <Metric
+          icon={<TrendingUp size={15} />}
+          label={t("statistics.completion_rate")}
+          value={`${stat.completionRate}%`}
+        />
       </div>
 
       {/* Thanh tiến độ tỷ lệ hoàn thành */}
@@ -274,20 +347,27 @@ function HabitStatCard({ stat }: { stat: HabitStat }) {
 
       {/* Biểu đồ 7 ngày + nhãn thứ */}
       <div>
-        <p className="text-xs font-semibold opacity-60 mb-2">{t("statistics.last_7_days")}</p>
+        <p className="text-xs font-semibold opacity-60 mb-2">
+          {t("statistics.last_7_days")}
+        </p>
         <div className="flex items-end gap-1 h-12">
           {stat.last7Days.map((v, i) => (
             <div
               key={i}
               className="flex-1 rounded-sm bg-[var(--primary)] transition-[height] duration-500 ease-out"
-              style={{ height: `${Math.max(v, 6)}%`, opacity: v === 0 ? 0.2 : 0.4 + (v / 100) * 0.6 }}
+              style={{
+                height: `${Math.max(v, 6)}%`,
+                opacity: v === 0 ? 0.2 : 0.4 + (v / 100) * 0.6,
+              }}
               title={`${v}%`}
             />
           ))}
         </div>
         <div className="flex gap-1 mt-1">
           {dayLabels.map((d, i) => (
-            <span key={i} className="flex-1 text-center text-[10px] opacity-40">{d}</span>
+            <span key={i} className="flex-1 text-center text-[10px] opacity-40">
+              {d}
+            </span>
           ))}
         </div>
       </div>

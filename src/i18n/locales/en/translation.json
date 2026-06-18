@@ -253,7 +253,10 @@
     "empty": "No statistics yet",
     "empty_hint": "Create habits and check in to see your stats here",
     "empty_action": "Create your habit",
-    "statistics.no_match": "No habits match the selected filters"
+    "statistics.no_match": "No habits match the selected filters",
+    "btn_export": "Download",
+    "ex_noti1": "Data export successful",
+    "ex_noti2": "Data export failed"
   },
   "notifications": {
     "title": "Notifications",
@@ -301,17 +304,17 @@
     "productivity": "Productivity",
     "days": "Days"
   },
-  "checkin":{
-    "history":"Check-in History",
-    "no":"Empty",
+  "checkin": {
+    "history": "Check-in History",
+    "no": "Empty",
     "not_finished": "Not finished",
-    "completed":"Completed"
+    "completed": "Completed"
   },
-  "setting":{
-    "setting":"Setting",
-    "darkMode":"Dark Mode",
-    "vietnamese":"Vietnamese",
-    "readOnly":"Read Only"
+  "setting": {
+    "setting": "Setting",
+    "darkMode": "Dark Mode",
+    "vietnamese": "Vietnamese",
+    "readOnly": "Read Only"
   },
   "heatmap": {
     "more":"More",
