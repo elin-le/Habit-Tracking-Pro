@@ -10,21 +10,26 @@ import { buildHeatMapData } from "@/shared/components/heatmap/heatmap.util";
 import type { CheckIn } from "@/shared/types/CheckIn";
 import type { Habit } from "@/shared/types/Habit";
 import type { User } from "@/shared/types/User";
-import { STORAGE_KEY } from "@/shared/constants/appConstants";
-import { ROUTES } from "@/shared/constants/appConstants";
+import {
+    STORAGE_KEY,
+    ROUTES,
+} from "@/shared/constants/appConstants";
 import { useTranslation } from "react-i18next";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface DashboardPageProps {
     userId?: string;
 }
-const DashboardPage = ({ userId }: DashboardPageProps) => {
+
+const DashboardPage = ({
+    userId,
+}: DashboardPageProps) => {
     const [selectedCategory] =
         useState("ALL");
 
     const { t } = useTranslation();
     const navigate = useNavigate();
-    // const location = useLocation();
+
     const currentUser: User | null =
         JSON.parse(
             localStorage.getItem(
@@ -38,17 +43,8 @@ const DashboardPage = ({ userId }: DashboardPageProps) => {
         }
     }, [currentUser, navigate]);
 
-    /**
-     * User cần hiển thị dashboard
-     * Nếu có user được search thì lấy user đó
-     * Không có thì lấy current user
-     */
-    const searchedUserId = userId
-        // location.state?.userId;
-
     const dashboardUserId =
-        searchedUserId ||
-        currentUser?.phone;
+        userId || currentUser?.phone;
 
     const {
         summaryCards,
@@ -60,9 +56,6 @@ const DashboardPage = ({ userId }: DashboardPageProps) => {
         selectedCategory,
     );
 
-    /**
-     * Filter checkin theo user
-     */
     const allHabits: Habit[] =
         JSON.parse(
             localStorage.getItem(
@@ -98,14 +91,13 @@ const DashboardPage = ({ userId }: DashboardPageProps) => {
             {/* Summary */}
             <section className="dashboard-summary">
                 <SummaryCard
-                    summaryCards={
-                        summaryCards
-                    }
+                    summaryCards={summaryCards}
                 />
             </section>
 
             {/* Charts */}
             <section className="dashboard-grid">
+                {/* Left */}
                 <div className="dashboard-grid__category">
                     <CategoryOverview
                         categories={
@@ -114,26 +106,30 @@ const DashboardPage = ({ userId }: DashboardPageProps) => {
                     />
                 </div>
 
-                <div className="dashboard-grid__statistics">
-                    <HabitStatistics
-                        statistics={
-                            habitStatistics
-                        }
-                    />
-                </div>
-            </section>
+                {/* Right */}
+                <div className="dashboard-grid__right">
+                    {/* Completion Rate */}
+                    <div className="dashboard-grid__statistics">
+                        <HabitStatistics
+                            statistics={
+                                habitStatistics
+                            }
+                        />
+                    </div>
 
-            {/* Heatmap */}
-            <section className="dashboard-heatmap">
-                <HeatMap
-                    data={buildHeatMapData(
-                        checkins,
-                    )}
-                    weeks={20}
-                    title={t(
-                        "heatmap.title",
-                    )}
-                />
+                    {/* Frequency of Check-in */}
+                    <div className="dashboard-grid__heatmap">
+                        <HeatMap
+                            data={buildHeatMapData(
+                                checkins,
+                            )}
+                            weeks={20}
+                            title={t(
+                                "heatmap.title",
+                            )}
+                        />
+                    </div>
+                </div>
             </section>
 
             {/* Goals */}
