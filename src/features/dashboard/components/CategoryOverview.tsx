@@ -7,7 +7,7 @@ import {
     Tooltip,
 } from "recharts";
 
-import type { CategoryOverviewType } from "../Dashboard.type";
+import type { CategoryOverviewType } from "../../../shared/types/Dashboard";
 
 interface CategoryOverviewProps {
     categories: CategoryOverviewType[];
@@ -25,6 +25,20 @@ const CategoryOverview = ({
     categories,
 }: CategoryOverviewProps) => {
     const { t } = useTranslation();
+
+    if (!categories.length) {
+        return (
+            <div className="dashboard-card">
+                <h2 className="dashboard-card__title">
+                    {t("dashboard.categoryOverview")}
+                </h2>
+
+                <p className="text-secondary">
+                    {t("dashboard.noData")}
+                </p>
+            </div>
+        );
+    }
 
     const total = categories.reduce(
         (sum, item) => sum + item.progress,
@@ -52,15 +66,17 @@ const CategoryOverview = ({
                 <div className="category-chart">
                     <ResponsiveContainer
                         width="100%"
-                        height={240}
+                        height="100%"
                     >
                         <PieChart>
                             <Pie
                                 data={chartData}
                                 dataKey="value"
                                 nameKey="name"
-                                innerRadius={60}
-                                outerRadius={90}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius="55%"
+                                outerRadius="80%"
                                 paddingAngle={3}
                             >
                                 {chartData.map(
@@ -82,10 +98,10 @@ const CategoryOverview = ({
                                 formatter={(
                                     value,
                                     _,
-                                    props,
+                                    item,
                                 ) => [
-                                    `${value} Habits (${props.payload.percent}%)`,
-                                    props.payload.name,
+                                    `${value} Habits (${item.payload.percent}%)`,
+                                    item.payload.name,
                                 ]}
                             />
                         </PieChart>

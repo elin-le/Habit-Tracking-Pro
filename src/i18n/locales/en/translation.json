@@ -265,6 +265,7 @@
     "listTitle": "Recent Notifications",
     "markAllRead": "Mark all as read",
     "readBtn": "Read",
+    "viewMore": "View all",
     "demoPanel": {
       "title": "Quick Notification Triggers",
       "subtitle": "Select milestones below to send alerts and progress updates",
@@ -302,7 +303,10 @@
     "health": "Health",
     "learning": "Learning",
     "productivity": "Productivity",
-    "days": "Days"
+    "days": "Days",
+    "showMore": "Show More",
+    "showLess": "Show Less",
+    "noGoals": "No active goals"
   },
   "checkin": {
     "history": "Check-in History",
