@@ -265,6 +265,7 @@
     "listTitle": "Recent Notifications",
     "markAllRead": "Mark all as read",
     "readBtn": "Read",
+    "viewMore": "View all",
     "demoPanel": {
       "title": "Quick Notification Triggers",
       "subtitle": "Select milestones below to send alerts and progress updates",
