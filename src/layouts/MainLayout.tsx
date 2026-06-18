@@ -13,17 +13,15 @@ import type { User } from "@/shared/types/User";
 import { useGoals } from "@/shared/hooks/useGoals";
 import { useCheckIns } from "@/shared/hooks/useCheckIns";
 
-export default function MainLayout() {
-  const currentUser = JSON.parse(
-    localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "{}",
-  ) as User;
 
+export default function MainLayout() {
+  const currentUser = JSON.parse(localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "{}") as User
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const { t } = useTranslation();
 
-  const habitData = useHabits(currentUser.phone);
-  const habitSchedule = useHabitSchedule(currentUser.phone);
+  const habitData = useHabits(currentUser?.phone);
+  const habitSchedule = useHabitSchedule(currentUser?.phone);
   const categoryData = useCategories();
 
   const goalData = useGoals();

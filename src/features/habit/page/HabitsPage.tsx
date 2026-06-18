@@ -11,10 +11,13 @@ import type {
   HabitSchedule,
 } from "../../../shared/types/HabitSchedule";
 import { HabitForm } from "../../../shared/components/forms/HabitForm";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { DAY_OF_WEEK_MAP } from "@/shared/constants/appConstants";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import type { Category } from "@/shared/types/Category";
+import { useNavigate } from "react-router-dom"
+import type { User } from "@/shared/types/User"
+import { ROUTES, STORAGE_KEY } from "@/shared/constants/appConstants"
 
 type LayoutContext = {
   habits: Habit[];
@@ -45,7 +48,14 @@ export function HabitsPage() {
     deleteHabit,
     deleteHabitSchedulesByHabitId,
   } = useOutletContext<LayoutContext>();
+  const navigate = useNavigate()
 
+  const currentUser: User | null =
+    JSON.parse(
+      localStorage.getItem(
+        STORAGE_KEY.CURRENT_USER
+      ) || "null"
+    );
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
@@ -84,15 +94,6 @@ export function HabitsPage() {
 
       const scheduleOk =
         !frequencyFilter || isScheduledOnDow(habit, frequencyFilter);
-
-      // console.log(habit.name, {
-      //   statusOk,
-      //   categoryOk,
-      //   priorityOk,
-      //   scheduleOk,
-      //   status: habit.status,
-      // });
-
       return statusOk && categoryOk && priorityOk && scheduleOk;
     });
   }, [
@@ -104,11 +105,6 @@ export function HabitsPage() {
     frequencyFilter,
   ]);
 
-  // console.log(filterCategory);
-  // console.log(filterPriority);
-  // console.log(filterStatus);
-  // console.log(frequencyFilter);
-
   const {
     currentPage,
     totalPages,
@@ -119,7 +115,11 @@ export function HabitsPage() {
   } = usePagination(filteredHabits, debouncedSearchQuery, (habit, query) =>
     habit.name.toLowerCase().includes(query.toLowerCase()),
   );
-
+  useEffect(() => {
+    if (!currentUser) {
+      navigate(ROUTES.AUTH);
+    }
+  }, [])
   return (
     <div className="animate-in">
       {/* Header */}

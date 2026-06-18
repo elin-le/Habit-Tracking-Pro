@@ -10,7 +10,9 @@ import type { Category } from "../../shared/types/Category"
 import type { User } from "../../shared/types/User"
 import { STORAGE_KEY } from "../../shared/constants/appConstants"
 import SettingsPopover from "./SettingsPopover"
+import { ROUTES } from "@/shared/constants/appConstants"
 
+import { useNavigate } from "react-router-dom"
 
 interface HeaderProps {
   title?: string;
@@ -98,7 +100,13 @@ export default function Header({
   const { theme } = useTheme();
   // const [lang, setLang] = useState<"EN" | "VI">("EN");
   const categories = JSON.parse(localStorage.getItem(STORAGE_KEY.CATEGORYS) || "[]") as Category[];
-  const currentUser = JSON.parse(localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "{}") as User;
+  const currentUser: User | null =
+    JSON.parse(
+      localStorage.getItem(
+        STORAGE_KEY.CURRENT_USER
+      ) || "null"
+    );
+  const navigate = useNavigate()
 
   // 1. Khai báo thêm hàm đọc thông báo
   const { unreadCount, notifications, markAsRead, markAllAsRead } = useContext(NotificationContext);
@@ -124,11 +132,11 @@ export default function Header({
     return "Good evening";
   })();
 
-  // const toggleLang = () => {
-  //   const newLang = lang === "EN" ? "VI" : "EN";
-  //   setLang(newLang);
-  //   i18n.changeLanguage(newLang.toLowerCase());
-  // };
+  useEffect(() => {
+    if (!currentUser) {
+      navigate(ROUTES.AUTH);
+    }
+  }, [])
 
   return (
     <header
@@ -139,61 +147,17 @@ export default function Header({
       <div className="flex md:hidden items-center justify-between gap-3 px-5 pt-8 pb-3">
         {/* Left: Avatar + greeting */}
         <div className="flex items-center gap-3 min-w-0">
-          <AvatarBadge name={currentUser.username} src={currentUser.avt} />
+          <AvatarBadge name={currentUser?.username || "Lê Đan"} src={currentUser?.avt} />
           <div className="min-w-0">
             <p className="text-xs text-violet-400 font-medium truncate" style={{ fontFamily: "UVN Giong Song" }}>
               {subtitle ?? `${greeting},`}
             </p>
             <h1 className="text-lg font-bold leading-tight truncate">
-              {title + " " + currentUser.username}
+              {title + " " + currentUser?.username}
             </h1>
           </div>
         </div>
 
-        {/* Right: quick toggles, nổi hẳn lên so với nền để không bị lẫn vào body khi light mode */}
-        {/* <div className="flex items-center gap-2 shrink-0">
-          <button
-            onClick={toggleLang}
-            aria-label="Toggle language"
-            className="flex items-center gap-1 h-8 px-2.5 rounded-lg bg-violet-50 shadow-sm ring-1 ring-violet-100 text-violet-500 text-[11px] font-semibold tracking-wide select-none"
-          >
-            <span
-              className={lang === "EN" ? "text-violet-700" : "text-violet-300"}
-            >
-              EN
-            </span>
-            <span className="text-violet-200 font-normal">|</span>
-            <span
-              className={lang === "VI" ? "text-violet-700" : "text-violet-300"}
-            >
-              VI
-            </span>
-          </button>
-
-          <button
-            onClick={toggleTheme}
-            aria-label="Toggle dark mode"
-            className={[
-              "relative w-10 h-6 rounded-full shadow-sm transition-colors duration-300 overflow-hidden",
-              theme === "light" ? "bg-violet-600" : "bg-violet-100",
-            ].join(" ")}
-          >
-            <span className="absolute left-1 top-1/2 -translate-y-1/2 text-yellow-400">
-              <SunIcon />
-            </span>
-            <span className="absolute right-1 top-1/2 -translate-y-1/2 text-violet-400">
-              <MoonIcon />
-            </span>
-            <span
-              className={[
-                "absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-md flex items-center justify-center transition-transform duration-300",
-                theme === "light" ? "translate-x-4" : "translate-x-0",
-              ].join(" ")}
-            >
-              {theme === "light" ? <MoonIcon /> : <SunIcon />}
-            </span>
-          </button>
-        </div> */}
         <div className="flex items-center gap-2 shrink-0">
           {/* Notification */}
           <button
@@ -230,7 +194,7 @@ export default function Header({
         {/* Title */}
         <div className="flex-1 min-w-0">
           <h1 className="text-3xl font-bold leading-tight truncate">
-            {title + " " + currentUser.username}
+            {title + " " + currentUser?.username}
           </h1>
           <p className="text-base text-violet-400 mt-1 leading-tight truncate" style={{ fontFamily: "UVN Giong Song" }}>
             {subtitle ?? "Here's your progress overview"}
@@ -259,51 +223,6 @@ export default function Header({
             </div>
           )}
 
-          {/* <div className="w-px h-6 bg-violet-100 mx-1" /> */}
-          {/* 
-          <button
-            onClick={toggleLang}
-            aria-label="Toggle language"
-            className="flex items-center gap-1 h-9 px-2.5 rounded-xl border text-violet-500 hover:bg-violet-50 hover:border-violet-200 transition-all text-xs font-semibold tracking-wide select-none"
-          >
-            <span
-              className={lang === "EN" ? "text-violet-700" : "text-violet-300"}
-            >
-              EN
-            </span>
-            <span className="text-violet-200 font-normal">|</span>
-            <span
-              className={lang === "VI" ? "text-violet-700" : "text-violet-300"}
-            >
-              VI
-            </span>
-          </button>
-
-          <button
-            onClick={toggleTheme}
-            aria-label="Toggle dark mode"
-            className={[
-              "relative w-[52px] h-7 rounded-full transition-colors duration-300 overflow-hidden",
-              theme === "light" ? "bg-violet-600" : "bg-violet-100",
-            ].join(" ")}
-          >
-            <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-yellow-400">
-              <SunIcon />
-            </span>
-            <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-violet-400">
-              <MoonIcon />
-            </span>
-            <span
-              className={[
-                "absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md flex items-center justify-center transition-transform duration-300",
-                theme === "light" ? "translate-x-6" : "translate-x-0",
-              ].join(" ")}
-            >
-              {theme === "light" ? <MoonIcon /> : <SunIcon />}
-            </span>
-          </button> */}
-
-          {/* <div className="w-px h-6 bg-violet-100 mx-1" /> */}
           <SettingsPopover />
           {/* Bell */}
           <div ref={dropdownRef}>
