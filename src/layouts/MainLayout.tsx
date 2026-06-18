@@ -15,24 +15,15 @@ import { useCheckIns } from "@/shared/hooks/useCheckIns";
 import { NotificationContext } from "../features/notifications/context/NotificationContext";
 import { getCurrentStreak, getStreakProgress, getTotalCompletionProgress } from "../features/habit/calculators/GoalCalculator";
 
+
 export default function MainLayout() {
-  const navigate = useNavigate();
-
-  // Chặn truy cập khi chưa đăng nhập (guard cho toàn bộ khu /dashboard)
-  const currentUser: User | null = JSON.parse(
-    localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "null",
-  );
-
-  useEffect(() => {
-    if (!currentUser) navigate(ROUTES.AUTH, { replace: true });
-  }, []);
-
+  const currentUser = JSON.parse(localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "{}") as User
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const { t } = useTranslation();
 
-  const habitData = useHabits(currentUser?.phone ?? "");
-  const habitSchedule = useHabitSchedule(currentUser?.phone ?? "");
+  const habitData = useHabits(currentUser?.phone);
+  const habitSchedule = useHabitSchedule(currentUser?.phone);
   const categoryData = useCategories();
 
   const goalData = useGoals();

@@ -31,6 +31,12 @@ import { usePagination } from "../../../shared/hooks/usePagination";
 import { Pagination } from "../../../shared/components/common/Pagination";
 import "../Goals.css";
 
+
+import { useNavigate } from "react-router-dom"
+import type { User } from "@/shared/types/User"
+import { ROUTES } from "@/shared/constants/appConstants"
+
+
 function GoalsPage() {
   const { t } = useTranslation();
 
@@ -54,7 +60,14 @@ function GoalsPage() {
     updateGoal,
     deleteGoal,
   } = useGoals();
+  const navigate = useNavigate()
 
+  const currentUser: User | null =
+    JSON.parse(
+      localStorage.getItem(
+        STORAGE_KEY.CURRENT_USER
+      ) || "null"
+    );
   // Get all habits from local storage
   const allHabits = useMemo(() => {
     return JSON.parse(
@@ -200,7 +213,11 @@ function GoalsPage() {
   };
 
   const hasActiveFilters = !statusFilters.includes("ALL") || typeFilter !== "ALL";
-
+  useEffect(() => {
+    if (!currentUser) {
+      navigate(ROUTES.AUTH);
+    }
+  }, [])
   // Main UI
   return (
     <div className="flex flex-col gap-6 pb-24 md:pb-8 text-[var(--text)] animate-in fade-in duration-300">
@@ -307,10 +324,9 @@ function GoalsPage() {
                 flex items-center gap-1.5 h-9 px-3.5 rounded-full
                 border text-sm font-medium
                 transition-all duration-150
-                ${
-                  showFilters || hasActiveFilters
-                    ? "border-[var(--primary)] bg-[var(--primary)]/10 text-[var(--primary)]"
-                    : "border-[var(--text)]/10 opacity-70 hover:opacity-100"
+                ${showFilters || hasActiveFilters
+                  ? "border-[var(--primary)] bg-[var(--primary)]/10 text-[var(--primary)]"
+                  : "border-[var(--text)]/10 opacity-70 hover:opacity-100"
                 }
             `}
             >
@@ -384,8 +400,8 @@ function GoalsPage() {
                     active={
                       s === "TRACKING"
                         ? statusFilters.includes("IN_PROGRESS") &&
-                          statusFilters.includes("NOT_STARTED") &&
-                          statusFilters.length === 2
+                        statusFilters.includes("NOT_STARTED") &&
+                        statusFilters.length === 2
                         : statusFilters.includes(s)
                     }
                     onClick={() => toggleStatusFilter(s)}
@@ -591,7 +607,7 @@ function GoalsPage() {
         habitName={
           selectedGoalDetail
             ? (allHabits.find((h) => h.id === selectedGoalDetail.habitId)
-                ?.name ?? t("goals.hidden_habit"))
+              ?.name ?? t("goals.hidden_habit"))
             : ""
         }
         isOpen={panelOpen}
