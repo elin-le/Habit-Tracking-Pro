@@ -21,7 +21,7 @@
     "statistics": "Statistics",
     "settings": "Settings",
     "notifications": "Notifications",
-    "community":"Community"
+    "community": "Community"
   },
   "habit": {
     "create": "Create Habit",
@@ -69,10 +69,13 @@
     "val-name-1": "*Habit name is required",
     "val-name-2": "*Habit name must be at least 2 characters",
     "val-name-3": "*Habit name must be under 50 characters",
+    "val-name-4": "*Target must be at least 1",
     "paused-hint": "*This habit is paused. Resume the habit to edit its frequency and daily target.",
     "ACTIVE": "Active",
     "PAUSED": "Paused",
-    "ARCHIVED": "Archived"
+    "ARCHIVED": "Archived",
+    "updated": "has been updated",
+    "created": "has been created"
   },
   "days": {
     "sun": "Sun",
@@ -187,6 +190,8 @@
     "weekly_performance": "Last 7 days performance",
     "congrats_completed": "Congratulations! You've successfully completed this goal!",
     "congrats_near": "Keep it up! You have reached over 80% of your goal!",
+    "motivation_eyebrow": "KEEP GOING",
+    "motivation_headline": "A journey of a thousand miles begins with a single step. You can do it!",
     "started_date": "Started",
     "end_date": "Ended",
     "action_archive": "Archive goal",
@@ -247,7 +252,11 @@
     "risk_at_risk": "At risk",
     "empty": "No statistics yet",
     "empty_hint": "Create habits and check in to see your stats here",
-    "empty_action": "Create your habit"
+    "empty_action": "Create your habit",
+    "statistics.no_match": "No habits match the selected filters",
+    "btn_export": "Download",
+    "ex_noti1": "Data export successful",
+    "ex_noti2": "Data export failed"
   },
   "notifications": {
     "title": "Notifications",
@@ -256,6 +265,7 @@
     "listTitle": "Recent Notifications",
     "markAllRead": "Mark all as read",
     "readBtn": "Read",
+    "viewMore": "View all",
     "demoPanel": {
       "title": "Quick Notification Triggers",
       "subtitle": "Select milestones below to send alerts and progress updates",
@@ -293,21 +303,26 @@
     "health": "Health",
     "learning": "Learning",
     "productivity": "Productivity",
-    "days": "Days"
+    "days": "Days",
+    "showMore": "Show More",
+    "showLess": "Show Less",
+    "noGoals": "No active goals"
   },
-  "checkin":{
-    "history":"Check-in History",
-    "no":"Empty",
+  "checkin": {
+    "history": "Check-in History",
+    "no": "Empty",
     "not_finished": "Not finished",
-    "completed":"Completed"
+    "completed": "Completed",
+    "toast_update": "Completed {{count}} {{name}}"
   },
-  "setting":{
-    "setting":"Setting",
-    "darkMode":"Dark Mode",
-    "vietnamese":"Vietnamese",
-    "readOnly":"Read Only"
+  "setting": {
+    "setting": "Setting",
+    "darkMode": "Dark Mode",
+    "vietnamese": "Vietnamese",
+    "readOnly": "Read Only"
   },
   "heatmap": {
-    "more":"More"
+    "more":"More",
+    "title":"Frequency of Check-in"
   }
 }

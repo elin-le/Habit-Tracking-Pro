@@ -1,4 +1,4 @@
-import type { HabitStat } from "../shared/types/Statistics";
+/*import type { HabitStat } from "../shared/types/Statistics";
 
 export const mockStats: HabitStat[] = [
 { 
@@ -45,4 +45,4 @@ export const mockStats: HabitStat[] = [
     riskLevel: "SAFE",    
     last7Days: [100, 100, 100, 100, 100, 80, 100] 
     },
-];
+];*/

@@ -64,19 +64,19 @@ export const NotificationList = ({ filter = 'ALL' }: { filter?: string }) => {
             }}
           >
             <div>
-              <h4 className="mb-1 text-sm font-medium" style={{ color: 'var(--text)' }}>
+              <h4 className={`mb-1 text-[15px] ${notif.isRead ? 'font-semibold' : 'font-bold'}`} style={{ color: 'var(--text)' }}>
                 {t(notif.title, {
                   ...notif.params,
                   habitName: notif.params?.habitName ? t(String(notif.params.habitName)) : ''
                 })}
               </h4>
-              <p className="text-sm opacity-80" style={{ color: 'var(--text)' }}>
+              <p className={`text-sm ${notif.isRead ? 'font-medium opacity-85' : 'font-semibold opacity-100'}`} style={{ color: 'var(--text)' }}>
                 {t(notif.message, {
                   ...notif.params,
                   habitName: notif.params?.habitName ? t(String(notif.params.habitName)) : ''
                 })}
               </p>
-              <span className="mt-2 block text-xs opacity-50" style={{ color: 'var(--text)' }}>
+              <span className="mt-2 block text-xs font-medium opacity-70" style={{ color: 'var(--text)' }}>
                 {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>

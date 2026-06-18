@@ -6,7 +6,7 @@ export interface Habit {
   id: string;
   name: string;
   frequencyType: FrequencyType;
-  targetPerDay: number;
+  targetPerDay: number | "";
   status: HabitStatus;
   priority: Priority;
   categoryId: string;

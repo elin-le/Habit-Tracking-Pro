@@ -20,7 +20,7 @@
     "statistics": "Thống kê",
     "settings": "Cài đặt",
     "notifications": "Thông báo",
-    "community":"Cộng đồng"
+    "community": "Cộng đồng"
   },
   "habit": {
     "create": "Tạo thói quen",
@@ -68,10 +68,13 @@
     "val-name-1": "*Tên thói quen là bắt buộc",
     "val-name-2": "*Tên thói quen phải có ít nhất 2 ký tự",
     "val-name-3": "*Tên thói quen phải dưới 50 ký tự",
+    "val-name-4": "*Mục tiêu phải ít nhất là 1",
     "paused-hint": "*Thói quen đang tạm dừng. Hãy tiếp tục (Resume) để chỉnh sửa tần suất và mục tiêu mỗi ngày.",
     "ACTIVE": "Đang hoạt động",
     "PAUSED": "Đã tạm dừng",
-    "ARCHIVED": "Đã lưu trữ"
+    "ARCHIVED": "Đã lưu trữ",
+    "updated": "đã được cập nhật",
+    "created": "đã được tạo"
   },
   "days": {
     "sun": "CN",
@@ -186,6 +189,8 @@
     "weekly_performance": "Hiệu suất 7 ngày qua",
     "congrats_completed": "Chúc mừng! Bạn đã hoàn thành mục tiêu này!",
     "congrats_near": "Cố lên! Bạn đã đạt hơn 80% chặng đường rồi!",
+    "motivation_eyebrow": "CỐ GẮNG LÊN",
+    "motivation_headline": "Hành trình ngàn dặm bắt đầu từ một bước chân. Bạn làm được mà!",
     "started_date": "Ngày bắt đầu",
     "end_date": "Ngày kết thúc",
     "action_archive": "Lưu trữ mục tiêu",
@@ -246,7 +251,11 @@
     "risk_at_risk": "Nguy cơ đứt chuỗi",
     "empty": "Chưa có dữ liệu để thống kê",
     "empty_hint": "Tạo thói quen và check-in mỗi ngày để xem thống kê tại đây",
-    "empty_action": "Tạo thói quen ngay"
+    "empty_action": "Tạo thói quen ngay",
+    "statistics.no_match": "Không có thói quen khớp bộ lọc",
+    "btn_export": "Xuất dữ liệu",
+    "ex_noti1": "Xuất dữ liệu thành công",
+    "ex_noti2": "Xuất dữ liệu thất bại"
   },
   "notifications": {
     "title": "Thông báo",
@@ -255,6 +264,7 @@
     "listTitle": "Thông báo gần đây",
     "markAllRead": "Đánh dấu tất cả đã đọc",
     "readBtn": "Đã đọc",
+    "viewMore": "View all",
     "demoPanel": {
       "title": "Kích hoạt thông báo nhanh",
       "subtitle": "Chọn các cột mốc bên dưới để gửi cảnh báo và thông báo tiến độ",
@@ -291,22 +301,28 @@
     "goalProgress": "Tiến độ mục tiêu",
     "health": "Sức khỏe",
     "learning": "Học tập",
-    "productivity": "Năng suất"
+    "productivity": "Năng suất",
+    "days": "Days",
+    "showMore": "Hiển thị thêm",
+    "showLess": "Thu gọn",
+    "noGoals": "Không có goals nào đang hoạt động"
   },
-   "checkin": {
+  "checkin": {
     "history": "Lịch sử check-in",
     "no": "Không có lịch sử check-in.",
     "not_finished": "Chưa hoàn thành",
-    "completed":"Đạt mục tiêu",
-    "days": "Ngày"
+    "completed": "Đạt mục tiêu",
+    "days": "Ngày",
+    "toast_update": "Đã thực hiện {{name}} {{count}} lần "
   },
-  "setting":{
-    "setting":"Cài đặt",
-    "darkMode":"Chế độ tối",
-    "vietnamese":"Tiếng Việt",
-    "readOnly":"Chỉ đọc"
+  "setting": {
+    "setting": "Cài đặt",
+    "darkMode": "Chế độ tối",
+    "vietnamese": "Tiếng Việt",
+    "readOnly": "Chỉ đọc"
   },
   "heatmap": {
-    "more":"Thêm"
+    "more":"Thêm",
+    "title":"Tần suất thực hiện thói quen"
   }
 }

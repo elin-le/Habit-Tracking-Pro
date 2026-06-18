@@ -95,7 +95,7 @@ export default function Header({
   createHabitSchedules,
 }: HeaderProps) {
   const { t } = useTranslation();
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   // const [lang, setLang] = useState<"EN" | "VI">("EN");
   const categories = JSON.parse(localStorage.getItem(STORAGE_KEY.CATEGORYS) || "[]") as Category[];
   const currentUser = JSON.parse(localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "{}") as User;
@@ -105,10 +105,16 @@ export default function Header({
 
   // 2. State điều khiển mở popup & click ra ngoài tự đóng
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showAllDropdownNotifs, setShowAllDropdownNotifs] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    if (!showNotifications) {
+      setShowAllDropdownNotifs(false);
+    }
+  }, [showNotifications]);
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {  
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setShowNotifications(false);
       }
@@ -339,13 +345,16 @@ export default function Header({
                   )}
                 </div>
 
-                <div className="max-h-[400px] overflow-y-auto">
+                <div 
+                  className="overflow-y-auto transition-all duration-200" 
+                  style={{ maxHeight: showAllDropdownNotifs ? '456px' : '400px' }}
+                >
                   {notifications.length === 0 ? (
                     <div className="p-8 text-center opacity-60" style={{ color: 'var(--text)' }}>
                       {t('notifications.empty')}
                     </div>
                   ) : (
-                    notifications.map((notif: any) => {
+                    (showAllDropdownNotifs ? notifications : notifications.slice(0, 5)).map((notif: any) => {
                       const isDark = theme === "dark";
                       const baseClass = "relative flex items-start gap-3 p-3 mx-2 my-1 rounded-xl cursor-pointer transition-colors";
                       const hoverClass = notif.isRead
@@ -366,8 +375,8 @@ export default function Header({
                       const textColor = isDark ? 'rgba(255,255,255,0.94)' : 'var(--text)';
 
                       const timeStyle: React.CSSProperties = notif.isRead
-                        ? { opacity: 0.6, color: isDark ? 'rgba(255,255,255,0.7)' : undefined }
-                        : { color: isDark ? '#93c5fd' : '#2563eb', fontWeight: 600 };
+                        ? { opacity: 0.75, color: isDark ? 'rgba(255,255,255,0.75)' : 'rgba(17,24,39,0.65)' }
+                        : { color: isDark ? '#93c5fd' : '#2563eb', fontWeight: 700 };
 
                       return (
                         <div
@@ -377,13 +386,13 @@ export default function Header({
                           style={itemStyle}
                         >
                           <div className="flex-1 min-w-0">
-                            <h4 className={`text-[15px] ${notif.isRead ? 'font-normal' : 'font-semibold'}`} style={{ color: textColor }}>
+                            <h4 className={`text-[15px] ${notif.isRead ? 'font-semibold' : 'font-bold'}`} style={{ color: textColor }}>
                               {t(notif.title, {
                                 ...(notif.params || {}),
                                 habitName: notif.params?.habitName ? t(String(notif.params.habitName)) : ''
                               }) as string}
                             </h4>
-                            <p className={`text-sm mt-0.5 leading-snug ${notif.isRead ? 'opacity-80' : 'opacity-90'}`} style={{ color: textColor }}>
+                            <p className={`text-sm mt-0.5 leading-snug ${notif.isRead ? 'font-medium opacity-85' : 'font-semibold opacity-100'}`} style={{ color: textColor }}>
                               {t(notif.message, {
                                 ...(notif.params || {}),
                                 habitName: notif.params?.habitName ? t(String(notif.params.habitName)) : ''
@@ -402,9 +411,25 @@ export default function Header({
                     })
                   )}
                 </div>
+
+                {notifications.length > 5 && !showAllDropdownNotifs && (
+                  <div className="border-t p-3 text-center" style={{ borderColor: 'color-mix(in srgb, var(--primary) 10%, transparent)' }}>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setShowAllDropdownNotifs(true);
+                      }}
+                      className="cursor-pointer inline-block w-full py-1.5 text-sm font-bold text-violet-600 hover:text-violet-700 transition-colors"
+                    >
+                      {t('notifications.viewMore')}
+                    </button>
+                  </div>
+                )}                
               </div>
             )}
           </div>
+
 
           {/* New Habit */}
           <button

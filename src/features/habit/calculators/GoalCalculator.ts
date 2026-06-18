@@ -376,3 +376,39 @@ export const getLast7DaysCompletionProgress = (
 
     return result;
 };
+
+export const getLast7DaysCompletionProgressWithoutGoal = (
+    habitCheckIns: CheckIn[],
+    targetPerDay: number
+): CompletionDto[] => {
+    const summary = getDailySummary(
+        habitCheckIns,
+        targetPerDay
+    );
+
+    const today = new Date();
+    const result: CompletionDto[] = [];
+
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+
+        const dateKey = getDateKey(date);
+
+        const completion =
+            summary[dateKey]?.count ?? 0;
+
+        result.push({
+            day: dateKey,
+            completion,
+            completionPercentage: Math.min(
+                Math.round(
+                    (completion / targetPerDay) * 100
+                ),
+                100
+            ),
+        });
+    }
+
+    return result;
+};

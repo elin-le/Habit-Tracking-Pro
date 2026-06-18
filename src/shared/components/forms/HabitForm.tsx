@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { DAY_LABELS, DAY_OF_WEEK_MAP } from "../../constants/appConstants";
+import {
+  DAY_LABELS,
+  DAY_OF_WEEK_MAP,
+  STORAGE_KEY,
+} from "../../constants/appConstants";
 import type {
   FrequencyType,
   Habit,
@@ -13,6 +17,7 @@ import { Button } from "../ui/Button";
 import { Modal } from "../ui/Modal";
 import { toast } from "sonner";
 import type { Category } from "@/shared/types/Category";
+import type { User } from "@/shared/types/User";
 
 // Style dùng chung cho input/select/textarea
 const inputStyle: React.CSSProperties = {
@@ -41,11 +46,15 @@ export function HabitForm({
   onSubmitSchedules,
   categories,
 }: HabitFormProps) {
+  const currentUser = JSON.parse(
+    localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "{}",
+  ) as User;
   const { t } = useTranslation();
 
   const isPaused = initial?.status === "PAUSED";
 
   const [nameError, setNameError] = useState("");
+  const [targetPerDayError, setTargetPerDayError] = useState("");
   const [activeDays, setActiveDays] = useState<number[]>(() => {
     if (!initialSchedules) return [];
     // convert DayOfWeek string → index
@@ -53,11 +62,18 @@ export function HabitForm({
       .map((s) => DAY_OF_WEEK_MAP.indexOf(s.dayOfWeek))
       .filter((i) => i !== -1);
   });
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{
+    name: string;
+    categoryId: string;
+    frequencyType: FrequencyType;
+    targetPerDay: number | "";
+    priority: Priority;
+    status: HabitStatus;
+  }>({
     name: initial?.name ?? "",
     categoryId: initial?.categoryId ?? "cat_health",
     frequencyType: initial?.frequencyType ?? ("DAILY" as FrequencyType),
-    targetPerDay: initial?.targetPerDay ?? 1,
+    targetPerDay: (initial?.targetPerDay ?? 1) as number | "",
     priority: initial?.priority ?? ("LOW" as Priority),
     status: initial?.status ?? ("ACTIVE" as HabitStatus),
   });
@@ -70,6 +86,11 @@ export function HabitForm({
     return "";
   };
 
+  const validateTargetPerDay = (value: number | ""): string => {
+    if (value === "" || value < 1) return `${t("habit_form.val-name-4")}`;
+    return "";
+  };
+
   const toggleDay = (dayIndex: number) => {
     setActiveDays((prev) =>
       prev.includes(dayIndex)
@@ -79,16 +100,18 @@ export function HabitForm({
   };
 
   const handleSubmit = () => {
-    const error = validateName(form.name);
-    if (error) {
-      setNameError(error);
-      return; // chặn submit
-    }
+    const nameError = validateName(form.name);
+    const targetError = validateTargetPerDay(form.targetPerDay);
+
+    setNameError(nameError);
+    setTargetPerDayError(targetError);
+
+    if (nameError || targetError) return;
 
     const newHabit: Habit = {
       ...form,
       id: initial?.id ?? crypto.randomUUID(),
-      userId: initial?.userId ?? "user-1",
+      userId: initial?.userId ?? currentUser.phone,
     };
 
     onSubmit(newHabit);
@@ -106,9 +129,9 @@ export function HabitForm({
     }
 
     if (initial?.id) {
-      toast.success(`"${newHabit.name}" has been updated`);
+      toast.success(`"${newHabit.name}" ${t("habit_form.updated")}`);
     } else {
-      toast.success(`"${newHabit.name}" has been created`);
+      toast.success(`"${newHabit.name}" ${t("habit_form.created")}`);
     }
 
     onClose();
@@ -135,9 +158,9 @@ export function HabitForm({
             value={form.name}
             onChange={(e) => {
               setForm((f) => ({ ...f, name: e.target.value }));
+              setNameError(validateName(form.name));
               if (nameError) setNameError(validateName(e.target.value)); // validate lại khi đang gõ (nếu đã từng lỗi)
             }}
-            onBlur={() => setNameError(validateName(form.name))} // validate khi rời input
             placeholder="e.g. Morning meditation..."
             className="w-full rounded-xl border px-4 py-3 outline-none transition focus:ring-4"
             style={
@@ -304,24 +327,50 @@ export function HabitForm({
               {t("habit_form.target-p-days")}
             </label>
             <input
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
+              type="number"
+              min={1}
+              max={999}
               disabled={isPaused}
               value={form.targetPerDay}
               onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, "");
+                if (isPaused) return;
+                const value = e.target.value;
 
-                if (value.length <= 3) {
-                  setForm({
-                    ...form,
-                    targetPerDay: Number(value || 1),
-                  });
+                if (value === "") {
+                  setForm((f) => ({ ...f, targetPerDay: "" })); // ✅ callback form
+                  setTargetPerDayError(validateTargetPerDay(""));
+                  return;
                 }
+
+                const numValue = Math.min(999, Number(value));
+
+                setForm((f) => ({ ...f, targetPerDay: numValue }));
+                setTargetPerDayError(validateTargetPerDay(numValue));
+              }}
+              onFocus={(e) => {
+                if (!targetPerDayError)
+                  e.currentTarget.style.borderColor = "var(--primary)";
               }}
               className="w-full rounded-xl border px-4 py-3 disabled:cursor-not-allowed"
-              style={inputStyle}
+              style={
+                {
+                  ...inputStyle,
+
+                  borderColor: targetPerDayError
+                    ? "#ef4444"
+                    : (inputStyle.borderColor as string),
+
+                  "--tw-ring-color": targetPerDayError
+                    ? "color-mix(in srgb, #ef4444 12%, transparent)"
+                    : "color-mix(in srgb, var(--primary) 12%, transparent)",
+                } as React.CSSProperties
+              }
             />
+            {targetPerDayError && (
+              <p className="mt-1.5 text-xs" style={{ color: "#ef4444" }}>
+                {targetPerDayError}
+              </p>
+            )}
           </div>
 
           {!initial?.id && (
@@ -353,11 +402,30 @@ export function HabitForm({
           <Button
             variant="outline"
             onClick={onClose}
-            className="cursor-pointer text-black dark:text-white"
+            className="cursor-pointer"
+            style={{
+              borderColor:
+                "color-mix(in srgb, var(--primary) 20%, transparent)",
+              background: "color-mix(in srgb, var(--primary) 4%, transparent)",
+              color: "var(--text)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background =
+                "color-mix(in srgb, var(--primary) 10%, transparent)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background =
+                "color-mix(in srgb, var(--primary) 4%, transparent)";
+            }}
           >
             {t("habit_form.btn_cancel")}
           </Button>
-          <Button onClick={handleSubmit} className="cursor-pointer">
+          <Button
+            onClick={() => {
+              handleSubmit();
+            }}
+            className="cursor-pointer"
+          >
             {form.name
               ? `${t("habit_form.btn_create2")}`
               : `${t("habit_form.btn_create1")}`}
