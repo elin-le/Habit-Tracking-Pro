@@ -317,6 +317,7 @@
     "readOnly": "Read Only"
   },
   "heatmap": {
-    "more": "More"
+    "more":"More",
+    "title":"Frequency of Check-in"
   }
 }
