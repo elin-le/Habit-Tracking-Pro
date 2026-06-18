@@ -302,7 +302,10 @@
     "health": "Health",
     "learning": "Learning",
     "productivity": "Productivity",
-    "days": "Days"
+    "days": "Days",
+    "showMore": "Show More",
+    "showLess": "Show Less",
+    "noGoals": "No active goals"
   },
   "checkin": {
     "history": "Check-in History",
