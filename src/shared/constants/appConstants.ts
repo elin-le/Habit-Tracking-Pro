@@ -8,7 +8,6 @@ export const ROUTES = {
   NOTIFICATIONS: "/notifications",
   AUTH: "/auth",
   LOGIN: "/auth/login",
-  REGISTER: "/auth/register",
   COMMUNITY: "/community"
 } as const;
 

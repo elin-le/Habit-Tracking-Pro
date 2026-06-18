@@ -313,6 +313,7 @@
     "readOnly":"Chỉ đọc"
   },
   "heatmap": {
-    "more":"Thêm"
+    "more":"Thêm",
+    "title":"Tần suất thực hiện thói quen"
   }
 }
