@@ -239,12 +239,8 @@ export function HabitCard({
                 toast.error(
                   <div className="w-full text-left" style={{ minWidth: '220px', maxWidth: '100%' }}>
                     <div className="flex justify-between items-center gap-2 w-full">
-                      <span className="font-bold text-slate-800 text-sm truncate flex-1">
-                        {habit.name}
-                      </span>
-                      <span className="font-bold text-red-600 text-sm shrink-0">
-                        {next}/{targetPerDay}
-                      </span>
+                      <span className="text-slate-800 text-sm truncate flex-1">
+                        {t("checkin.undo", { next: next, target: targetPerDay })}                      </span>
                     </div>
 
                     <div 

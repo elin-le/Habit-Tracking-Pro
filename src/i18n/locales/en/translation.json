@@ -324,7 +324,7 @@
     "no": "Empty",
     "not_finished": "Not finished",
     "completed": "Completed",
-    "toast_update": "Completed {{count}} {{name}}"
+    "undo": "Back to {{next}}/{{target}}. Let's smash it later!"
   },
   "setting": {
     "setting": "Setting",
