@@ -35,6 +35,7 @@ type LayoutContext = {
   categories: Category[];
   showAddForm: boolean;
   setShowAddForm: (v: boolean) => void;
+  deleteGoalsByHabitId: (habitId: string) => void;
   createGoal: (goalData: Omit<Goal, "id">) => Goal;
 };
 
@@ -53,16 +54,14 @@ export function HabitsPage() {
     replaceHabitSchedules,
     deleteHabit,
     deleteHabitSchedulesByHabitId,
+    deleteGoalsByHabitId,
     createGoal,
   } = useOutletContext<LayoutContext>();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const currentUser: User | null =
-    JSON.parse(
-      localStorage.getItem(
-        STORAGE_KEY.CURRENT_USER
-      ) || "null"
-    );
+  const currentUser: User | null = JSON.parse(
+    localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "null",
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
@@ -131,7 +130,7 @@ export function HabitsPage() {
     if (!currentUser) {
       navigate(ROUTES.AUTH);
     }
-  }, [])
+  }, []);
   return (
     <div className="animate-in">
       {/* Header */}
@@ -243,6 +242,7 @@ export function HabitsPage() {
               onDelete={() => {
                 deleteHabit(habit.id);
                 deleteHabitSchedulesByHabitId(habit.id);
+                deleteGoalsByHabitId(habit.id);
               }}
               onSetGoal={() => setGoalHabit(habit)}
               hasActiveGoal={
