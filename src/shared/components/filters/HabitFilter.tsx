@@ -1,8 +1,7 @@
-import {  SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 import { FilterChip } from "../common/FilterChip";
 import { DAY_OF_WEEK_MAP, DAYS } from "@/shared/constants/appConstants";
 import { useTranslation } from "react-i18next";
-import { enUS, vi } from "date-fns/locale";
 import type { HabitStatus, Priority } from "@/shared/types/Habit";
 import type { DaysOfWeek } from "@/shared/types/HabitSchedule";
 import { useState } from "react";
@@ -33,7 +32,7 @@ export function HabitFilter({
   onFrequencyChange,
   onClearAll,
 }: HabitFilterProps) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const [calendarDate, setCalendarDate] = useState<Date | undefined>();
 
