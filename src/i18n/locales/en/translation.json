@@ -222,6 +222,7 @@
     "create_goal": "Create goal",
     "error_target_required": "Enter a target greater than 0",
     "error_end_before_start": "End date must be after start date",
+    "error_end_before_today": "End date must be in the future",
     "empty_title": "No goals found",
     "empty_hint": "Add a goal to a habit below to get started",
     "empty_filter_hint": "No goals match your current filters",
