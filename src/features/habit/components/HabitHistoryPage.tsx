@@ -13,7 +13,7 @@ type LayoutContext = {
 };
 
 export function HabitHistoryPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { habitId } = useParams<{ habitId: string }>();
   const { habits } = useOutletContext<LayoutContext>();
@@ -138,7 +138,7 @@ export function HabitHistoryPage() {
                 {/* nội dung ngày tháng */}
                 <div className="flex flex-col">
                   <span className="text-sm font-medium" style={{ color: "var(--text)" }}>
-                    {new Date(record.checkedAt).toLocaleDateString("vi-VN", {
+                    {new Date(record.checkedAt).toLocaleDateString(i18n.language, {
                       weekday: "long",
                       year: "numeric",
                       month: "long",
