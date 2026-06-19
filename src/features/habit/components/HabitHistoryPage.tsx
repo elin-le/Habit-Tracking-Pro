@@ -29,8 +29,11 @@ export function HabitHistoryPage() {
   // lấy toàn bộ lịch sử check-in của habit này và sắp xếp ngày mới nhất lên đầu
   const historyRecords = useMemo(() => {
     if (!habitId) return [];
-    return getHistoryByHabitId(habitId);
-  }, [habitId, checkIns]);
+    const rawHistory = getHistoryByHabitId(habitId);
+    
+    // filter out if completionCount = 0
+    return rawHistory.filter((record: any) => record.completionCount > 0);
+  }, [habitId, checkIns, getHistoryByHabitId]); 
 
   if (!habit) {
     return (
