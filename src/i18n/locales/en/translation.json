@@ -266,6 +266,15 @@
     "markAllRead": "Mark all as read",
     "readBtn": "Read",
     "viewMore": "View all",
+    "filters": {
+      "title": "Notification Filters",
+      "typeLabel": "Notification Type",
+      "statusLabel": "Status",
+      "statusAll": "All",
+      "unread": "Unread",
+      "read": "Read",
+      "typeAll": "All"
+    },
     "demoPanel": {
       "title": "Quick Notification Triggers",
       "subtitle": "Select milestones below to send alerts and progress updates",

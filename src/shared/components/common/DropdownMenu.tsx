@@ -18,6 +18,8 @@ interface DropdownMenuProps {
   onUpdate: () => void;
   onUpdateStatus: (status: HabitStatus) => void;
   onDelete: () => void;
+  onSetGoal?: () => void;
+  hasActiveGoal?: boolean;
 }
 
 export function DropdownMenu({
@@ -27,6 +29,8 @@ export function DropdownMenu({
   onUpdate,
   onUpdateStatus,
   onDelete,
+  onSetGoal,
+  hasActiveGoal,
 }: DropdownMenuProps) {
   const { t } = useTranslation();
 
@@ -51,7 +55,8 @@ export function DropdownMenu({
           {
             icon: <Target size={14} />,
             label: "Set Goal",
-            action: () => console.log("Set Goal"),
+            action: onSetGoal || (() => {}),
+            disabled: hasActiveGoal,
           },
         ]
       : []),
@@ -111,11 +116,12 @@ export function DropdownMenu({
         <button
           key={item.label}
           onClick={item.action}
-          className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm transition-colors cursor-pointer"
+          className={`flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm transition-colors ${item.disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
           style={{
             color: item.danger ? "#ef4444" : "var(--sidebar-muted)",
           }}
           onMouseEnter={(e) => {
+            if(item.disabled) return;
             e.currentTarget.style.background = item.danger
               ? "color-mix(in srgb, #ef4444 10%, transparent)"
               : "color-mix(in srgb, var(--primary) 8%, transparent)";
@@ -124,11 +130,13 @@ export function DropdownMenu({
               : "var(--text)";
           }}
           onMouseLeave={(e) => {
+            if(item.disabled) return;
             e.currentTarget.style.background = "transparent";
             e.currentTarget.style.color = item.danger
               ? "#ef4444"
               : "var(--sidebar-muted)";
           }}
+          disabled={item.disabled}
         >
           {item.icon}
           {t(`dd-menu.${item.label}`)}

@@ -4,13 +4,25 @@ import { NotificationContext } from '../context/NotificationContext';
 import type { AppNotification } from '../types';
 import { NotificationTime } from './NotificationTime';
 
-export const NotificationList = ({ filter = 'ALL' }: { filter?: string }) => {
-  const { t } = useTranslation();
+export const NotificationList = ({
+  typeFilter = 'ALL',
+  readFilter = 'ALL'
+}: {
+  typeFilter?: string;
+  readFilter?: string;
+}) => {
+    const { t } = useTranslation();
   const { notifications, markAsRead, markAllAsRead } = useContext(NotificationContext);
 
-  const filteredNotifications = filter === 'ALL'
-    ? notifications
-    : notifications.filter((n: any) => n.type === filter);
+  const filteredNotifications = notifications.filter((notif: any) => {
+    const matchesType = typeFilter === 'ALL' || notif.type === typeFilter;
+    const matchesRead = readFilter === 'ALL'
+      ? true
+      : readFilter === 'UNREAD'
+        ? !notif.isRead
+        : notif.isRead;
+    return matchesType && matchesRead;
+  });
 
   if (filteredNotifications.length === 0) {
     return (

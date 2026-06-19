@@ -15,6 +15,7 @@ import { NotificationTime } from "@/features/notifications/component/Notificatio
 
 import { useNavigate } from "react-router-dom"
 
+
 interface HeaderProps {
   title?: string;
   subtitle?: string;
@@ -115,7 +116,8 @@ export default function Header({
   // 2. State điều khiển mở popup & click ra ngoài tự đóng
   const [showNotifications, setShowNotifications] = useState(false);
   const [showAllDropdownNotifs, setShowAllDropdownNotifs] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const desktopDropdownRef = useRef<HTMLDivElement>(null);
+  const mobileDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!showNotifications) {
@@ -123,15 +125,116 @@ export default function Header({
     }
   }, [showNotifications]);
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowNotifications(false);
+    function handleClickOutside(event: MouseEvent) {  
+      const target = event.target as Node;
+      const isInsideDesktop = desktopDropdownRef.current && desktopDropdownRef.current.contains(target);
+      const isInsideMobile = mobileDropdownRef.current && mobileDropdownRef.current.contains(target);
+      if (!isInsideDesktop && !isInsideMobile) {        setShowNotifications(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const renderDropdown = () => {
+    if (!showNotifications) return null;
+    return (
+      <div
+        className="absolute -right-[48px] top-full md:right-0 mt-2 w-80 max-w-[calc(100vw-32px)] sm:w-96 rounded-2xl shadow-xl border overflow-hidden z-50 flex flex-col"
+        style={{ background: 'var(--surface)', borderColor: 'color-mix(in srgb, var(--primary) 20%, transparent)' }}
+      >
+        <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: 'color-mix(in srgb, var(--primary) 10%, transparent)' }}>
+          <h3 className="font-bold text-xl" style={{ color: 'var(--text)' }}>
+            {t('notifications.title')}
+          </h3>
+          {unreadCount > 0 && (
+            <button
+              onClick={(e) => { e.stopPropagation(); markAllAsRead(); }}
+              className="text-sm font-medium text-blue-600 hover:text-blue-700"
+            >
+              {t('notifications.markAllRead')}
+            </button>
+          )}
+        </div>
+        <div 
+          className="overflow-y-auto transition-all duration-200" 
+          style={{ maxHeight: showAllDropdownNotifs ? '456px' : '400px' }}
+        >
+          {notifications.length === 0 ? (
+            <div className="p-8 text-center opacity-60" style={{ color: 'var(--text)' }}>
+              {t('notifications.empty')}
+            </div>
+          ) : (
+            (showAllDropdownNotifs ? notifications : notifications.slice(0, 5)).map((notif: any) => {
+              const isDark = theme === "dark";
+              const baseClass = "relative flex items-start gap-3 p-3 mx-2 my-1 rounded-xl cursor-pointer transition-colors";
+              const hoverClass = notif.isRead
+                ? isDark
+                  ? "hover:bg-white/5"
+                  : "hover:bg-black/5"
+                : isDark
+                  ? "hover:bg-[rgba(255,255,255,0.04)]"
+                  : "hover:bg-blue-50";
+              const itemStyle: React.CSSProperties = notif.isRead
+                ? {}
+                : (isDark
+                  ? { background: 'rgba(255,255,255,0.03)' }
+                  : { background: 'rgba(59,130,246,0.06)' }
+                );
+              const textColor = isDark ? 'rgba(255,255,255,0.94)' : 'var(--text)';
+              const timeStyle: React.CSSProperties = notif.isRead
+                ? { opacity: 0.75, color: isDark ? 'rgba(255,255,255,0.75)' : 'rgba(17,24,39,0.65)' }
+                : { color: isDark ? '#93c5fd' : '#2563eb', fontWeight: 700 };
+              return (
+                <div
+                  key={notif.id}
+                  onClick={() => { if (!notif.isRead) markAsRead(notif.id); }}
+                  className={`${baseClass} ${hoverClass}`}
+                  style={itemStyle}
+                >
+                  <div className="flex-1 min-w-0">
+                    <h4 className={`text-[15px] ${notif.isRead ? 'font-semibold' : 'font-bold'}`} style={{ color: textColor }}>
+                      {t(notif.title, {
+                        ...(notif.params || {}),
+                        habitName: notif.params?.habitName ? t(String(notif.params.habitName)) : ''
+                      }) as string}
+                    </h4>
+                    <p className={`text-sm mt-0.5 leading-snug ${notif.isRead ? 'font-medium opacity-85' : 'font-semibold opacity-100'}`} style={{ color: textColor }}>
+                      {t(notif.message, {
+                        ...(notif.params || {}),
+                        habitName: notif.params?.habitName ? t(String(notif.params.habitName)) : ''
+                      }) as string}
+                    </p>
+                    <span className={`text-[12px] mt-1 block`} style={timeStyle}>
+                      <NotificationTime createdAt={notif.createdAt || new Date().toISOString()} />
+                    </span>
+                  </div>
+                  {/* Chấm tròn xanh (Chưa đọc) */}
+                  {!notif.isRead && (
+                    <div className="w-3 h-3 rounded-full bg-blue-600 shrink-0 mt-2"></div>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
+        {notifications.length > 5 && !showAllDropdownNotifs && (
+          <div className="border-t p-3 text-center" style={{ borderColor: 'color-mix(in srgb, var(--primary) 10%, transparent)' }}>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowAllDropdownNotifs(true);
+              }}
+              className="cursor-pointer inline-block w-full py-1.5 text-sm font-bold text-violet-600 hover:text-violet-700 transition-colors"
+            >
+              {t('notifications.viewMore')}
+            </button>
+          </div>
+        )}                
+      </div>
+    );
+  };
   const greeting = (() => {
     const h = new Date().getHours();
     if (h < 12) return "Good morning";
@@ -167,26 +270,31 @@ export default function Header({
 
         <div className="flex items-center gap-2 shrink-0">
           {/* Notification */}
-          <button
-            onClick={() => setShowNotifications(!showNotifications)}
-            className="
-      relative
-      w-9 h-9
-      flex items-center justify-center
-      rounded-xl
-      text-violet-500
-      hover:bg-violet-50
-      transition
-    "
-          >
-            <BellIcon />
+          <div ref={mobileDropdownRef} className="relative">
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="
+                relative
+                w-9 h-9
+                flex items-center justify-center
+                rounded-xl
+                text-violet-500
+                hover:bg-violet-50
+                transition
+                cursor-pointer
+              "
+            >
+              <BellIcon />
 
-            {unreadCount > 0 && (
-              <span className="absolute top-0 right-0 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
-                {unreadCount > 99 ? "99+" : unreadCount}
-              </span>
-            )}
-          </button>
+              {unreadCount > 0 && (
+                <span className="absolute top-0 right-0 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
+            </button>
+            {renderDropdown()}
+          </div>
+
 
           <SettingsPopover />
         </div>
@@ -232,7 +340,7 @@ export default function Header({
 
           <SettingsPopover />
           {/* Bell */}
-          <div ref={dropdownRef}>
+          <div ref={desktopDropdownRef} >
             <button
               onClick={() => setShowNotifications(!showNotifications)}
               className="relative w-9 h-9 flex items-center justify-center rounded-xl text-violet-400 hover:bg-violet-50 hover:text-violet-600 transition-colors cursor-pointer"
@@ -245,109 +353,10 @@ export default function Header({
               )}
             </button>
 
-            {/* Khung Popup thả xuống */}
-            {showNotifications && (
-              <div
-                className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl shadow-xl border overflow-hidden z-50 flex flex-col"
-                style={{ background: 'var(--surface)', borderColor: 'color-mix(in srgb, var(--primary) 20%, transparent)' }}
-              >
-                <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: 'color-mix(in srgb, var(--primary) 10%, transparent)' }}>
-                  <h3 className="font-bold text-xl" style={{ color: 'var(--text)' }}>
-                    {t('notifications.title')}
-                  </h3>
-                  {unreadCount > 0 && (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); markAllAsRead(); }}
-                      className="text-sm font-medium text-blue-600 hover:text-blue-700"
-                    >
-                      {t('notifications.markAllRead')}
-                    </button>
-                  )}
-                </div>
+            
 
-                <div
-                  className="overflow-y-auto transition-all duration-200"
-                  style={{ maxHeight: showAllDropdownNotifs ? '456px' : '400px' }}
-                >
-                  {notifications.length === 0 ? (
-                    <div className="p-8 text-center opacity-60" style={{ color: 'var(--text)' }}>
-                      {t('notifications.empty')}
-                    </div>
-                  ) : (
-                    (showAllDropdownNotifs ? notifications : notifications.slice(0, 5)).map((notif: any) => {
-                      const isDark = theme === "dark";
-                      const baseClass = "relative flex items-start gap-3 p-3 mx-2 my-1 rounded-xl cursor-pointer transition-colors";
-                      const hoverClass = notif.isRead
-                        ? isDark
-                          ? "hover:bg-white/5"
-                          : "hover:bg-black/5"
-                        : isDark
-                          ? "hover:bg-[rgba(255,255,255,0.04)]"
-                          : "hover:bg-blue-50";
 
-                      const itemStyle: React.CSSProperties = notif.isRead
-                        ? {}
-                        : (isDark
-                          ? { background: 'rgba(255,255,255,0.03)' }
-                          : { background: 'rgba(59,130,246,0.06)' }
-                        );
-
-                      const textColor = isDark ? 'rgba(255,255,255,0.94)' : 'var(--text)';
-
-                      const timeStyle: React.CSSProperties = notif.isRead
-                        ? { opacity: 0.75, color: isDark ? 'rgba(255,255,255,0.75)' : 'rgba(17,24,39,0.65)' }
-                        : { color: isDark ? '#93c5fd' : '#2563eb', fontWeight: 700 };
-
-                      return (
-                        <div
-                          key={notif.id}
-                          onClick={() => { if (!notif.isRead) markAsRead(notif.id); }}
-                          className={`${baseClass} ${hoverClass}`}
-                          style={itemStyle}
-                        >
-                          <div className="flex-1 min-w-0">
-                            <h4 className={`text-[15px] ${notif.isRead ? 'font-semibold' : 'font-bold'}`} style={{ color: textColor }}>
-                              {t(notif.title, {
-                                ...(notif.params || {}),
-                                habitName: notif.params?.habitName ? t(String(notif.params.habitName)) : ''
-                              }) as string}
-                            </h4>
-                            <p className={`text-sm mt-0.5 leading-snug ${notif.isRead ? 'font-medium opacity-85' : 'font-semibold opacity-100'}`} style={{ color: textColor }}>
-                              {t(notif.message, {
-                                ...(notif.params || {}),
-                                habitName: notif.params?.habitName ? t(String(notif.params.habitName)) : ''
-                              }) as string}
-                            </p>
-                            <span className={`text-[12px] mt-1 block`} style={timeStyle}>
-                              <NotificationTime createdAt={notif.createdAt || new Date().toISOString()} />
-                            </span>
-                          </div>
-                          {/* Chấm tròn xanh (Chưa đọc) */}
-                          {!notif.isRead && (
-                            <div className="w-3 h-3 rounded-full bg-blue-600 shrink-0 mt-2"></div>
-                          )}
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-
-                {notifications.length > 5 && !showAllDropdownNotifs && (
-                  <div className="border-t p-3 text-center" style={{ borderColor: 'color-mix(in srgb, var(--primary) 10%, transparent)' }}>
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setShowAllDropdownNotifs(true);
-                      }}
-                      className="cursor-pointer inline-block w-full py-1.5 text-sm font-bold text-violet-600 hover:text-violet-700 transition-colors"
-                    >
-                      {t('notifications.viewMore')}
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
+            {renderDropdown()}
           </div>
 
 
