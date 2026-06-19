@@ -67,7 +67,9 @@ export default function MainLayout() {
     const originalSetItem = localStorage.setItem;
     localStorage.setItem = function (key, value) {
       originalSetItem.apply(this, [key, value]);
-      window.dispatchEvent(new CustomEvent('local-storage-update', { detail: { key, value } }));
+      window.dispatchEvent(
+        new CustomEvent("local-storage-update", { detail: { key, value } }),
+      );
     };
     return () => {
       localStorage.setItem = originalSetItem;
@@ -81,13 +83,14 @@ export default function MainLayout() {
         e.detail.key === STORAGE_KEY.USER_CHECKINS ||
         e.detail.key === STORAGE_KEY.USER_GOALS ||
         e.detail.key === STORAGE_KEY.USER_HABITS ||
-        e.detail.key === 'notifications'
+        e.detail.key === "notifications"
       ) {
-        setStorageTrigger(prev => prev + 1);
+        setStorageTrigger((prev) => prev + 1);
       }
     };
-    window.addEventListener('local-storage-update', handleStorageUpdate);
-    return () => window.removeEventListener('local-storage-update', handleStorageUpdate);
+    window.addEventListener("local-storage-update", handleStorageUpdate);
+    return () =>
+      window.removeEventListener("local-storage-update", handleStorageUpdate);
   }, []);
 
   useEffect(() => {
@@ -99,14 +102,18 @@ export default function MainLayout() {
     if (!rawHabits || !rawGoals || !rawCheckins) return;
 
     const allHabits = JSON.parse(rawHabits) as any[];
-    const habits = allHabits.filter((h: any) => h.userId === currentUser?.phone);
+    const habits = allHabits.filter(
+      (h: any) => h.userId === currentUser?.phone,
+    );
     const goals = JSON.parse(rawGoals) as any[];
     const checkIns = JSON.parse(rawCheckins) as any[];
 
     // Helper to get notifications list directly from localStorage to avoid stale state and race conditions
     const getFreshNotifications = () => {
       try {
-        return JSON.parse(localStorage.getItem('notifications') || '[]') as any[];
+        return JSON.parse(
+          localStorage.getItem("notifications") || "[]",
+        ) as any[];
       } catch {
         return [];
       }
@@ -117,22 +124,30 @@ export default function MainLayout() {
       const habit = habits.find((h: any) => h.id === goal.habitId);
       if (!habit) return; // Defensive check: Skip goals not belonging to current user's habits
 
-      const targetPerDay = typeof habit.targetPerDay === 'number' ? habit.targetPerDay : 1;
+      const targetPerDay =
+        typeof habit.targetPerDay === "number" ? habit.targetPerDay : 1;
       const habitName = habit.name;
 
-      const goalCheckins = checkIns.filter((c: any) => c.habitId === goal.habitId);
+      const goalCheckins = checkIns.filter(
+        (c: any) => c.habitId === goal.habitId,
+      );
       let progressPercent = 0;
-      if (goal.targetType === 'STREAK') {
+      if (goal.targetType === "STREAK") {
         progressPercent = getStreakProgress(goal, targetPerDay, goalCheckins);
-      } else if (goal.targetType === 'TOTAL_COMPLETIONS') {
-        progressPercent = getTotalCompletionProgress(goal, targetPerDay, goalCheckins);
+      } else if (goal.targetType === "TOTAL_COMPLETIONS") {
+        progressPercent = getTotalCompletionProgress(
+          goal,
+          targetPerDay,
+          goalCheckins,
+        );
       }
 
       const currentNotifs = getFreshNotifications();
 
       if (progressPercent >= 100) {
         const hasAchievedNotif = currentNotifs.some(
-          (n: any) => n.relatedEntityId === goal.id && n.type === 'GOAL_ACHIEVED'
+          (n: any) =>
+            n.relatedEntityId === goal.id && n.type === "GOAL_ACHIEVED",
         );
         if (!hasAchievedNotif) {
           addNotification(
@@ -146,7 +161,7 @@ export default function MainLayout() {
         }
       } else if (progressPercent >= 80) {
         const has80Notif = currentNotifs.some(
-          (n: any) => n.relatedEntityId === goal.id && n.type === 'GOAL_80'
+          (n: any) => n.relatedEntityId === goal.id && n.type === "GOAL_80",
         );
         if (!has80Notif) {
           addNotification(
@@ -163,10 +178,11 @@ export default function MainLayout() {
 
     // 2. Streak Risk
     habits.forEach((habit: any) => {
-      if (habit.status !== 'ACTIVE') return; // Defensive check: Skip inactive habits
+      if (habit.status !== "ACTIVE") return; // Defensive check: Skip inactive habits
 
       const habitCheckins = checkIns.filter((c: any) => c.habitId === habit.id);
-      const targetPerDay = typeof habit.targetPerDay === 'number' ? habit.targetPerDay : 1;
+      const targetPerDay =
+        typeof habit.targetPerDay === "number" ? habit.targetPerDay : 1;
       const currentStreakVal = getCurrentStreak(habitCheckins, targetPerDay);
 
       if (currentStreakVal >= 3) {
@@ -205,11 +221,14 @@ export default function MainLayout() {
     const todayKey = new Date().toISOString().split("T")[0];
 
     habits.forEach((habit: any) => {
-      if (habit.status !== 'ACTIVE') return; // Defensive check: Skip inactive habits
+      if (habit.status !== "ACTIVE") return; // Defensive check: Skip inactive habits
 
       const habitCheckins = checkIns.filter((c: any) => c.habitId === habit.id);
-      const targetPerDay = typeof habit.targetPerDay === 'number' ? habit.targetPerDay : 1;
-      const yesterdaySummary = habitCheckins.filter((c: any) => c.checkedAt === yesterdayKey).length;
+      const targetPerDay =
+        typeof habit.targetPerDay === "number" ? habit.targetPerDay : 1;
+      const yesterdaySummary = habitCheckins.filter(
+        (c: any) => c.checkedAt === yesterdayKey,
+      ).length;
       const isCompletedYesterday = yesterdaySummary >= targetPerDay;
 
       // Only fire missed habit if they have at least checked in once (not new habit)
@@ -270,12 +289,6 @@ export default function MainLayout() {
               // Goal
               goals: goalData.goals,
               userGoals: userGoals,
-              filteredGoals: goalData.filteredGoals,
-              statusFilters: goalData.statusFilters,
-              setStatusFilters: goalData.setStatusFilters,
-              toggleStatusFilter: goalData.toggleStatusFilter,
-              typeFilter: goalData.typeFilter,
-              setTypeFilter: goalData.setTypeFilter,
               createGoal: goalData.createGoal,
               updateGoal: goalData.updateGoal,
               deleteGoal: goalData.deleteGoal,
