@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { STORAGE_KEY } from "../constants/appConstants";
 import type { CheckIn } from "../types/CheckIn";
 
@@ -96,7 +96,32 @@ export function useCheckIns() {
 
     setCheckIns(next);
     writeCheckInsToStorage(next);
+
+    // dispatch event
+    const ev = new CustomEvent("checkins:updated", { detail: next });
+    window.dispatchEvent(ev);
+
   };
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      try {
+        const ev = e as CustomEvent<CheckIn[]>;
+        if (ev?.detail) {
+          setCheckIns(ev.detail);
+          return;
+        }
+      } catch (error) {
+        console.error("Checkin error:", error);
+      }
+
+      // fallback: read from storage
+      setCheckIns(readCheckInsFromStorage());
+    };
+
+    window.addEventListener("checkins:updated", handler as EventListener);
+    return () => window.removeEventListener("checkins:updated", handler as EventListener);
+  }, []);
 
   return {
     checkIns,

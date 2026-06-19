@@ -21,7 +21,7 @@ export const mockCheckIns: CheckIn[] = [
   { id: "checkin14", habitId: "habit-ngoc-5", checkedAt: "2026-06-10", completionCount: 1 },
   { id: "checkin15", habitId: "habit-elin-8", checkedAt: "2026-06-11", completionCount: 2 },
 
-  { id: "checkin16", habitId: "habit-truc-1", checkedAt: "2026-06-01", completionCount: 5 },
+  { id: "checkin16", habitId: "habit-truc-1", checkedAt: "2026-06-01", completionCount: 8 },
   { id: "checkin17", habitId: "habit-truc-2", checkedAt: "2026-06-10", completionCount: 1 },
   { id: "checkin18", habitId: "habit-truc-6", checkedAt: "2026-06-10", completionCount: 1 },
 
@@ -35,7 +35,7 @@ export const mockCheckIns: CheckIn[] = [
 
   { id: "checkin25", habitId: "habit-truc-2", checkedAt: "2026-06-07", completionCount: 1 },
   { id: "checkin26", habitId: "habit-truc-4", checkedAt: "2026-06-07", completionCount: 1 },
-  { id: "checkin27", habitId: "habit-elin-6", checkedAt: "2026-06-07", completionCount: 3 },
+  { id: "checkin27", habitId: "habit-elin-6", checkedAt: "2026-06-07", completionCount: 1 },
 
   { id: "checkin28", habitId: "habit-baohanh-5", checkedAt: "2026-06-06", completionCount: 2 },
   { id: "checkin29", habitId: "habit-baohanh-7", checkedAt: "2026-06-06", completionCount: 1 },
@@ -49,7 +49,7 @@ export const mockCheckIns: CheckIn[] = [
   { id: "checkin35", habitId: "habit-baohanh-4", checkedAt: "2026-06-04", completionCount: 2 },
   { id: "checkin36", habitId: "habit-baohanh-7", checkedAt: "2026-06-04", completionCount: 1 },
 
-  { id: "checkin37", habitId: "habit-elin-5", checkedAt: "2026-01-01", completionCount: 4 },
+  { id: "checkin37", habitId: "habit-elin-5", checkedAt: "2026-01-01", completionCount: 1 },
   { id: "checkin38", habitId: "habit-elin-8", checkedAt: "2026-02-03", completionCount: 2 },
 
   { id: "checkin39", habitId: "habit-elin-1", checkedAt: "2026-06-01", completionCount: 2 },
@@ -92,7 +92,7 @@ export const mockCheckIns: CheckIn[] = [
   { id: "checkin74", habitId: "habit-ngan-5", checkedAt: "2026-09-11", completionCount: 1 },
   { id: "checkin75", habitId: "habit-ngan-8", checkedAt: "2026-06-11", completionCount: 2 },
 
-  { id: "checkin76", habitId: "habit-thuyanh-1", checkedAt: "2026-01-10", completionCount: 5 },
+  { id: "checkin76", habitId: "habit-thuyanh-1", checkedAt: "2026-01-10", completionCount: 8 },
   { id: "checkin77", habitId: "habit-thuyanh-2", checkedAt: "2026-09-10", completionCount: 1 },
   { id: "checkin78", habitId: "habit-thuyanh-6", checkedAt: "2026-06-10", completionCount: 1 },
 
@@ -117,7 +117,7 @@ export const mockCheckIns: CheckIn[] = [
 
   { id: "checkin142", habitId: "habit-thuyanh-2", checkedAt: "2026-05-30", completionCount: 1 },
   { id: "checkin143", habitId: "habit-thuyanh-4", checkedAt: "2026-04-30", completionCount: 2 },
-  { id: "checkin144", habitId: "habit-thuyanh-7", checkedAt: "2026-02-22", completionCount: 4 },
+  { id: "checkin144", habitId: "habit-thuyanh-7", checkedAt: "2026-02-22", completionCount: 1 },
 
   { id: "checkin145", habitId: "habit-ngan-5", checkedAt: "2026-05-28", completionCount: 1 },
   { id: "checkin146", habitId: "habit-ngan-8", checkedAt: "2026-05-28", completionCount: 2 },
