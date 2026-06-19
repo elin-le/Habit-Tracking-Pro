@@ -15,8 +15,8 @@ import { useMemo, useState, useEffect } from "react";
 import { DAY_OF_WEEK_MAP } from "@/shared/constants/appConstants";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import type { Category } from "@/shared/types/Category";
-import type { User } from "@/shared/types/User"
-import { ROUTES, STORAGE_KEY } from "@/shared/constants/appConstants"
+import type { User } from "@/shared/types/User";
+import { ROUTES, STORAGE_KEY } from "@/shared/constants/appConstants";
 
 type LayoutContext = {
   habits: Habit[];
@@ -30,6 +30,7 @@ type LayoutContext = {
   categories: Category[];
   showAddForm: boolean;
   setShowAddForm: (v: boolean) => void;
+  deleteGoalsByHabitId: (habitId: string) => void;
 };
 
 export function HabitsPage() {
@@ -46,15 +47,13 @@ export function HabitsPage() {
     replaceHabitSchedules,
     deleteHabit,
     deleteHabitSchedulesByHabitId,
+    deleteGoalsByHabitId,
   } = useOutletContext<LayoutContext>();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const currentUser: User | null =
-    JSON.parse(
-      localStorage.getItem(
-        STORAGE_KEY.CURRENT_USER
-      ) || "null"
-    );
+  const currentUser: User | null = JSON.parse(
+    localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "null",
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
@@ -122,7 +121,7 @@ export function HabitsPage() {
     if (!currentUser) {
       navigate(ROUTES.AUTH);
     }
-  }, [])
+  }, []);
   return (
     <div className="animate-in">
       {/* Header */}
@@ -234,6 +233,7 @@ export function HabitsPage() {
               onDelete={() => {
                 deleteHabit(habit.id);
                 deleteHabitSchedulesByHabitId(habit.id);
+                deleteGoalsByHabitId(habit.id);
               }}
               categories={categories}
               isViewingToday={isViewingToday}
