@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   Target,
@@ -14,7 +14,6 @@ import {
 import type { Goal, GoalWithDerived } from "../../../shared/types/Goal.ts";
 import type { Habit } from "../../../shared/types/Habit.ts";
 import type { CheckIn } from "../../../shared/types/CheckIn.ts";
-import type { User } from "../../../shared/types/User.ts";
 import type {
   TypeFilter,
   StatusFilter,
@@ -32,7 +31,6 @@ import { SummaryCard } from "../components/SummaryCard.tsx";
 import { FilterChip } from "../components/FilterChip.tsx";
 import { calculateGoalStats } from "../services/GoalService.ts";
 
-import { STORAGE_KEY, ROUTES } from "../../../shared/constants/appConstants";
 import { ToastService } from "../../../routes/services/toastService.ts";
 import { removeAccents } from "../../../shared/utils/stringUtils.ts";
 import "../Goals.css";
@@ -50,7 +48,6 @@ type LayoutContext = {
 function GoalsPage() {
   // Contexts & Hooks
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const {
     habits: allHabits,
     goals,
@@ -86,11 +83,6 @@ function GoalsPage() {
     !statusFilters.includes("ALL") || typeFilter !== "ALL";
 
   // Derived state
-  const currentUser = useMemo(() => {
-    const rawUser = localStorage.getItem(STORAGE_KEY.CURRENT_USER);
-    return rawUser ? JSON.parse(rawUser) : null;
-  }, []) as User | null;
-
   const activeHabits = useMemo(
     () => allHabits.filter((h: Habit) => h.status === "ACTIVE"),
     [allHabits],
@@ -189,6 +181,16 @@ function GoalsPage() {
     };
   }, [selectedGoalDetail, checkIns, allHabits]);
 
+  // Sync selectedGoalDetail when global goals update (e.g. from check-in)
+  // useEffect(() => {
+  //   if (selectedGoalDetail) {
+  //     const updatedGoal = goals.find((g) => g.id === selectedGoalDetail.id);
+  //     if (updatedGoal && updatedGoal !== selectedGoalDetail) {
+  //       setSelectedGoalDetail(updatedGoal);
+  //     }
+  //   }
+  // }, [goals, selectedGoalDetail]);
+
   const habitsWithoutGoal = useMemo(() => {
     const activeGoalHabitIds = new Set(
       goals
@@ -210,12 +212,6 @@ function GoalsPage() {
   }, [activeHabits, goals, habitWithoutGoalSearchQuery]);
 
   // Side effects
-  useEffect(() => {
-    if (!currentUser) {
-      navigate(ROUTES.AUTH);
-    }
-  }, [currentUser, navigate]);
-
   useEffect(() => {
     const handler = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", handler);

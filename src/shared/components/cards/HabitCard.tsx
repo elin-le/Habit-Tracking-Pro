@@ -41,6 +41,8 @@ interface HabitCardProps {
   onDelete: () => void;
   categories: Category[];
   isViewingToday: boolean;
+  onSetGoal?: () => void;
+  hasActiveGoal?: boolean;
 }
 
 export function HabitCard({
@@ -50,6 +52,8 @@ export function HabitCard({
   onDelete,
   categories,
   isViewingToday,
+  onSetGoal,
+  hasActiveGoal,
 }: HabitCardProps) {
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -325,6 +329,11 @@ export function HabitCard({
             setMenuOpen(false);
             setDeleteDialogOpen(true);
           }}
+          onSetGoal={() => {
+            setMenuOpen(false);
+            onSetGoal?.();
+          }}
+          hasActiveGoal={hasActiveGoal}
         />
       )}
 
