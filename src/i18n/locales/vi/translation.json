@@ -221,6 +221,7 @@
     "create_goal": "Tạo mục tiêu",
     "error_target_required": "Nhập mục tiêu lớn hơn 0",
     "error_end_before_start": "Ngày kết thúc phải sau ngày bắt đầu",
+    "error_end_before_today": "Ngày kết thúc phải là ngày trong tương lai",
     "empty_title": "Không tìm thấy mục tiêu",
     "empty_hint": "Thêm mục tiêu cho một thói quen bên dưới để bắt đầu",
     "empty_filter_hint": "Không có mục tiêu nào khớp với bộ lọc hiện tại",

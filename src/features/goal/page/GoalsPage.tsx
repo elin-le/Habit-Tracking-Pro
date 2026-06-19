@@ -65,7 +65,7 @@ function GoalsPage() {
   const [editingGoal, setEditingGoal] = useState<GoalWithDerived | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [statusFilters, setStatusFilters] = useState<StatusFilter[]>(["ALL"]);
+  const [statusFilters, setStatusFilters] = useState<StatusFilter[]>(["TRACKING"]);
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("ALL");
   const [activeHabitSearchQuery, setactiveHabitSearchQuery] = useState("");
   const [habitWithoutGoalSearchQuery, setHabitWithoutGoalSearchQuery] =
@@ -181,7 +181,6 @@ function GoalsPage() {
     };
   }, [selectedGoalDetail, checkIns, allHabits]);
 
-  // Sync selectedGoalDetail when global goals update (e.g. from check-in)
   // useEffect(() => {
   //   if (selectedGoalDetail) {
   //     const updatedGoal = goals.find((g) => g.id === selectedGoalDetail.id);
@@ -563,7 +562,7 @@ function GoalsPage() {
         {paginatedGoals.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {paginatedGoals.map((g) => {
-              const habit = activeHabits.find((h: Habit) => h.id === g.habitId);
+              const habit = allHabits.find((h: Habit) => h.id === g.habitId);
               const habitName = habit ? habit.name : t("goals.hidden_habit");
 
               return (
@@ -571,6 +570,7 @@ function GoalsPage() {
                   key={g.id}
                   goal={g}
                   habitName={habitName}
+                  habitStatus={habit?.status}
                   onSelectDetail={handleSelectDetail}
                   onEdit={() => handleOpenEditModal(g)}
                   onDelete={() => {
@@ -767,7 +767,7 @@ function GoalsPage() {
         goal={selectedGoalFull}
         habitName={
           selectedGoalFull
-            ? (activeHabits.find((h) => h.id === selectedGoalFull.habitId)
+            ? (allHabits.find((h) => h.id === selectedGoalFull.habitId)
                 ?.name ?? t("goals.hidden_habit"))
             : ""
         }
