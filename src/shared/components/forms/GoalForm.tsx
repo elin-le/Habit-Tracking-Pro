@@ -100,10 +100,13 @@ const GoalForm: React.FC<GoalFormProps> = ({
   }
 
   const validate = (): boolean => {
-    const next: FormErrors = {
-      targetValue: validateTargetValue(),
-      endDate: validateEndDate()
-    };
+    const next: FormErrors = {};
+    
+    const targetError = validateTargetValue();
+    if (targetError) next.targetValue = targetError;
+    
+    const endError = validateEndDate();
+    if (endError) next.endDate = endError;
 
     setErrors(next);
     return Object.keys(next).length === 0;

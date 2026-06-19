@@ -181,14 +181,14 @@ function GoalsPage() {
     };
   }, [selectedGoalDetail, checkIns, allHabits]);
 
-  // useEffect(() => {
-  //   if (selectedGoalDetail) {
-  //     const updatedGoal = goals.find((g) => g.id === selectedGoalDetail.id);
-  //     if (updatedGoal && updatedGoal !== selectedGoalDetail) {
-  //       setSelectedGoalDetail(updatedGoal);
-  //     }
-  //   }
-  // }, [goals, selectedGoalDetail]);
+  useEffect(() => {
+    if (selectedGoalDetail) {
+      const updatedGoal = goals.find((g) => g.id === selectedGoalDetail.id);
+      if (updatedGoal && updatedGoal !== selectedGoalDetail) {
+        setSelectedGoalDetail(updatedGoal);
+      }
+    }
+  }, [goals, selectedGoalDetail]);
 
   const habitsWithoutGoal = useMemo(() => {
     const activeGoalHabitIds = new Set(
