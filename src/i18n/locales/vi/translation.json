@@ -265,6 +265,15 @@
     "markAllRead": "Đánh dấu tất cả đã đọc",
     "readBtn": "Đã đọc",
     "viewMore": "View all",
+    "filters": {
+      "title": "Bộ lọc thông báo",
+      "typeLabel": "Loại thông báo",
+      "statusLabel": "Trạng thái",
+      "statusAll": "Tất cả",
+      "unread": "Chưa đọc",
+      "read": "Đã đọc",
+      "typeAll": "Tất cả"
+    },
     "demoPanel": {
       "title": "Kích hoạt thông báo nhanh",
       "subtitle": "Chọn các cột mốc bên dưới để gửi cảnh báo và thông báo tiến độ",

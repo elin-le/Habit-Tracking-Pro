@@ -140,7 +140,7 @@ export default function Header({
     if (!showNotifications) return null;
     return (
       <div
-        className="absolute -right-[48px] md:right-0 mt-2 w-80 max-w-[calc(100vw-32px)] sm:w-96 rounded-2xl shadow-xl border overflow-hidden z-50 flex flex-col"
+        className="absolute -right-[48px] top-full md:right-0 mt-2 w-80 max-w-[calc(100vw-32px)] sm:w-96 rounded-2xl shadow-xl border overflow-hidden z-50 flex flex-col"
         style={{ background: 'var(--surface)', borderColor: 'color-mix(in srgb, var(--primary) 20%, transparent)' }}
       >
         <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: 'color-mix(in srgb, var(--primary) 10%, transparent)' }}>
@@ -340,7 +340,7 @@ export default function Header({
 
           <SettingsPopover />
           {/* Bell */}
-          <div ref={desktopDropdownRef} className="relative">
+          <div ref={desktopDropdownRef} >
             <button
               onClick={() => setShowNotifications(!showNotifications)}
               className="relative w-9 h-9 flex items-center justify-center rounded-xl text-violet-400 hover:bg-violet-50 hover:text-violet-600 transition-colors cursor-pointer"
