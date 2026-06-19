@@ -50,6 +50,14 @@
 .dashboard-grid {
     display: grid;
     gap: 1.5rem;
+    /* FIX: đảm bảo các child không tràn ra ngoài */
+    min-width: 0;
+}
+
+/* FIX: tất cả direct children của grid phải có min-width: 0
+   để không bị overflow khi content (chart) rộng hơn container */
+.dashboard-grid > * {
+    min-width: 0;
 }
 
 .dashboard-grid__right {
@@ -57,14 +65,17 @@
     flex-direction: column;
     gap: 1.5rem;
     height: 100%;
+    min-width: 0; /* FIX: flex child không tràn */
 }
 
 .dashboard-grid__statistics {
     flex: 0 0 220px;
+    min-width: 0;
 }
 
 .dashboard-grid__heatmap {
     flex: 1;
+    min-width: 0;
 }
 
 /* ==========================================
@@ -77,6 +88,9 @@
     border: 2px solid rgba(124, 58, 237, 0.15);
     border-radius: 20px;
     padding: 1.5rem;
+    /* FIX: ngăn chart tràn ra khỏi card */
+    overflow: hidden;
+    min-width: 0;
     box-shadow:
         0 4px 12px rgba(124, 58, 237, 0.05),
         0 12px 30px rgba(124, 58, 237, 0.05);
@@ -142,11 +156,13 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .category-chart {
     width: 100%;
-    height: clamp(320px, 32vw, 420px);
+    height: clamp(300px, 40cqh, 420px);
 }
 
 .category-legend {
@@ -196,7 +212,7 @@
 
 .completion-chart {
     width: 100%;
-    height: clamp(220px, 18vw, 270px);
+    height: 250px;
 }
 
 /* ==========================================
@@ -250,7 +266,7 @@
 }
 
 /* ==========================================
-   MOBILE
+   MOBILE  (≤ 767px)
 ========================================== */
 
 @media (max-width: 767px) {
@@ -295,11 +311,11 @@
     }
 
     .category-chart {
-        height: 240px;
+        height: 260px;
     }
 
     .completion-chart {
-        height: 290px;
+        height: 220px;
     }
 
     .summary-card__value {
@@ -313,57 +329,74 @@
 }
 
 /* ==========================================
-   TABLET
+   TABLET  (768px – 1023px)
 ========================================== */
 
-@media (min-width:768px) and (max-width:1023px){
+@media (min-width: 768px) and (max-width: 1023px) {
 
-    .summary-grid{
-        grid-template-columns:repeat(4,1fr);
+    .summary-grid {
+        grid-template-columns: repeat(4, 1fr);
     }
 
-    .dashboard-grid{
-        grid-template-columns:1fr;
+    .dashboard-grid {
+        grid-template-columns: 1fr;
     }
 
-    .goal-grid{
-        grid-template-columns:repeat(2,1fr);
+    .goal-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .category-chart {
+        height: 340px;
+    }
+
+    .completion-chart {
+        height: 250px;
     }
 }
 
 /* ==========================================
-   DESKTOP
+   DESKTOP  (≥ 1024px)
 ========================================== */
 
-@media (min-width:1024px){
+@media (min-width: 1024px) {
 
-    .summary-grid{
-        grid-template-columns:repeat(4,1fr);
+    .summary-grid {
+        grid-template-columns: repeat(4, 1fr);
     }
 
-    .dashboard-grid{
-        display:grid;
-        grid-template-columns:45% 55%;
-        gap:1.5rem;
-        align-items:stretch;
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 45fr 55fr;
+        gap: 1.5rem;
+        align-items: stretch;
     }
 
-    .dashboard-grid__right{
-        display:flex;
-        flex-direction:column;
-        gap:1.5rem;
-        height:100%;
+    .dashboard-grid__right {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        height: 100%;
+        min-width: 0;
     }
 
-    .dashboard-grid__statistics{
-        flex:0 0 280px;
+    .dashboard-grid__statistics {
+        flex: 0 0 280px;
     }
 
-    .dashboard-grid__heatmap{
-        flex:1;
+    .dashboard-grid__heatmap {
+        flex: 1;
     }
 
-    .goal-grid{
-        grid-template-columns:repeat(3,1fr);
+    .goal-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .category-chart {
+        height: 380px;
+    }
+
+    .completion-chart {
+        height: 270px;
     }
 }
