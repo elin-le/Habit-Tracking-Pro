@@ -167,6 +167,7 @@
     "subtitle": "Every check-in moves you forward"
   },
   "goals": {
+    "active_goal_exists": "This habit already has an active goal. Please complete or archive it first.",
     "title": "Goals",
     "subtitle": "Manage and track your goals progress",
     "tracking": "Tracking",

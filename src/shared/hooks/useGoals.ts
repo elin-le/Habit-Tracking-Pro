@@ -8,6 +8,8 @@ import {
   updateGoal as serviceUpdateGoal,
   deleteGoal as serviceDeleteGoal,
 } from "../../features/goal/services/GoalService";
+import { ToastService } from "@/routes/services/toastService";
+import { useTranslation } from "react-i18next";
 
 export type StatusFilter =
   | "ALL"
@@ -19,6 +21,7 @@ export type StatusFilter =
 export type TypeFilter = "ALL" | "STREAK" | "TOTAL_COMPLETIONS";
 
 export const useGoals = (userHabits: Habit[] = [], checkIns: CheckIn[] = []) => {
+  const { t } = useTranslation();
   const [goals, setGoals] = useState<GoalWithDerived[]>([]);
 
   // hàm load lại dữ liệu
@@ -33,12 +36,33 @@ export const useGoals = (userHabits: Habit[] = [], checkIns: CheckIn[] = []) => 
 
   // các hàm CRUD, gọi xong tự động refresh lại màn hình
   const createGoal = (goalData: Omit<Goal, "id">) => {
-    const newGoal = serviceCreateGoal(goalData, userHabits, checkIns);
+    const activeGoal = goals.find(g => 
+        g.habitId === goalData.habitId && 
+        (g.progress.status === 'IN_PROGRESS' || g.progress.status === 'NOT_STARTED')
+    );
+    
+    if (activeGoal) {
+        ToastService.error(t("goals.active_goal_exists"));
+        return null;
+    }
+
+    const newGoal = serviceCreateGoal(goalData);
     refreshGoals();
     return newGoal;
   };
 
   const updateGoal = (id: string, goalData: Partial<Goal>) => {
+    const activeGoal = goals.find(g => 
+      g.id !== id &&
+      g.habitId === goalData.habitId &&
+      (g.progress.status === 'IN_PROGRESS' || g.progress.status === 'NOT_STARTED')
+    );
+
+    if (activeGoal) {
+      ToastService.error(t("goals.active_goal_exists"));
+      return null;
+    }
+
     const updated = serviceUpdateGoal(id, goalData);
     refreshGoals();
     return updated;
