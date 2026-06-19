@@ -50,7 +50,21 @@
 .dashboard-grid {
     display: grid;
     gap: 1.5rem;
-    align-items: start;
+}
+
+.dashboard-grid__right {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    height: 100%;
+}
+
+.dashboard-grid__statistics {
+    flex: 0 0 220px;
+}
+
+.dashboard-grid__heatmap {
+    flex: 1;
 }
 
 /* ==========================================
@@ -132,7 +146,7 @@
 
 .category-chart {
     width: 100%;
-    height: clamp(220px, 30vw, 300px);
+    height: clamp(320px, 32vw, 420px);
 }
 
 .category-legend {
@@ -182,7 +196,7 @@
 
 .completion-chart {
     width: 100%;
-    height: clamp(260px, 35vw, 390px);
+    height: clamp(220px, 18vw, 270px);
 }
 
 /* ==========================================
@@ -240,6 +254,7 @@
 ========================================== */
 
 @media (max-width: 767px) {
+
     .dashboard-page {
         padding: 1rem;
         gap: 1rem;
@@ -251,6 +266,16 @@
 
     .dashboard-grid {
         grid-template-columns: 1fr;
+    }
+
+    .dashboard-grid__right {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .dashboard-grid__statistics,
+    .dashboard-grid__heatmap {
+        flex: unset;
     }
 
     .goal-grid {
@@ -270,20 +295,20 @@
     }
 
     .category-chart {
-        height: 220px;
+        height: 240px;
     }
 
     .completion-chart {
-        height: 260px;
-    }
-
-    .category-legend__label,
-    .category-legend__value {
-        font-size: 0.5rem;
+        height: 290px;
     }
 
     .summary-card__value {
         font-size: 1.4rem;
+    }
+
+    .category-legend__label,
+    .category-legend__value {
+        font-size: 0.75rem;
     }
 }
 
@@ -291,25 +316,18 @@
    TABLET
 ========================================== */
 
-@media (min-width: 768px) and (max-width: 1023px) {
-    .summary-grid {
-        grid-template-columns: repeat(4, 1fr);
+@media (min-width:768px) and (max-width:1023px){
+
+    .summary-grid{
+        grid-template-columns:repeat(4,1fr);
     }
 
-    .dashboard-grid {
-        grid-template-columns: repeat(12, 1fr);
+    .dashboard-grid{
+        grid-template-columns:1fr;
     }
 
-    .dashboard-grid__category {
-        grid-column: span 5;
-    }
-
-    .dashboard-grid__statistics {
-        grid-column: span 7;
-    }
-
-    .goal-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .goal-grid{
+        grid-template-columns:repeat(2,1fr);
     }
 }
 
@@ -317,24 +335,35 @@
    DESKTOP
 ========================================== */
 
-@media (min-width: 1024px) {
-    .summary-grid {
-        grid-template-columns: repeat(4, 1fr);
+@media (min-width:1024px){
+
+    .summary-grid{
+        grid-template-columns:repeat(4,1fr);
     }
 
-    .dashboard-grid {
-        grid-template-columns: repeat(12, 1fr);
+    .dashboard-grid{
+        display:grid;
+        grid-template-columns:45% 55%;
+        gap:1.5rem;
+        align-items:stretch;
     }
 
-    .dashboard-grid__category {
-        grid-column: span 4;
+    .dashboard-grid__right{
+        display:flex;
+        flex-direction:column;
+        gap:1.5rem;
+        height:100%;
     }
 
-    .dashboard-grid__statistics {
-        grid-column: span 8;
+    .dashboard-grid__statistics{
+        flex:0 0 280px;
     }
 
-    .goal-grid {
-        grid-template-columns: repeat(3, 1fr);
+    .dashboard-grid__heatmap{
+        flex:1;
+    }
+
+    .goal-grid{
+        grid-template-columns:repeat(3,1fr);
     }
 }
