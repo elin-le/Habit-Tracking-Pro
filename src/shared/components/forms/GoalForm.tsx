@@ -85,8 +85,12 @@ const GoalForm: React.FC<GoalFormProps> = ({
     if (!targetValue || isNaN(num) || num <= 0) {
       next.targetValue = t("goals.error_target_required");
     }
-    if (!isStreak && endDate && endDate < startedDate) {
-      next.endDate = t("goals.error_end_before_start");
+    if (!isStreak && endDate) {
+      if (endDate < startedDate) {
+        next.endDate = t("goals.error_end_before_start");
+      } else if (endDate <= new Date().toISOString().split("T")[0]) {
+        next.endDate = t("goals.error_end_before_today");
+      }
     }
 
     setErrors(next);

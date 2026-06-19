@@ -237,12 +237,6 @@ export default function MainLayout() {
               
               // Goal
               goals: goalData.goals,
-              filteredGoals: goalData.filteredGoals,
-              statusFilters: goalData.statusFilters,
-              setStatusFilters: goalData.setStatusFilters,
-              toggleStatusFilter: goalData.toggleStatusFilter,
-              typeFilter: goalData.typeFilter,
-              setTypeFilter: goalData.setTypeFilter,
               createGoal: goalData.createGoal,
               updateGoal: goalData.updateGoal,
               deleteGoal: goalData.deleteGoal,

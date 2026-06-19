@@ -17,9 +17,14 @@ import { useDebounce } from "@/shared/hooks/useDebounce";
 import type { Category } from "@/shared/types/Category";
 import type { User } from "@/shared/types/User"
 import { ROUTES, STORAGE_KEY } from "@/shared/constants/appConstants"
+import GoalForm, { type GoalFormData } from "../../../shared/components/forms/GoalForm";
+import { Modal } from "../../../shared/components/ui/Modal";
+import type { Goal, GoalWithDerived } from "../../../shared/types/Goal";
+import { ToastService } from "../../../routes/services/toastService";
 
 type LayoutContext = {
   habits: Habit[];
+  goals: GoalWithDerived[];
   createHabit: (habit: Habit) => void;
   updateHabit: (habit: Habit) => void;
   deleteHabit: (habitId: string) => void;
@@ -30,12 +35,14 @@ type LayoutContext = {
   categories: Category[];
   showAddForm: boolean;
   setShowAddForm: (v: boolean) => void;
+  createGoal: (goalData: Omit<Goal, "id">) => Goal;
 };
 
 export function HabitsPage() {
   const { t } = useTranslation();
   const {
     habits,
+    goals,
     showAddForm,
     habitSchedules,
     categories,
@@ -46,6 +53,7 @@ export function HabitsPage() {
     replaceHabitSchedules,
     deleteHabit,
     deleteHabitSchedulesByHabitId,
+    createGoal,
   } = useOutletContext<LayoutContext>();
   const navigate = useNavigate()
 
@@ -59,6 +67,7 @@ export function HabitsPage() {
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   const [updatingHabit, setUpdatingHabit] = useState<Habit | null>(null);
+  const [goalHabit, setGoalHabit] = useState<Habit | null>(null);
 
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
   const [filterPriority, setFilterPriority] = useState<Priority | null>(null);
@@ -235,6 +244,10 @@ export function HabitsPage() {
                 deleteHabit(habit.id);
                 deleteHabitSchedulesByHabitId(habit.id);
               }}
+              onSetGoal={() => setGoalHabit(habit)}
+              hasActiveGoal={
+                goals?.some((g) => g.habitId === habit.id && (g.progress.status === "NOT_STARTED" || g.progress.status === "IN_PROGRESS"))
+              }
               categories={categories}
               isViewingToday={isViewingToday}
             />
@@ -271,6 +284,33 @@ export function HabitsPage() {
           }
           categories={categories}
         />
+      )}
+
+      {goalHabit && (
+        <Modal
+          title={t("goals.add_goal")}
+          onClose={() => setGoalHabit(null)}
+          size="sm"
+        >
+          <GoalForm
+            habitId={goalHabit.id}
+            habitName={goalHabit.name}
+            onSubmit={(formData: GoalFormData) => {
+              const newGoal: Omit<Goal, "id"> = {
+                ...formData,
+                endDate: formData.endDate || "",
+              };
+              try {
+                createGoal(newGoal);
+                ToastService.success(t("goals.add_success"));
+                setGoalHabit(null);
+              } catch (e: any) {
+                ToastService.error(e.message || "Error");
+              }
+            }}
+            onCancel={() => setGoalHabit(null)}
+          />
+        </Modal>
       )}
     </div>
   );
