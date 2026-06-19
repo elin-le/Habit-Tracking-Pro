@@ -152,13 +152,17 @@ const GoalDetailPanel: React.FC<GoalDetailPanelProps> = ({
               {t("goals.detail_title")}
             </span>
             <h2
-              className="text-xl font-bold mt-1 line-clamp-1 goal-detail-title"
-              onClick={() => {
-                onClose();
-                navigate(`/dashboard/habits/${display.habitId}/history`);
-              }}
+              className="text-xl font-bold mt-1 line-clamp-1"
             >
-              {habitName}
+              <span
+                className="goal-detail-habit-badge"
+                style={{ "--badge-color": barColor } as React.CSSProperties}
+                onClick={() => {
+                  onClose();
+                  navigate(`/dashboard/habits/${display.habitId}/history`);
+                }}>
+                {habitName}
+              </span>
             </h2>
           </div>
           <button

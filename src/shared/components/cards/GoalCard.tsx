@@ -18,6 +18,7 @@ import "./GoalCard.css";
 export interface GoalCardProps {
   goal?: GoalWithDerived;
   habitName: string;
+  habitStatus?: "ACTIVE" | "PAUSED" | "ARCHIVED";
   onSelectDetail?: (goal: GoalWithDerived) => void;
   onEdit?: () => void;
   onDelete?: () => void;
@@ -46,6 +47,7 @@ function formatDate(dateStr: string, locale?: string): string {
 const GoalCard: React.FC<GoalCardProps> = ({
   goal,
   habitName,
+  habitStatus,
   onSelectDetail,
   onEdit,
   onDelete,
@@ -191,6 +193,12 @@ const GoalCard: React.FC<GoalCardProps> = ({
                 80%+
               </span>
             )}
+            {habitStatus && habitStatus !== "ACTIVE" && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400/15 text-amber-500">
+                {habitStatus === "PAUSED" ? t("habit_form.PAUSED") : t("habit_form.ARCHIVED")}
+              </span>
+            )}
+
             <GoalDropdown onEdit={onEdit} onDelete={onDelete} />
           </div>
         </div>

@@ -221,6 +221,7 @@
     "create_goal": "Tạo mục tiêu",
     "error_target_required": "Nhập mục tiêu lớn hơn 0",
     "error_end_before_start": "Ngày kết thúc phải sau ngày bắt đầu",
+    "error_end_before_today": "Ngày kết thúc phải là ngày trong tương lai",
     "empty_title": "Không tìm thấy mục tiêu",
     "empty_hint": "Thêm mục tiêu cho một thói quen bên dưới để bắt đầu",
     "empty_filter_hint": "Không có mục tiêu nào khớp với bộ lọc hiện tại",
@@ -265,6 +266,15 @@
     "markAllRead": "Đánh dấu tất cả đã đọc",
     "readBtn": "Đã đọc",
     "viewMore": "View all",
+    "filters": {
+      "title": "Bộ lọc thông báo",
+      "typeLabel": "Loại thông báo",
+      "statusLabel": "Trạng thái",
+      "statusAll": "Tất cả",
+      "unread": "Chưa đọc",
+      "read": "Đã đọc",
+      "typeAll": "Tất cả"
+    },
     "demoPanel": {
       "title": "Kích hoạt thông báo nhanh",
       "subtitle": "Chọn các cột mốc bên dưới để gửi cảnh báo và thông báo tiến độ",
@@ -305,7 +315,8 @@
     "days": "Days",
     "showMore": "Hiển thị thêm",
     "showLess": "Thu gọn",
-    "noGoals": "Không có goals nào đang hoạt động"
+    "noGoals": "Không có goals nào đang hoạt động",
+    "noData": "Không có danh mục nào"
   },
   "checkin": {
     "history": "Lịch sử check-in",
@@ -313,7 +324,7 @@
     "not_finished": "Chưa hoàn thành",
     "completed": "Đạt mục tiêu",
     "days": "Ngày",
-    "toast_update": "Đã thực hiện {{name}} {{count}} lần "
+    "undo": "Trở lại mốc {{next}}/{{target}}. Cố gắng tiếp nhé!"
   },
   "setting": {
     "setting": "Cài đặt",

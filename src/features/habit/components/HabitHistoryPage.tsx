@@ -13,7 +13,7 @@ type LayoutContext = {
 };
 
 export function HabitHistoryPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { habitId } = useParams<{ habitId: string }>();
   const { habits } = useOutletContext<LayoutContext>();
@@ -29,8 +29,11 @@ export function HabitHistoryPage() {
   // lấy toàn bộ lịch sử check-in của habit này và sắp xếp ngày mới nhất lên đầu
   const historyRecords = useMemo(() => {
     if (!habitId) return [];
-    return getHistoryByHabitId(habitId);
-  }, [habitId, checkIns]);
+    const rawHistory = getHistoryByHabitId(habitId);
+    
+    // filter out if completionCount = 0
+    return rawHistory.filter((record: any) => record.completionCount > 0);
+  }, [habitId, checkIns, getHistoryByHabitId]); 
 
   if (!habit) {
     return (
@@ -138,7 +141,7 @@ export function HabitHistoryPage() {
                 {/* nội dung ngày tháng */}
                 <div className="flex flex-col">
                   <span className="text-sm font-medium" style={{ color: "var(--text)" }}>
-                    {new Date(record.checkedAt).toLocaleDateString("vi-VN", {
+                    {new Date(record.checkedAt).toLocaleDateString(i18n.language, {
                       weekday: "long",
                       year: "numeric",
                       month: "long",

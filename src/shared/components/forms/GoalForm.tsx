@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { TargetType } from "../../types/Goal";
 import { AlertCircle, Flame, Target, Calendar } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -72,22 +72,38 @@ const GoalForm: React.FC<GoalFormProps> = ({
   const handleTargetTypeChange = (type: TargetType) => {
     setTargetType(type);
     if (type === "STREAK") {
-      setEndDate("");
       setErrors((prev) => ({ ...prev, endDate: undefined }));
+    } else {
+      setEndDate("");
     }
   };
 
-  // Validation
-  const validate = (): boolean => {
-    const next: FormErrors = {};
-    const num = Number(targetValue);
+  // Auto-compute end date for STREAK goals
+  const computeStreakEndDate = (start: string, days: number): string => {
+    const date = new Date(start);
+    date.setDate(date.getDate() + days - 1);
+    return date.toISOString().split("T")[0];
+  };
 
-    if (!targetValue || isNaN(num) || num <= 0) {
-      next.targetValue = t("goals.error_target_required");
+  // Validation
+  const validateTargetValue = (): string | undefined => {
+    const inputValue = Number(targetValue);
+    if(!targetValue || isNaN(inputValue) || inputValue <= 0){
+      return t("goals.error_target_required");
     }
-    if (!isStreak && endDate && endDate < startedDate) {
-      next.endDate = t("goals.error_end_before_start");
-    }
+  }
+
+  const validateEndDate = (): string | undefined => {
+    if(isStreak || !endDate) return undefined;
+    if(endDate < startedDate) return t("goals.error_end_before_start");
+    if(endDate <= new Date().toISOString().split("T")[0]) return t("goals.error_end_before_today");
+  }
+
+  const validate = (): boolean => {
+    const next: FormErrors = {
+      targetValue: validateTargetValue(),
+      endDate: validateEndDate()
+    };
 
     setErrors(next);
     return Object.keys(next).length === 0;
@@ -96,6 +112,32 @@ const GoalForm: React.FC<GoalFormProps> = ({
   // Clear errors on change
   const clearError = (key: keyof FormErrors) =>
     setErrors((prev) => ({ ...prev, [key]: undefined }));
+
+  
+  // Side effects
+  const prevStartedDate = useRef(startedDate);
+  
+  useEffect(() => {
+    if(!isStreak) return;
+    const days = Number(targetValue);
+    if(days > 0) {
+      setEndDate(computeStreakEndDate(startedDate, days));
+    }
+  }, [targetValue, startedDate, isStreak]);
+
+  useEffect(() => {
+    if(isStreak || endDate === "") return;
+    
+    const oldStart = prevStartedDate.current;
+    const newStart = startedDate;
+
+    const spanMs = new Date(endDate).getTime() - new Date(oldStart).getTime();
+    const newEnd = new Date(new Date(startedDate).getTime() + spanMs).toISOString().split("T")[0];
+    
+    setEndDate(newEnd);
+    prevStartedDate.current = newStart;
+
+  }, [startedDate]);
 
   // Submit
   const handleSubmit = (e: React.FormEvent) => {

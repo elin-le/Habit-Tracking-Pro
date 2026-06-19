@@ -139,16 +139,15 @@ export const calculateGoalStats = (goal: Goal, checkins: CheckIn[], targetPerDay
     };
 }
 
-// Hàm tính toàn bộ dữ liệu liên quan đến goal
+// Hàm tính toán dữ liệu cơ bản liên quan đến goal
 export const calculateGoalProgress = (goal: Goal, checkins: CheckIn[], targetPerDay: number) : GoalWithDerived => {
     const progress = calculateCoreGoalProgress(goal, checkins, targetPerDay);
-    const stats = calculateGoalStats(goal, checkins, targetPerDay);
 
-    // trả về 1 goal có thêm progress và stats -> GoalWithDerived
+    // trả về 1 goal có thêm progress -> GoalWithDerived
+    // Không tính toán stats và weeklyHistory ở đây nữa để tối ưu performance
     return {
         ...goal,
         progress : progress,
-        ...stats
     };
 };
 
