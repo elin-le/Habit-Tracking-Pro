@@ -314,7 +314,8 @@
     "days": "Days",
     "showMore": "Hiển thị thêm",
     "showLess": "Thu gọn",
-    "noGoals": "Không có goals nào đang hoạt động"
+    "noGoals": "Không có goals nào đang hoạt động",
+    "noData": "Không có danh mục nào"
   },
   "checkin": {
     "history": "Lịch sử check-in",

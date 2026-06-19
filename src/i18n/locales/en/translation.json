@@ -315,7 +315,8 @@
     "days": "Days",
     "showMore": "Show More",
     "showLess": "Show Less",
-    "noGoals": "No active goals"
+    "noGoals": "No active goals",
+    "noData": "No Category Available"
   },
   "checkin": {
     "history": "Check-in History",
