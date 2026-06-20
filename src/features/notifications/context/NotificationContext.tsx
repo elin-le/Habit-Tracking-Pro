@@ -19,19 +19,22 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
             if (n.type === 'GOAL_80') {
               n.title = 'notifications.goal_80.title';
               n.message = 'notifications.goal_80.message';
-              n.params = { habitName: 'habit_form.Study' };
+              n.params = { habitName: n.params?.habitName || 'habit_form.Study' };
             } else if (n.type === 'GOAL_ACHIEVED') {
               n.title = 'notifications.goal_achieved.title';
               n.message = 'notifications.goal_achieved.message';
-              n.params = { habitName: 'habit_form.Health' };
+              n.params = { habitName: n.params?.habitName || 'habit_form.Health' };
             } else if (n.type === 'MISSED_HABIT') {
               n.title = 'notifications.missed_habit.title';
               n.message = 'notifications.missed_habit.message';
-              n.params = { habitName: 'habit_form.Mindfulness' };
+              n.params = { habitName: n.params?.habitName || 'habit_form.Mindfulness' };
             } else if (n.type === 'STREAK_RISK') {
               n.title = 'notifications.streak_risk.title';
               n.message = 'notifications.streak_risk.message';
-              n.params = { habitName: 'habit_form.Work', streakCount: 5 };
+              n.params = { 
+                habitName: n.params?.habitName || 'habit_form.Work', 
+                streakCount: typeof n.params?.streakCount === 'number' ? n.params.streakCount : 5 
+              };
             }
           }
           return n;
@@ -68,11 +71,18 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       params,
     };
 
-    setNotifications(prev => {
-      const updated = [newNotif, ...prev];
-      localStorage.setItem('notifications', JSON.stringify(updated));
-      return updated;
-    });
+    const saved = localStorage.getItem('notifications');
+    let currentList: AppNotification[] = [];
+    if (saved) {
+      try {
+        currentList = JSON.parse(saved);
+      } catch {
+        currentList = [];
+      }
+    }
+    const updated = [newNotif, ...currentList];
+    localStorage.setItem('notifications', JSON.stringify(updated));
+    setNotifications(updated);
   };
 
 

@@ -292,11 +292,11 @@
       "btnStreakRisk": "Nguy cơ đứt chuỗi"
     },
     "goal_80": {
-      "title": "Sắp đạt mục tiêu!",
+      "title": "Mục tiêu đạt 80%",
       "message": "Tuyệt vời! Bạn đã hoàn thành 80% mục tiêu {{habitName}}."
     },
     "goal_achieved": {
-      "title": "Đã hoàn thành mục tiêu!",
+      "title": "Mục tiêu đã đạt",
       "message": "Chúc mừng! Bạn đã xuất sắc hoàn thành mục tiêu {{habitName}}."
     },
     "missed_habit": {
@@ -305,7 +305,7 @@
     },
     "streak_risk": {
       "title": "Nguy cơ đứt chuỗi",
-      "message": "Cẩn thận! Bạn sắp làm đứt chuỗi {{habitName}} {{streakCount}} ngày rồi."
+      "message": "Cần thận! Bạn sắp làm đứt chuỗi {{habitName}} {{streakCount}} ngày rồi."
     }
   },
   "dashboard": {
