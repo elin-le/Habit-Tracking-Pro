@@ -251,23 +251,14 @@ Each seeding function checks if data already exists before creating to avoid ove
 - **Lucide React 1.18.0** - Icon library with 1000+ icons
 - **CVA (Class Variance Authority)** - Component variant management
 - **tailwind-merge** - Efficient Tailwind CSS class merging
-
-### Charts & Visualization
 - **ReCharts 3.8.1** - React charting library for analytics
+- **next-themes 0.4.6** - Theme management with system preference detection
 
 ### Data & Persistence
 - **localStorage API** - Browser-based data persistence
 - **JSON serialization** - Data format for storage
 
-### Theming
-- **next-themes 0.4.6** - Theme management with system preference detection
 
-### Notifications
-- **Sonner 2.0.7** - Beautiful toast notification library
-
-### Code Quality
-- **ESLint 10.3.0** - JavaScript/TypeScript linting
-- **typescript-eslint 8.59.2** - TypeScript-specific lint rules
 
 ## 📜 Scripts
 
@@ -303,10 +294,16 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📝 License
 
-This project is part of the NAB Wecamp Capstone program.
+This project is part of the NAB Wecamp program.
 
 ## 👨‍💻 Authors
-
+- Phan Lý Bảo Hạnh
+- Lê Yến Đan
+- Dương Thanh Ngọc
+- Phạm Thanh Bảo Ngân
+- Lương Thanh Trúc
+- Lưu Thuý Anh
+- Trần Thụy Vy
 ---
 
 **Last Updated**: June 2026
