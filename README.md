@@ -230,11 +230,7 @@ Each seeding function checks if data already exists before creating to avoid ove
 - **No User Authentication System**: Currently uses local user accounts stored in localStorage; no proper authentication or security
 - **Limited Analytics**: Analytics are calculated in real-time from local data; complex historical analysis may be slow with large datasets
 - **No Reminder System**: Application doesn't send push notifications or reminders outside of the app
-- **No Social Features**: Limited community/sharing features between users on the same device
 
-### Performance
-- **No Pagination**: Long lists of habits, goals, or check-ins are not paginated; performance may degrade with thousands of records
-- **In-memory Calculations**: All statistics and analytics are computed on-the-fly; historical analysis can be slow
 
 ## 🛠️ Technology Stack
 
@@ -262,11 +258,6 @@ Each seeding function checks if data already exists before creating to avoid ove
 ### Data & Persistence
 - **localStorage API** - Browser-based data persistence
 - **JSON serialization** - Data format for storage
-
-### Internationalization
-- **i18next 26.3.1** - Comprehensive i18n framework
-- **react-i18next 17.0.8** - React integration for i18n
-- **i18next-browser-languagedetector 8.2.1** - Automatic language detection
 
 ### Theming
 - **next-themes 0.4.6** - Theme management with system preference detection
