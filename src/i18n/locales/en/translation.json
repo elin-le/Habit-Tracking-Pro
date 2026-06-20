@@ -300,7 +300,8 @@
     },
     "missed_habit": {
       "title": "Missed habit",
-      "message": "You missed your {{habitName}} habit yesterday. Keep going today!"
+      "message": "You missed your {{habitName}} habit yesterday. Keep going today!",
+      "message_date": "You missed your {{habitName}} habit on {{missedDate}}."
     },
     "streak_risk": {
       "title": "Streak at risk",

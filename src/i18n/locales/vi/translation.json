@@ -301,7 +301,8 @@
     },
     "missed_habit": {
       "title": "Bỏ lỡ thói quen",
-      "message": "Bạn đã bỏ lỡ thói quen {{habitName}} ngày hôm qua. Cố gắng hôm nay nhé!"
+      "message": "Bạn đã bỏ lỡ thói quen {{habitName}} ngày hôm qua. Cố gắng hôm nay nhé!",
+      "message_date": "Bạn đã bỏ lỡ thói quen {{habitName}} ngày {{missedDate}}."
     },
     "streak_risk": {
       "title": "Nguy cơ đứt chuỗi",
