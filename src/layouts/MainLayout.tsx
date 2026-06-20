@@ -18,6 +18,7 @@ import {
   getStreakProgress,
   getTotalCompletionProgress,
 } from "../features/habit/calculators/GoalCalculator";
+import { getHabitStats } from "../features/statistics/services/StatisticsService";
 
 export default function MainLayout() {
   const currentUser = JSON.parse(
@@ -99,6 +100,8 @@ export default function MainLayout() {
     const rawGoals = localStorage.getItem(STORAGE_KEY.USER_GOALS);
     const rawCheckins = localStorage.getItem(STORAGE_KEY.USER_CHECKINS);
     const rawSchedules = localStorage.getItem(STORAGE_KEY.USER_HABIT_SCHEDULES);
+    const rawCategories = localStorage.getItem(STORAGE_KEY.CATEGORYS);
+
 
     if (!rawHabits || !rawGoals || !rawCheckins) return;
 
@@ -109,6 +112,8 @@ export default function MainLayout() {
     const goals = JSON.parse(rawGoals) as any[];
     const checkIns = JSON.parse(rawCheckins) as any[];
     const schedules = rawSchedules ? (JSON.parse(rawSchedules) as any[]) : [];
+    const categories = rawCategories ? JSON.parse(rawCategories) : [];
+
     // Helper to get notifications list directly from localStorage to avoid stale state and race conditions
     const getFreshNotifications = () => {
       try {
@@ -178,38 +183,27 @@ export default function MainLayout() {
     });
 
     // 2. Streak Risk
-    habits.forEach((habit: any) => {
-      if (habit.status !== "ACTIVE") return; // Defensive check: Skip inactive habits
+    const stats = getHabitStats(habits, checkIns, categories);
+    stats.forEach((stat: any) => {
+      if (stat.riskLevel === "AT_RISK") {
 
-      const habitCheckins = checkIns.filter((c: any) => c.habitId === habit.id);
-      const targetPerDay =
-        typeof habit.targetPerDay === "number" ? habit.targetPerDay : 1;
-      const currentStreakVal = getCurrentStreak(habitCheckins, targetPerDay);
-
-      if (currentStreakVal >= 3) {
         const todayKey = new Date().toISOString().split("T")[0];
-        const todayCheckIn = habitCheckins.find((c: any) => c.checkedAt === todayKey);
-        const todayCount = todayCheckIn ? todayCheckIn.completionCount : 0;
-        const isCompletedToday = todayCount >= targetPerDay;
-
-        if (!isCompletedToday) {
-          const currentNotifs = getFreshNotifications();
-          const todayNotifExists = currentNotifs.some(
-            (n: any) =>
-              n.relatedEntityId === habit.id &&
-              n.type === "STREAK_RISK" &&
-              n.createdAt.startsWith(todayKey),
+        const currentNotifs = getFreshNotifications();
+        const todayNotifExists = currentNotifs.some(
+          (n: any) =>
+            n.relatedEntityId === stat.id &&
+            n.type === "STREAK_RISK" &&
+            n.createdAt.startsWith(todayKey),
+        );
+        if (!todayNotifExists) {
+          addNotification(
+            "STREAK_RISK",
+            "notifications.streak_risk.title",
+            "notifications.streak_risk.message",
+            { habitName: stat.name, streakCount: stat.currentStreak },
+            stat.id,
+            "HABIT",      
           );
-          if (!todayNotifExists) {
-            addNotification(
-              "STREAK_RISK",
-              "notifications.streak_risk.title",
-              "notifications.streak_risk.message",
-              { habitName: habit.name, streakCount: currentStreakVal },
-              habit.id,
-              "HABIT",
-            );
-          }
         }
       }
     });

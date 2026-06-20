@@ -71,11 +71,18 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       params,
     };
 
-    setNotifications(prev => {
-      const updated = [newNotif, ...prev];
-      localStorage.setItem('notifications', JSON.stringify(updated));
-      return updated;
-    });
+    const saved = localStorage.getItem('notifications');
+    let currentList: AppNotification[] = [];
+    if (saved) {
+      try {
+        currentList = JSON.parse(saved);
+      } catch {
+        currentList = [];
+      }
+    }
+    const updated = [newNotif, ...currentList];
+    localStorage.setItem('notifications', JSON.stringify(updated));
+    setNotifications(updated);
   };
 
 
