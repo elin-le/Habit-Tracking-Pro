@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 import { useHabitSchedule } from "../shared/hooks/useHabitSchedule";
 import { useHabits } from "../shared/hooks/useHabit";
 import { useCategories } from "@/shared/hooks/useCategory";
-import { STORAGE_KEY } from "@/shared/constants/appConstants";
+import { STORAGE_KEY, DAY_OF_WEEK_MAP } from "@/shared/constants/appConstants";
 import type { User } from "@/shared/types/User";
 import { useGoals } from "@/shared/hooks/useGoals";
 import { useCheckIns } from "@/shared/hooks/useCheckIns";
@@ -98,6 +98,7 @@ export default function MainLayout() {
     const rawHabits = localStorage.getItem(STORAGE_KEY.USER_HABITS);
     const rawGoals = localStorage.getItem(STORAGE_KEY.USER_GOALS);
     const rawCheckins = localStorage.getItem(STORAGE_KEY.USER_CHECKINS);
+    const rawSchedules = localStorage.getItem(STORAGE_KEY.USER_HABIT_SCHEDULES);
 
     if (!rawHabits || !rawGoals || !rawCheckins) return;
 
@@ -107,7 +108,7 @@ export default function MainLayout() {
     );
     const goals = JSON.parse(rawGoals) as any[];
     const checkIns = JSON.parse(rawCheckins) as any[];
-
+    const schedules = rawSchedules ? (JSON.parse(rawSchedules) as any[]) : [];
     // Helper to get notifications list directly from localStorage to avoid stale state and race conditions
     const getFreshNotifications = () => {
       try {
@@ -187,10 +188,9 @@ export default function MainLayout() {
 
       if (currentStreakVal >= 3) {
         const todayKey = new Date().toISOString().split("T")[0];
-        const todaySummary = habitCheckins.filter(
-          (c: any) => c.checkedAt === todayKey,
-        ).length;
-        const isCompletedToday = todaySummary >= targetPerDay;
+        const todayCheckIn = habitCheckins.find((c: any) => c.checkedAt === todayKey);
+        const todayCount = todayCheckIn ? todayCheckIn.completionCount : 0;
+        const isCompletedToday = todayCount >= targetPerDay;
 
         if (!isCompletedToday) {
           const currentNotifs = getFreshNotifications();
@@ -219,6 +219,8 @@ export default function MainLayout() {
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayKey = yesterday.toISOString().split("T")[0];
     const todayKey = new Date().toISOString().split("T")[0];
+    const yesterdayDate = new Date(yesterdayKey);
+    const yesterdayDowName = DAY_OF_WEEK_MAP[yesterdayDate.getDay()];
 
     habits.forEach((habit: any) => {
       if (habit.status !== "ACTIVE") return; // Defensive check: Skip inactive habits
@@ -226,13 +228,18 @@ export default function MainLayout() {
       const habitCheckins = checkIns.filter((c: any) => c.habitId === habit.id);
       const targetPerDay =
         typeof habit.targetPerDay === "number" ? habit.targetPerDay : 1;
-      const yesterdaySummary = habitCheckins.filter(
-        (c: any) => c.checkedAt === yesterdayKey,
-      ).length;
-      const isCompletedYesterday = yesterdaySummary >= targetPerDay;
-
-      // Only fire missed habit if they have at least checked in once (not new habit)
-      if (habitCheckins.length > 0 && !isCompletedYesterday) {
+      const yesterdayCheckIn = habitCheckins.find((c: any) => c.checkedAt === yesterdayKey);
+      const yesterdayCount = yesterdayCheckIn ? yesterdayCheckIn.completionCount : 0;
+      const isCompletedYesterday = yesterdayCount >= targetPerDay;
+      // Check if the habit is scheduled for yesterday
+      const isScheduledYesterday =
+        habit.frequencyType === "DAILY" ||
+        schedules.some(
+          (s: any) => s.habitId === habit.id && s.dayOfWeek === yesterdayDowName,
+        );
+      // Only fire missed habit if they have at least checked in once (not new habit),
+      // they were scheduled to perform it yesterday, and they missed it yesterday.
+      if (habitCheckins.length > 0 && isScheduledYesterday && !isCompletedYesterday) {
         const currentNotifs = getFreshNotifications();
         const yesterdayNotifExists = currentNotifs.some(
           (n: any) =>
