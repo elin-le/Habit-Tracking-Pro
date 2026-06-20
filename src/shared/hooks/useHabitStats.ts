@@ -10,7 +10,7 @@ export const useHabitStats = (
   categories: Category[]
 ) => {
   return useMemo(
-    () => getHabitStats(habits, checkIns, categories),
+    () => getHabitStats(habits ?? [], checkIns ?? [], categories ?? []),
     [habits, checkIns, categories]
   );
 };
