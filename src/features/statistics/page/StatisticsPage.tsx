@@ -18,19 +18,19 @@ import { ROUTES, STORAGE_KEY } from "@/shared/constants/appConstants";
 import { exportJson } from "@/shared/utils/exportJson";
 import { toast } from "sonner";
 
-type LayoutContext = { habits: Habit[]; goals: Goal[]; checkIns: CheckIn[] };
+type LayoutContext = { habits: Habit[]; userGoals: Goal[]; userCheckIns: CheckIn[] };
 const STATS_PER_PAGE = 6;
 
 export default function StatisticsPage() {
   const { t } = useTranslation();
   const { categories } = useCategories();
-  const { habits, goals, checkIns } = useOutletContext<LayoutContext>();
+  const { habits, userGoals, userCheckIns } = useOutletContext<LayoutContext>();
   const navigate = useNavigate();
 
   const currentUser: User | null = JSON.parse(localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "null");
   useEffect(() => { if (!currentUser) navigate(ROUTES.AUTH, { replace: true }); }, []);
 
-  const stats = useHabitStats(habits, checkIns, categories);
+  const stats = useHabitStats(habits, userCheckIns, categories);
 
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
   const [filterPriority, setFilterPriority] = useState<Priority | null>(null);
@@ -38,7 +38,7 @@ export default function StatisticsPage() {
   const [showFilter, setShowFilter] = useState(false);
 
   const handleExport = () => {
-    try { exportJson(habits, goals, checkIns); toast.success(`${t("statistics.ex_noti1")}`); }
+    try { exportJson(habits, userGoals, userCheckIns); toast.success(`${t("statistics.ex_noti1")}`); }
     catch (error) { toast.error(`${t("statistics.ex_noti2")}`); console.error(error); }
   };
 
