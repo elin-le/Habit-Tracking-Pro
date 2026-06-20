@@ -166,6 +166,7 @@
     "subtitle": "Mỗi lần hoàn thành đều giúp bạn tiến xa hơn"
   },
   "goals": {
+    "active_goal_exists": "Habit này đã có mục tiêu đang được thực hiện. Vui lòng hoàn thành hoặc lưu trữ mục tiêu cũ trước.",
     "title": "Mục tiêu",
     "subtitle": "Quản lý và theo dõi tiến độ các mục tiêu của bạn",
     "tracking": "Đang theo dõi",

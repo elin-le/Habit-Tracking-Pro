@@ -42,15 +42,9 @@ export const getGoalById = (id: string, userHabitIds: string[]): Goal | undefine
 };
 
 // Hàm tạo goal mới
-export const createGoal = (goalData: Omit<Goal, 'id'>, userHabits: Habit[], checkIns: CheckIn[]): Goal => {
+export const createGoal = (goalData: Omit<Goal, 'id'>): Goal => {
     const allGoals = getAllGoals();
     
-    const habit = userHabits.find(h => h.id === goalData.habitId);
-    const targetPerDay = Number(habit?.targetPerDay || 1);
-
-    // validate mỗi habit chỉ có 1 goal đang thực hiện
-    validateNoActiveGoalForHabit(goalData.habitId, allGoals, checkIns, targetPerDay);
-
     const newGoal: Goal = {
         ...goalData,
         id: crypto.randomUUID(),
@@ -64,6 +58,7 @@ export const createGoal = (goalData: Omit<Goal, 'id'>, userHabits: Habit[], chec
 // Hàm update goal
 export const updateGoal = (id: string, goalData: Partial<Goal>): Goal | undefined => {
     const allGoals = getAllGoals();
+
     const index = allGoals.findIndex(g => g.id === id);
     if (index === -1) return undefined;
 
@@ -113,9 +108,10 @@ export const calculateCoreGoalProgress = (goal: Goal, checkins: CheckIn[], targe
 
 // Hàm tính goal stats (bao gồm bestStreak, completionRate) và weeklyHistory của goal đó
 export const calculateGoalStats = (goal: Goal, checkins: CheckIn[], targetPerDay:number) => {
-    const bestStreak = getLongestStreak(checkins, targetPerDay);
-    const completionRate = getCompletionRate(goal.startedDate, goal.endDate || new Date().toISOString(), checkins, targetPerDay);
-    const summary = getDailySummary(checkins, targetPerDay);
+    const habitCheckins = checkins.filter(c => c.habitId === goal.habitId);
+    const bestStreak = getLongestStreak(habitCheckins, targetPerDay);
+    const completionRate = getCompletionRate(goal.startedDate, goal.endDate || new Date().toISOString(), habitCheckins, targetPerDay);
+    const summary = getDailySummary(habitCheckins, targetPerDay);
     const weeklyHistory = [];
     
     for (let i = 6; i >= 0; i--) {
@@ -141,7 +137,8 @@ export const calculateGoalStats = (goal: Goal, checkins: CheckIn[], targetPerDay
 
 // Hàm tính toán dữ liệu cơ bản liên quan đến goal
 export const calculateGoalProgress = (goal: Goal, checkins: CheckIn[], targetPerDay: number) : GoalWithDerived => {
-    const progress = calculateCoreGoalProgress(goal, checkins, targetPerDay);
+    const habitCheckins = checkins.filter(c => c.habitId === goal.habitId);
+    const progress = calculateCoreGoalProgress(goal, habitCheckins, targetPerDay);
 
     // trả về 1 goal có thêm progress -> GoalWithDerived
     // Không tính toán stats và weeklyHistory ở đây nữa để tối ưu performance
@@ -150,18 +147,6 @@ export const calculateGoalProgress = (goal: Goal, checkins: CheckIn[], targetPer
         progress : progress,
     };
 };
-
-// Hàm validate không cho phép habit có nhiều goal cùng thực hiện
-export const validateNoActiveGoalForHabit = (habitId: string, goals: Goal[], checkins: CheckIn[], targetPerDay: number): void => {
-    const habitGoals = goals.filter(g => g.habitId === habitId);
-
-    for (const rawGoal of habitGoals) {
-        const goalWithProgress = calculateGoalProgress(rawGoal, checkins, targetPerDay);
-        if (goalWithProgress.progress.status === "IN_PROGRESS" || goalWithProgress.progress.status === "NOT_STARTED") {
-            throw new Error("Habit này đã có mục tiêu đang được thực hiện. Vui lòng hoàn thành hoặc lưu trữ mục tiêu cũ trước.");
-        }
-    }
-}
 
 // Hàm lấy toàn bộ goal của user hiện tại kèm theo progress và stats
 export const getAllGoalsWithProgress = (userHabits: Habit[], checkIns: CheckIn[]): GoalWithDerived[] => {
