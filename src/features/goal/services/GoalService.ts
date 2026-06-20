@@ -1,4 +1,4 @@
-import type { Goal, GoalDerived, GoalWithDerived } from "../../../shared/types/Goal";
+import type { Goal, GoalDerived, GoalWithDerived, GoalStatus } from "../../../shared/types/Goal";
 import { STORAGE_KEY } from "../../../shared/constants/appConstants";
 import { calculateMilestones } from "../calculators/MilestoneCalculator";
 import type { Habit } from "../../../shared/types/Habit";
@@ -86,7 +86,7 @@ export const calculateCoreGoalProgress = (goal: Goal, checkins: CheckIn[], targe
 
     currentProgress = Math.max(0, currentProgress);
     const progressPercent = Math.min(Math.round((currentProgress / goal.targetValue) * 100), 100);
-    let status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
+    let status: GoalStatus;
 
     if (progressPercent >= 100) {
         status = 'COMPLETED';

@@ -193,8 +193,8 @@
     "congrats_near": "Keep it up! You have reached over 80% of your goal!",
     "motivation_eyebrow": "KEEP GOING",
     "motivation_headline": "A journey of a thousand miles begins with a single step. You can do it!",
-    "started_date": "Started",
-    "end_date": "Ended",
+    "started_date": "Start",
+    "end_date": "End",
     "action_archive": "Archive goal",
     "action_delete": "Delete goal",
     "edit_success": "Goal updated successfully!",
@@ -339,7 +339,7 @@
     "readOnly": "Read Only"
   },
   "heatmap": {
-    "more":"More",
-    "title":"Frequency of Check-in"
+    "more": "More",
+    "title": "Frequency of Check-in"
   }
 }
