@@ -1,4 +1,10 @@
-import { Search, SparklesIcon } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Search,
+  SlidersHorizontal,
+  SparklesIcon,
+} from "lucide-react";
 import { HabitCard } from "../../../shared/components/cards/HabitCard";
 import { HabitFilter } from "../../../shared/components/filters/HabitFilter";
 import { usePagination } from "../../../shared/hooks/usePagination";
@@ -15,9 +21,11 @@ import { useMemo, useState, useEffect } from "react";
 import { DAY_OF_WEEK_MAP } from "@/shared/constants/appConstants";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import type { Category } from "@/shared/types/Category";
-import type { User } from "@/shared/types/User"
-import { ROUTES, STORAGE_KEY } from "@/shared/constants/appConstants"
-import GoalForm, { type GoalFormData } from "../../../shared/components/forms/GoalForm";
+import type { User } from "@/shared/types/User";
+import { ROUTES, STORAGE_KEY } from "@/shared/constants/appConstants";
+import GoalForm, {
+  type GoalFormData,
+} from "../../../shared/components/forms/GoalForm";
 import { Modal } from "../../../shared/components/ui/Modal";
 import type { Goal, GoalWithDerived } from "../../../shared/types/Goal";
 import { ToastService } from "../../../routes/services/toastService";
@@ -62,6 +70,10 @@ export function HabitsPage() {
   const currentUser: User | null = JSON.parse(
     localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "null",
   );
+
+  const [showFilter, setShowFilter] = useState(false);
+  const [activeFilterCount, setActiveFilterCount] = useState(0);
+
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
@@ -76,10 +88,6 @@ export function HabitsPage() {
   const [frequencyFilter, setFrequencyFilter] = useState<DaysOfWeek | null>(
     DAY_OF_WEEK_MAP[new Date().getDay()],
   );
-
-  const todayDow = DAY_OF_WEEK_MAP[new Date().getDay()];
-  const isViewingToday =
-    frequencyFilter === null || frequencyFilter === todayDow;
 
   const handleClearAll = () => {
     setFilterCategory(null);
@@ -172,18 +180,37 @@ export function HabitsPage() {
 
       {/* Filter */}
       <div className="mb-5">
-        <HabitFilter
-          categories={categories}
-          selectedCategory={filterCategory}
-          onCategoryChange={setFilterCategory}
-          selectedPriority={filterPriority}
-          onPriorityChange={setFilterPriority}
-          selectedStatus={filterStatus}
-          onStatusChange={setFilterStatus}
-          frequencyFilter={frequencyFilter}
-          onFrequencyChange={setFrequencyFilter}
-          onClearAll={handleClearAll}
-        />
+        <button
+          onClick={() => setShowFilter((v) => !v)}
+          className="flex items-center gap-2 rounded-xl border border-[var(--primary)]/20 px-4 py-2 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--primary)]/8 cursor-pointer"
+        >
+          <SlidersHorizontal size={15} className="text-[var(--primary)]" />
+          {t("habit_filter.title")}
+          {activeFilterCount > 0 && (
+            <span className="rounded-full p-0.5 bg-[var(--primary)] px-1.5 text-[10px] font-bold text-white">
+              {activeFilterCount}
+            </span>
+          )}
+          {showFilter ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+        </button>
+        {showFilter && (
+          <div className="mt-3">
+            <HabitFilter
+              categories={categories}
+              selectedCategory={filterCategory}
+              onCategoryChange={setFilterCategory}
+              selectedPriority={filterPriority}
+              onPriorityChange={setFilterPriority}
+              selectedStatus={filterStatus}
+              onStatusChange={setFilterStatus}
+              frequencyFilter={frequencyFilter}
+              onFrequencyChange={setFrequencyFilter}
+              onClearAll={handleClearAll}
+              activeFilterCount={activeFilterCount}
+              setActiveFilterCount={setActiveFilterCount}
+            />
+          </div>
+        )}
       </div>
 
       {/* Empty State */}
@@ -237,6 +264,7 @@ export function HabitsPage() {
             <HabitCard
               key={habit.id}
               habit={habit}
+              habitSchedules={habitSchedules}
               onUpdate={() => setUpdatingHabit(habit)}
               onUpdateStatus={(status) => updateHabit({ ...habit, status })}
               onDelete={() => {
@@ -245,11 +273,13 @@ export function HabitsPage() {
                 deleteGoalsByHabitId(habit.id);
               }}
               onSetGoal={() => setGoalHabit(habit)}
-              hasActiveGoal={
-                goals?.some((g) => g.habitId === habit.id && (g.progress.status === "NOT_STARTED" || g.progress.status === "IN_PROGRESS"))
-              }
+              hasActiveGoal={goals?.some(
+                (g) =>
+                  g.habitId === habit.id &&
+                  (g.progress.status === "NOT_STARTED" ||
+                    g.progress.status === "IN_PROGRESS"),
+              )}
               categories={categories}
-              isViewingToday={isViewingToday}
             />
           ))}
         </div>
