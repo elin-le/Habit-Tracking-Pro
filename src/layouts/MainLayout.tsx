@@ -32,30 +32,26 @@ export default function MainLayout() {
   const categoryData = useCategories();
 
   const checkInData = useCheckIns();
-  const goalData = useGoals(habitData.habits, checkInData.checkIns);
-
-  // Filter goals và checkIns theo habits của current user
+  
+  // Filter checkIns theo habits của current user
   const userHabitIds = useMemo(
     () => habitData.habits.map((h) => h.id),
     [habitData.habits],
   );
-
-  const userGoals = useMemo(
-    () => goalData.goals.filter((g) => userHabitIds.includes(g.habitId)),
-    [goalData.goals, userHabitIds],
-  );
-
+  
   const userCheckIns = useMemo(
     () => checkInData.checkIns.filter((c) => userHabitIds.includes(c.habitId)),
     [checkInData.checkIns, userHabitIds],
   );
+  
+  const userGoals = useGoals(habitData.habits, userCheckIns);
 
   const deleteGoalsByHabitId = useCallback(
     (habitId: string) => {
-      const goals = goalData.goals.filter((g) => g.habitId === habitId);
-      goals.forEach((g) => goalData.deleteGoal(g.id));
+      const goals = userGoals.goals.filter((g) => g.habitId === habitId);
+      goals.forEach((g) => userGoals.deleteGoal(g.id));
     },
-    [goalData],
+    [userGoals],
   );
 
   const { addNotification, notifications } = useContext(NotificationContext);
@@ -287,13 +283,12 @@ export default function MainLayout() {
               setShowAddForm,
 
               // Goal
-              goals: goalData.goals,
-              userGoals: userGoals,
-              createGoal: goalData.createGoal,
-              updateGoal: goalData.updateGoal,
-              deleteGoal: goalData.deleteGoal,
+              userGoals: userGoals.goals,
+              createGoal: userGoals.createGoal,
+              updateGoal: userGoals.updateGoal,
+              deleteGoal: userGoals.deleteGoal,
               deleteGoalsByHabitId: deleteGoalsByHabitId,
-              refreshGoals: goalData.refreshGoals,
+              refreshGoals: userGoals.refreshGoals,
 
               // Checkin
               userCheckIns: userCheckIns,
