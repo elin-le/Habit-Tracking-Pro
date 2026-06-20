@@ -68,17 +68,17 @@ function readHabits(userId?: string): Habit[] {
     }
 }
 
-function readCheckIns(): CheckIn[] {
-    try {
-        const raw = localStorage.getItem(
-            STORAGE_KEY.USER_CHECKINS,
-        );
+// function readCheckIns(): CheckIn[] {
+//     try {
+//         const raw = localStorage.getItem(
+//             STORAGE_KEY.USER_CHECKINS,
+//         );
 
-        return raw ? JSON.parse(raw) : [];
-    } catch {
-        return [];
-    }
-}
+//         return raw ? JSON.parse(raw) : [];
+//     } catch {
+//         return [];
+//     }
+// }
 
 function readCategories(): Category[] {
     try {
@@ -122,7 +122,7 @@ function isHabitCompletedOnDate(
 }
 
 function buildSummaryCards(
-    habits: Habit[],
+    // habits: Habit[],
     activeHabits: Habit[],
     checkIns: CheckIn[],
 ): SummaryCardType[] {
@@ -334,7 +334,7 @@ export function computeDashboardData(
     return {
         summaryCards:
             buildSummaryCards(
-                habits,
+                // habits,
                 filteredHabits,
                 checkIns,
             ),
