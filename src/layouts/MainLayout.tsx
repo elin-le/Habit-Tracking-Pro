@@ -14,7 +14,6 @@ import { useGoals } from "@/shared/hooks/useGoals";
 import { useCheckIns } from "@/shared/hooks/useCheckIns";
 import { NotificationContext } from "../features/notifications/context/NotificationContext";
 import {
-  getCurrentStreak,
   getStreakProgress,
   getTotalCompletionProgress,
 } from "../features/habit/calculators/GoalCalculator";
@@ -205,6 +204,11 @@ export default function MainLayout() {
     });
 
     // 3. Missed Habit
+    const formatDate = (dateStr: string) => {
+      const [y, m, d] = dateStr.split("-");
+      return `${d}/${m}/${y}`;
+    };
+
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayKey = yesterday.toISOString().split("T")[0];
@@ -212,12 +216,37 @@ export default function MainLayout() {
     const yesterdayDate = new Date(yesterdayKey);
     const yesterdayDowName = DAY_OF_WEEK_MAP[yesterdayDate.getDay()];
 
+    interface MissedEvent {
+      habit: any;
+      dateKey: string;
+      formattedDate: string;
+      isYesterday: boolean;
+    }
+    const missedEvents: MissedEvent[] = [];
+
+
     habits.forEach((habit: any) => {
       if (habit.status !== "ACTIVE") return; // Defensive check: Skip inactive habits
 
       const habitCheckins = checkIns.filter((c: any) => c.habitId === habit.id);
       const targetPerDay =
         typeof habit.targetPerDay === "number" ? habit.targetPerDay : 1;
+
+      // Collect historical check-ins (excluding yesterday)
+      habitCheckins.forEach((c: any) => {        
+        if (c.checkedAt === yesterdayKey) return;
+        const isCompleted = c.completionCount >= targetPerDay;
+        if (!isCompleted) {
+          missedEvents.push({
+            habit,
+            dateKey: c.checkedAt,
+            formattedDate: formatDate(c.checkedAt),
+            isYesterday: false,
+          });
+        }
+      });
+
+      // Collect yesterday check-in (whether exists or not)
       const yesterdayCheckIn = habitCheckins.find((c: any) => c.checkedAt === yesterdayKey);
       const yesterdayCount = yesterdayCheckIn ? yesterdayCheckIn.completionCount : 0;
       const isCompletedYesterday = yesterdayCount >= targetPerDay;
@@ -230,19 +259,44 @@ export default function MainLayout() {
       // Only fire missed habit if they have at least checked in once (not new habit),
       // they were scheduled to perform it yesterday, and they missed it yesterday.
       if (habitCheckins.length > 0 && isScheduledYesterday && !isCompletedYesterday) {
-        const currentNotifs = getFreshNotifications();
-        const yesterdayNotifExists = currentNotifs.some(
-          (n: any) =>
-            n.relatedEntityId === habit.id &&
-            n.type === "MISSED_HABIT" &&
-            n.createdAt.startsWith(todayKey),
+        missedEvents.push({
+          habit,
+          dateKey: yesterdayKey,
+          formattedDate: formatDate(yesterdayKey),
+          isYesterday: true,
+        });
+      }
+    });
+    // Sắp xếp các sự kiện bị bỏ lỡ theo thời gian tăng dần (cũ nhất đến mới nhất)
+    // Để khi gọi addNotification (prepend), các ngày mới nhất (như ngày hôm qua) sẽ được chèn lên đầu
+    missedEvents.sort((a, b) => a.dateKey.localeCompare(b.dateKey));
+    // Thực hiện tạo các thông báo theo thứ tự đã sắp xếp
+    missedEvents.forEach((event) => {
+      const { habit, formattedDate, isYesterday } = event;
+      const currentNotifs = getFreshNotifications();
+      const notifExists = currentNotifs.some((n: any) => {
+        return (
+          n.relatedEntityId === habit.id &&
+          n.type === "MISSED_HABIT" &&
+          (n.params?.missedDate === formattedDate || (!n.params?.missedDate && isYesterday && n.createdAt.startsWith(todayKey)))
         );
-        if (!yesterdayNotifExists) {
+      });
+      if (!notifExists) {
+        if (isYesterday) {
           addNotification(
             "MISSED_HABIT",
             "notifications.missed_habit.title",
             "notifications.missed_habit.message",
-            { habitName: habit.name },
+            { habitName: habit.name, missedDate: formattedDate },
+            habit.id,
+            "HABIT",
+          );
+        } else {
+          addNotification(
+            "MISSED_HABIT",
+            "notifications.missed_habit.title",
+            "notifications.missed_habit.message_date",
+            { habitName: habit.name, missedDate: formattedDate },
             habit.id,
             "HABIT",
           );
