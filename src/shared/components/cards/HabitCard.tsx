@@ -70,7 +70,8 @@ export function HabitCard({
   const today = useMemo(() => new Date().toISOString().split("T")[0], []);
   const { getCheckIn, upsertCheckIn } = useCheckIns();
   const checkIn = getCheckIn(habit.id, today);
-  const currentCount = checkIn?.completionCount ?? 0;
+  //const currentCount = checkIn?.completionCount ?? 0;
+  const currentCount = isViewingToday? (checkIn?.completionCount ?? 0) : 0;
   const targetPerDay = Number(habit.targetPerDay ?? 1) || 1;
   const isCompleted = currentCount >= targetPerDay;
 
