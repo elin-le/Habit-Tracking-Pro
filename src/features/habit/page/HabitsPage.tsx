@@ -37,7 +37,7 @@ import DailyCheckIns from "../components/DailyCheckIns"
 type LayoutContext = {
   habits: Habit[];
   checkIns?: CheckIn[];
-  goals: GoalWithDerived[];
+  userGoals: GoalWithDerived[];
   createHabit: (habit: Habit) => void;
   updateHabit: (habit: Habit) => void;
   deleteHabit: (habitId: string) => void;
@@ -57,7 +57,7 @@ export function HabitsPage() {
   const {
     habits,
     checkIns = [], 
-    goals,
+    userGoals = [],
     showAddForm,
     habitSchedules,
     categories,
@@ -280,7 +280,7 @@ export function HabitsPage() {
                 deleteGoalsByHabitId(habit.id);
               }}
               onSetGoal={() => setGoalHabit(habit)}
-              hasActiveGoal={goals?.some(
+              hasActiveGoal={userGoals?.some(
                 (g) =>
                   g.habitId === habit.id &&
                   (g.progress.status === "NOT_STARTED" ||

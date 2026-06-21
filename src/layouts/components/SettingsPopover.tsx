@@ -1,6 +1,6 @@
 
 import { useEffect } from "react"
-import { Settings, Globe, Lock, Moon } from "lucide-react";
+import { Settings, Globe, Moon } from "lucide-react";
 import { Switch } from "../../shared/components/ui/switch";
 import {
     Popover,
@@ -13,7 +13,7 @@ import { useTheme } from "../../shared/hooks/useTheme";
 import { useTranslation } from "react-i18next";
 
 export default function SettingsPopover() {
-    const { readOnly, setReadOnly } = useReadOnly();
+    const { readOnly } = useReadOnly();
     const { theme, toggleTheme } = useTheme();
     const { t, i18n } = useTranslation();
     useEffect(() => {
@@ -106,19 +106,6 @@ export default function SettingsPopover() {
                         <Switch
                             checked={theme === "dark"}
                             onCheckedChange={toggleTheme}
-                        />
-                    </div>
-
-                    {/* Read Only */}
-                    <div className="flex items-center justify-between rounded-lg px-2 py-2 hover:bg-zinc-100 dark:hover:bg-indigo-800 transition-colors">
-                        <div className="flex items-center gap-2 text-violet-600 dark:text-violet-400">
-                            <Lock size={16} />
-                            <span className="text-zinc-900 dark:text-zinc-100">Read Only</span>
-                        </div>
-
-                        <Switch
-                            checked={readOnly}
-                            onCheckedChange={setReadOnly}
                         />
                     </div>
                 </div>
