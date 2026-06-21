@@ -282,6 +282,7 @@ export const mockCheckIns: CheckIn[] = [
   { id: "ci-elin-2-07",  habitId: "habit-elin-2",  checkedAt: "2026-06-06", completionCount: 1 },
   { id: "ci-elin-2-08",  habitId: "habit-elin-2",  checkedAt: "2026-06-04", completionCount: 1 },
   { id: "ci-elin-2-09",  habitId: "habit-elin-2",  checkedAt: "2026-06-01", completionCount: 1 },
+  { id: "ci-elin-2-10",  habitId: "habit-elin-2",  checkedAt: "2026-06-20", completionCount: 1 },
 
   // --- habit-elin-3: Chạy bộ (DAY_OF_WEEK Tue Thu Sat) ---
   { id: "ci-elin-3-01",  habitId: "habit-elin-3",  checkedAt: "2026-06-17", completionCount: 1 },
@@ -305,6 +306,7 @@ export const mockCheckIns: CheckIn[] = [
   { id: "ci-elin-4-09",  habitId: "habit-elin-4",  checkedAt: "2026-06-11", completionCount: 1 },
   { id: "ci-elin-4-10",  habitId: "habit-elin-4",  checkedAt: "2026-06-10", completionCount: 1 },
   { id: "ci-elin-4-11",  habitId: "habit-elin-4",  checkedAt: "2026-06-09", completionCount: 1 },
+  { id: "ci-elin-4-12",  habitId: "habit-elin-4",  checkedAt: "2026-06-20", completionCount: 1 },
 
   // --- habit-elin-5: Không ăn khuya (DAILY) ---
   { id: "ci-elin-5-01",  habitId: "habit-elin-5",  checkedAt: "2026-06-19", completionCount: 1 },
@@ -440,11 +442,16 @@ export const mockCheckIns: CheckIn[] = [
   { id: "ci-truc-8-09",  habitId: "habit-truc-8",  checkedAt: "2026-06-09", completionCount: 1 },
 
   // --- habit-truc-9: Ghi chú ý tưởng (DAILY) ---
-  { id: "ci-truc-9-01",  habitId: "habit-truc-9",  checkedAt: "2026-06-19", completionCount: 1 },
-  { id: "ci-truc-9-02",  habitId: "habit-truc-9",  checkedAt: "2026-06-17", completionCount: 1 },
-  { id: "ci-truc-9-03",  habitId: "habit-truc-9",  checkedAt: "2026-06-15", completionCount: 1 },
-  { id: "ci-truc-9-04",  habitId: "habit-truc-9",  checkedAt: "2026-06-12", completionCount: 1 },
-  { id: "ci-truc-9-05",  habitId: "habit-truc-9",  checkedAt: "2026-06-10", completionCount: 1 },
+  { id: "ci-truc-9-01",  habitId: "habit-truc-9",  checkedAt: "2026-06-20", completionCount: 1 },
+  { id: "ci-truc-9-02",  habitId: "habit-truc-9",  checkedAt: "2026-06-19", completionCount: 1 },
+  { id: "ci-truc-9-03",  habitId: "habit-truc-9",  checkedAt: "2026-06-18", completionCount: 1 },
+  { id: "ci-truc-9-04",  habitId: "habit-truc-9",  checkedAt: "2026-06-17", completionCount: 1 },
+  { id: "ci-truc-9-05",  habitId: "habit-truc-9",  checkedAt: "2026-06-16", completionCount: 1 },
+  { id: "ci-truc-9-06",  habitId: "habit-truc-9",  checkedAt: "2026-06-15", completionCount: 1 },
+  { id: "ci-truc-9-07",  habitId: "habit-truc-9",  checkedAt: "2026-06-14", completionCount: 1 },
+  { id: "ci-truc-9-08",  habitId: "habit-truc-9",  checkedAt: "2026-06-13", completionCount: 1 },
+  { id: "ci-truc-9-09",  habitId: "habit-truc-9",  checkedAt: "2026-06-12", completionCount: 1 },
+  { id: "ci-truc-9-10",  habitId: "habit-truc-9",  checkedAt: "2026-06-10", completionCount: 1 },
 
   // PAUSED/ARCHIVED
   { id: "ci-truc-6-01",  habitId: "habit-truc-6",  checkedAt: "2026-05-20", completionCount: 1 },
