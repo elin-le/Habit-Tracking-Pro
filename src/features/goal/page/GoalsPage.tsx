@@ -38,7 +38,7 @@ import "../Goals.css";
 type LayoutContext = {
   habits: Habit[];
   userGoals: GoalWithDerived[];
-  userCheckIns: CheckIn[];
+  checkIns: CheckIn[];
   createGoal: (goalData: Omit<Goal, "id">) => Goal;
   updateGoal: (id: string, goalData: Partial<Goal>) => Goal | undefined;
   deleteGoal: (id: string) => void;
@@ -51,7 +51,7 @@ function GoalsPage() {
   const {
     habits: allHabits,
     userGoals: goals,
-    userCheckIns: checkIns,
+    checkIns = [],
     createGoal,
     updateGoal,
     deleteGoal,
