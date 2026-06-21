@@ -1,6 +1,6 @@
 // MainLayout.tsx
 import { Outlet } from "react-router-dom";
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useMemo, useCallback } from "react";
 import SideBar from "./components/SideBar";
 import Header from "./components/Header";
 import BottomTabBar from "./components/BottomTabBar";
@@ -8,15 +8,21 @@ import { useTranslation } from "react-i18next";
 import { useHabitSchedule } from "../shared/hooks/useHabitSchedule";
 import { useHabits } from "../shared/hooks/useHabit";
 import { useCategories } from "@/shared/hooks/useCategory";
-import { STORAGE_KEY } from "@/shared/constants/appConstants";
+import { STORAGE_KEY, DAY_OF_WEEK_MAP } from "@/shared/constants/appConstants";
 import type { User } from "@/shared/types/User";
 import { useGoals } from "@/shared/hooks/useGoals";
 import { useCheckIns } from "@/shared/hooks/useCheckIns";
 import { NotificationContext } from "../features/notifications/context/NotificationContext";
-import { getCurrentStreak, getStreakProgress, getTotalCompletionProgress } from "../features/habit/calculators/GoalCalculator";
+import {
+  getStreakProgress,
+  getTotalCompletionProgress,
+} from "../features/habit/calculators/GoalCalculator";
+import { getHabitStats } from "../features/statistics/services/StatisticsService";
 
 export default function MainLayout() {
-  const currentUser = JSON.parse(localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "{}") as User
+  const currentUser = JSON.parse(
+    localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "{}",
+  ) as User;
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const { t } = useTranslation();
@@ -26,7 +32,27 @@ export default function MainLayout() {
   const categoryData = useCategories();
 
   const checkInData = useCheckIns();
-  const goalData = useGoals(habitData.habits, checkInData.checkIns);
+  
+  // Filter checkIns theo habits của current user
+  const userHabitIds = useMemo(
+    () => habitData.habits.map((h) => h.id),
+    [habitData.habits],
+  );
+  
+  const userCheckIns = useMemo(
+    () => checkInData.checkIns.filter((c) => userHabitIds.includes(c.habitId)),
+    [checkInData.checkIns, userHabitIds],
+  );
+  
+  const userGoals = useGoals(habitData.habits, userCheckIns);
+
+  const deleteGoalsByHabitId = useCallback(
+    (habitId: string) => {
+      const goals = userGoals.goals.filter((g) => g.habitId === habitId);
+      goals.forEach((g) => userGoals.deleteGoal(g.id));
+    },
+    [userGoals],
+  );
 
   const { addNotification, notifications } = useContext(NotificationContext);
 
@@ -37,7 +63,9 @@ export default function MainLayout() {
     const originalSetItem = localStorage.setItem;
     localStorage.setItem = function (key, value) {
       originalSetItem.apply(this, [key, value]);
-      window.dispatchEvent(new CustomEvent('local-storage-update', { detail: { key, value } }));
+      window.dispatchEvent(
+        new CustomEvent("local-storage-update", { detail: { key, value } }),
+      );
     };
     return () => {
       localStorage.setItem = originalSetItem;
@@ -51,13 +79,14 @@ export default function MainLayout() {
         e.detail.key === STORAGE_KEY.USER_CHECKINS ||
         e.detail.key === STORAGE_KEY.USER_GOALS ||
         e.detail.key === STORAGE_KEY.USER_HABITS ||
-        e.detail.key === 'notifications'
+        e.detail.key === "notifications"
       ) {
-        setStorageTrigger(prev => prev + 1);
+        setStorageTrigger((prev) => prev + 1);
       }
     };
-    window.addEventListener('local-storage-update', handleStorageUpdate);
-    return () => window.removeEventListener('local-storage-update', handleStorageUpdate);
+    window.addEventListener("local-storage-update", handleStorageUpdate);
+    return () =>
+      window.removeEventListener("local-storage-update", handleStorageUpdate);
   }, []);
 
   useEffect(() => {
@@ -65,18 +94,27 @@ export default function MainLayout() {
     const rawHabits = localStorage.getItem(STORAGE_KEY.USER_HABITS);
     const rawGoals = localStorage.getItem(STORAGE_KEY.USER_GOALS);
     const rawCheckins = localStorage.getItem(STORAGE_KEY.USER_CHECKINS);
+    const rawSchedules = localStorage.getItem(STORAGE_KEY.USER_HABIT_SCHEDULES);
+    const rawCategories = localStorage.getItem(STORAGE_KEY.CATEGORYS);
+
 
     if (!rawHabits || !rawGoals || !rawCheckins) return;
 
     const allHabits = JSON.parse(rawHabits) as any[];
-    const habits = allHabits.filter((h: any) => h.userId === currentUser?.phone);
+    const habits = allHabits.filter(
+      (h: any) => h.userId === currentUser?.phone,
+    );
     const goals = JSON.parse(rawGoals) as any[];
     const checkIns = JSON.parse(rawCheckins) as any[];
+    const schedules = rawSchedules ? (JSON.parse(rawSchedules) as any[]) : [];
+    const categories = rawCategories ? JSON.parse(rawCategories) : [];
 
     // Helper to get notifications list directly from localStorage to avoid stale state and race conditions
     const getFreshNotifications = () => {
       try {
-        return JSON.parse(localStorage.getItem('notifications') || '[]') as any[];
+        return JSON.parse(
+          localStorage.getItem("notifications") || "[]",
+        ) as any[];
       } catch {
         return [];
       }
@@ -87,116 +125,180 @@ export default function MainLayout() {
       const habit = habits.find((h: any) => h.id === goal.habitId);
       if (!habit) return; // Defensive check: Skip goals not belonging to current user's habits
 
-      const targetPerDay = typeof habit.targetPerDay === 'number' ? habit.targetPerDay : 1;
+      const targetPerDay =
+        typeof habit.targetPerDay === "number" ? habit.targetPerDay : 1;
       const habitName = habit.name;
 
-      const goalCheckins = checkIns.filter((c: any) => c.habitId === goal.habitId);
+      const goalCheckins = checkIns.filter(
+        (c: any) => c.habitId === goal.habitId,
+      );
       let progressPercent = 0;
-      if (goal.targetType === 'STREAK') {
+      if (goal.targetType === "STREAK") {
         progressPercent = getStreakProgress(goal, targetPerDay, goalCheckins);
-      } else if (goal.targetType === 'TOTAL_COMPLETIONS') {
-        progressPercent = getTotalCompletionProgress(goal, targetPerDay, goalCheckins);
+      } else if (goal.targetType === "TOTAL_COMPLETIONS") {
+        progressPercent = getTotalCompletionProgress(
+          goal,
+          targetPerDay,
+          goalCheckins,
+        );
       }
 
       const currentNotifs = getFreshNotifications();
 
       if (progressPercent >= 100) {
         const hasAchievedNotif = currentNotifs.some(
-          (n: any) => n.relatedEntityId === goal.id && n.type === 'GOAL_ACHIEVED'
+          (n: any) =>
+            n.relatedEntityId === goal.id && n.type === "GOAL_ACHIEVED",
         );
         if (!hasAchievedNotif) {
           addNotification(
-            'GOAL_ACHIEVED',
-            'notifications.goal_achieved.title',
-            'notifications.goal_achieved.message',
+            "GOAL_ACHIEVED",
+            "notifications.goal_achieved.title",
+            "notifications.goal_achieved.message",
             { habitName },
             goal.id,
-            'GOAL'
+            "GOAL",
           );
         }
       } else if (progressPercent >= 80) {
         const has80Notif = currentNotifs.some(
-          (n: any) => n.relatedEntityId === goal.id && n.type === 'GOAL_80'
+          (n: any) => n.relatedEntityId === goal.id && n.type === "GOAL_80",
         );
         if (!has80Notif) {
           addNotification(
-            'GOAL_80',
-            'notifications.goal_80.title',
-            'notifications.goal_80.message',
+            "GOAL_80",
+            "notifications.goal_80.title",
+            "notifications.goal_80.message",
             { habitName },
             goal.id,
-            'GOAL'
+            "GOAL",
           );
         }
       }
     });
 
     // 2. Streak Risk
-    habits.forEach((habit: any) => {
-      if (habit.status !== 'ACTIVE') return; // Defensive check: Skip inactive habits
+    const stats = getHabitStats(habits, checkIns, categories);
+    stats.forEach((stat: any) => {
+      if (stat.riskLevel === "AT_RISK") {
 
-      const habitCheckins = checkIns.filter((c: any) => c.habitId === habit.id);
-      const targetPerDay = typeof habit.targetPerDay === 'number' ? habit.targetPerDay : 1;
-      const currentStreakVal = getCurrentStreak(habitCheckins, targetPerDay);
-
-      if (currentStreakVal >= 3) {
-        const todayKey = new Date().toISOString().split('T')[0];
-        const todaySummary = habitCheckins.filter((c: any) => c.checkedAt === todayKey).length;
-        const isCompletedToday = todaySummary >= targetPerDay;
-
-        if (!isCompletedToday) {
-          const currentNotifs = getFreshNotifications();
-          const todayNotifExists = currentNotifs.some(
-            (n: any) =>
-              n.relatedEntityId === habit.id &&
-              n.type === 'STREAK_RISK' &&
-              n.createdAt.startsWith(todayKey)
+        const todayKey = new Date().toISOString().split("T")[0];
+        const currentNotifs = getFreshNotifications();
+        const todayNotifExists = currentNotifs.some(
+          (n: any) =>
+            n.relatedEntityId === stat.id &&
+            n.type === "STREAK_RISK" &&
+            n.createdAt.startsWith(todayKey),
+        );
+        if (!todayNotifExists) {
+          addNotification(
+            "STREAK_RISK",
+            "notifications.streak_risk.title",
+            "notifications.streak_risk.message",
+            { habitName: stat.name, streakCount: stat.currentStreak },
+            stat.id,
+            "HABIT",      
           );
-          if (!todayNotifExists) {
-            addNotification(
-              'STREAK_RISK',
-              'notifications.streak_risk.title',
-              'notifications.streak_risk.message',
-              { habitName: habit.name, streakCount: currentStreakVal },
-              habit.id,
-              'HABIT'
-            );
-          }
         }
       }
     });
 
     // 3. Missed Habit
+    const formatDate = (dateStr: string) => {
+      const [y, m, d] = dateStr.split("-");
+      return `${d}/${m}/${y}`;
+    };
+
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayKey = yesterday.toISOString().split('T')[0];
-    const todayKey = new Date().toISOString().split('T')[0];
+    const yesterdayKey = yesterday.toISOString().split("T")[0];
+    const todayKey = new Date().toISOString().split("T")[0];
+    const yesterdayDate = new Date(yesterdayKey);
+    const yesterdayDowName = DAY_OF_WEEK_MAP[yesterdayDate.getDay()];
+
+    interface MissedEvent {
+      habit: any;
+      dateKey: string;
+      formattedDate: string;
+      isYesterday: boolean;
+    }
+    const missedEvents: MissedEvent[] = [];
+
 
     habits.forEach((habit: any) => {
-      if (habit.status !== 'ACTIVE') return; // Defensive check: Skip inactive habits
+      if (habit.status !== "ACTIVE") return; // Defensive check: Skip inactive habits
 
       const habitCheckins = checkIns.filter((c: any) => c.habitId === habit.id);
-      const targetPerDay = typeof habit.targetPerDay === 'number' ? habit.targetPerDay : 1;
-      const yesterdaySummary = habitCheckins.filter((c: any) => c.checkedAt === yesterdayKey).length;
-      const isCompletedYesterday = yesterdaySummary >= targetPerDay;
-      
-      // Only fire missed habit if they have at least checked in once (not new habit)
-      if (habitCheckins.length > 0 && !isCompletedYesterday) {
-        const currentNotifs = getFreshNotifications();
-        const yesterdayNotifExists = currentNotifs.some(
-          (n: any) =>
-            n.relatedEntityId === habit.id &&
-            n.type === 'MISSED_HABIT' &&
-            n.createdAt.startsWith(todayKey)
+      const targetPerDay =
+        typeof habit.targetPerDay === "number" ? habit.targetPerDay : 1;
+
+      // Collect historical check-ins (excluding yesterday)
+      habitCheckins.forEach((c: any) => {        
+        if (c.checkedAt === yesterdayKey) return;
+        const isCompleted = c.completionCount >= targetPerDay;
+        if (!isCompleted) {
+          missedEvents.push({
+            habit,
+            dateKey: c.checkedAt,
+            formattedDate: formatDate(c.checkedAt),
+            isYesterday: false,
+          });
+        }
+      });
+
+      // Collect yesterday check-in (whether exists or not)
+      const yesterdayCheckIn = habitCheckins.find((c: any) => c.checkedAt === yesterdayKey);
+      const yesterdayCount = yesterdayCheckIn ? yesterdayCheckIn.completionCount : 0;
+      const isCompletedYesterday = yesterdayCount >= targetPerDay;
+      // Check if the habit is scheduled for yesterday
+      const isScheduledYesterday =
+        habit.frequencyType === "DAILY" ||
+        schedules.some(
+          (s: any) => s.habitId === habit.id && s.dayOfWeek === yesterdayDowName,
         );
-        if (!yesterdayNotifExists) {
+      // Only fire missed habit if they have at least checked in once (not new habit),
+      // they were scheduled to perform it yesterday, and they missed it yesterday.
+      if (habitCheckins.length > 0 && isScheduledYesterday && !isCompletedYesterday) {
+        missedEvents.push({
+          habit,
+          dateKey: yesterdayKey,
+          formattedDate: formatDate(yesterdayKey),
+          isYesterday: true,
+        });
+      }
+    });
+    // Sắp xếp các sự kiện bị bỏ lỡ theo thời gian tăng dần (cũ nhất đến mới nhất)
+    // Để khi gọi addNotification (prepend), các ngày mới nhất (như ngày hôm qua) sẽ được chèn lên đầu
+    missedEvents.sort((a, b) => a.dateKey.localeCompare(b.dateKey));
+    // Thực hiện tạo các thông báo theo thứ tự đã sắp xếp
+    missedEvents.forEach((event) => {
+      const { habit, formattedDate, isYesterday } = event;
+      const currentNotifs = getFreshNotifications();
+      const notifExists = currentNotifs.some((n: any) => {
+        return (
+          n.relatedEntityId === habit.id &&
+          n.type === "MISSED_HABIT" &&
+          (n.params?.missedDate === formattedDate || (!n.params?.missedDate && isYesterday && n.createdAt.startsWith(todayKey)))
+        );
+      });
+      if (!notifExists) {
+        if (isYesterday) {
           addNotification(
-            'MISSED_HABIT',
-            'notifications.missed_habit.title',
-            'notifications.missed_habit.message',
-            { habitName: habit.name },
+            "MISSED_HABIT",
+            "notifications.missed_habit.title",
+            "notifications.missed_habit.message",
+            { habitName: habit.name, missedDate: formattedDate },
             habit.id,
-            'HABIT'
+            "HABIT",
+          );
+        } else {
+          addNotification(
+            "MISSED_HABIT",
+            "notifications.missed_habit.title",
+            "notifications.missed_habit.message_date",
+            { habitName: habit.name, missedDate: formattedDate },
+            habit.id,
+            "HABIT",
           );
         }
       }
@@ -218,7 +320,7 @@ export default function MainLayout() {
           createHabitSchedules={habitSchedule.createHabitSchedules}
         />
 
-        <main className="flex-1 p-6 overflow-auto mb-13">
+        <main className="flex-1 p-6 overflow-auto">
           <Outlet
             context={{
               // Habit
@@ -234,19 +336,40 @@ export default function MainLayout() {
               categories: categoryData.categories,
               showAddForm,
               setShowAddForm,
-              
+
               // Goal
-              goals: goalData.goals,
-              createGoal: goalData.createGoal,
-              updateGoal: goalData.updateGoal,
-              deleteGoal: goalData.deleteGoal,
-              refreshGoals: goalData.refreshGoals,
-              
+              userGoals: userGoals.goals,
+              createGoal: userGoals.createGoal,
+              updateGoal: userGoals.updateGoal,
+              deleteGoal: userGoals.deleteGoal,
+              deleteGoalsByHabitId: deleteGoalsByHabitId,
+              refreshGoals: userGoals.refreshGoals,
+
               // Checkin
-              checkIns: checkInData.checkIns,
+              checkIns: userCheckIns,
             }}
           />
         </main>
+
+        <button
+          className="md:hidden fixed bottom-20 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-transform active:scale-95 cursor-pointer mb-2"
+          style={{ background: "var(--primary)", color: "#fff" }}
+          onClick={() => setShowAddForm(true)}
+          aria-label="Tạo thói quen mới"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          >
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+        </button>
+
         <BottomTabBar />
       </div>
     </div>

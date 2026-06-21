@@ -6,8 +6,13 @@ import {
   getCurrentStreak,
   getLongestStreak,
   getDailySummary,
+  getLast7DaysCompletionProgressWithoutGoal,
 } from "../../habit/calculators/GoalCalculator";
 import { getHabitRisk } from "../../habit/calculators/riskDetector";
+
+/* HÀM THUẦN: nhận habits/checkIns/categories từ outlet context
+   (cùng nguồn Goal/Dashboard) -> đồng bộ. Mọi chỉ số tính từ check-in,
+   "mục tiêu" = đạt targetPerDay mỗi ngày (KHÔNG đụng ERD/Goal entity). */
 
 const pad = (n: number) => String(n).padStart(2, "0");
 const toKey = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -23,49 +28,40 @@ const last7DateKeys = (): string[] => {
   return out;
 };
 
-const isCompletedOnDate = (
-  habitCheckIns: CheckIn[],
-  target: number,
-  dateKey: string
-): boolean => {
-  const c = habitCheckIns.find((ci) => ci.checkedAt === dateKey);
-  return (c?.completionCount ?? 0) >= target;
-};
-
 const deriveHabitStat = (
   habit: Habit,
   allCheckIns: CheckIn[],
   categories: Category[]
 ): HabitStat => {
-  // targetPerDay có thể là "" (form cho nhập rỗng) -> ép về số
   const target = Math.max(1, Number(habit.targetPerDay) || 1);
-  const habitCheckIns = allCheckIns.filter((c) => c.habitId === habit.id);
+  const habitCheckIns = (allCheckIns ?? []).filter((c) => c.habitId === habit.id);
 
-  // streak — dùng engine của Đan
+  const summary = getDailySummary(habitCheckIns, target);
+  const entries = Object.values(summary);
+
+  const totalCompletions = entries.filter((d) => d.completed).length; // số ngày đạt mục tiêu
+  const daysTracked = entries.filter((d) => d.count > 0).length;      // số ngày có check-in
+  const goalRate = daysTracked ? Math.round((totalCompletions / daysTracked) * 100) : 0;
+
+  const todayCount = summary[toKey(new Date())]?.count ?? 0;
+  const todayRate = Math.min(100, Math.round((todayCount / target) * 100));
+
   const currentStreak = getCurrentStreak(habitCheckIns, target);
   const longestStreak = getLongestStreak(habitCheckIns, target);
 
-  // tổng số ngày hoàn thành — từ getDailySummary của engine
-  const summary = getDailySummary(habitCheckIns, target);
-  const totalCompletions = Object.values(summary).filter((d) => d.completed).length;
+  const last7Days = getLast7DaysCompletionProgressWithoutGoal(habitCheckIns, target).map(
+    (d) => d.completionPercentage
+  );
 
-  // 7 ngày qua: % hoàn thành mỗi ngày (cho mini bar chart)
-  const last7Days = last7DateKeys().map((dateKey) => {
-    const c = habitCheckIns.find((ci) => ci.checkedAt === dateKey);
-    return Math.min(100, Math.round(((c?.completionCount ?? 0) / target) * 100));
-  });
-
-  // tỷ lệ hoàn thành 7 ngày = số ngày đủ target / 7 (giống DashboardService)
-  const completedInLast7 = last7DateKeys().filter((dk) =>
-    isCompletedOnDate(habitCheckIns, target, dk)
+  const completedInLast7 = last7DateKeys().filter(
+    (dk) => (summary[dk]?.count ?? 0) >= target
   ).length;
   const completionRate = Math.round((completedInLast7 / 7) * 100);
 
-  // "at risk" = có chuỗi nhưng hôm nay chưa hoàn thành 
-  const completedToday = isCompletedOnDate(habitCheckIns, target, toKey(new Date()));
+  const completedToday = todayCount >= target;
   const riskLevel = getHabitRisk(completionRate, currentStreak, completedToday);
 
-  const category = categories.find((c) => c.id === habit.categoryId)?.name ?? "—";
+  const category = (categories ?? []).find((c) => c.id === habit.categoryId)?.name ?? "—";
 
   return {
     id: habit.id,
@@ -73,12 +69,17 @@ const deriveHabitStat = (
     category,
     categoryId: habit.categoryId,
     priority: habit.priority,
+    targetPerDay: target,
+    todayCount,
+    todayRate,
+    totalCompletions,
+    goalRate,
     currentStreak,
     longestStreak,
-    totalCompletions,
     completionRate,
     riskLevel,
     last7Days,
+    checkIns: habitCheckIns,
   };
 };
 
@@ -87,7 +88,7 @@ export const getHabitStats = (
   checkIns: CheckIn[],
   categories: Category[]
 ): HabitStat[] => {
-  return habits
+  return (habits ?? [])
     .filter((h) => h.status === "ACTIVE")
     .map((h) => deriveHabitStat(h, checkIns, categories));
 };

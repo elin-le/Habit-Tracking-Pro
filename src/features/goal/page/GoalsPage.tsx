@@ -37,8 +37,8 @@ import "../Goals.css";
 
 type LayoutContext = {
   habits: Habit[];
-  goals: GoalWithDerived[];
-  checkIns: CheckIn[];
+  userGoals: GoalWithDerived[];
+  userCheckIns: CheckIn[];
   createGoal: (goalData: Omit<Goal, "id">) => Goal;
   updateGoal: (id: string, goalData: Partial<Goal>) => Goal | undefined;
   deleteGoal: (id: string) => void;
@@ -50,8 +50,8 @@ function GoalsPage() {
   const { t } = useTranslation();
   const {
     habits: allHabits,
-    goals,
-    checkIns,
+    userGoals: goals,
+    userCheckIns: checkIns,
     createGoal,
     updateGoal,
     deleteGoal,
@@ -60,12 +60,13 @@ function GoalsPage() {
   // State
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedHabit, setSelectedHabit] = useState({ id: "", name: "" });
-  const [selectedGoalDetail, setSelectedGoalDetail] =
-    useState<GoalWithDerived | null>(null);
+  const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
   const [editingGoal, setEditingGoal] = useState<GoalWithDerived | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [statusFilters, setStatusFilters] = useState<StatusFilter[]>(["TRACKING"]);
+  const [statusFilters, setStatusFilters] = useState<StatusFilter[]>([
+    "TRACKING",
+  ]);
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("ALL");
   const [activeHabitSearchQuery, setactiveHabitSearchQuery] = useState("");
   const [habitWithoutGoalSearchQuery, setHabitWithoutGoalSearchQuery] =
@@ -166,6 +167,10 @@ function GoalsPage() {
     });
   }, [filteredGoals, activeHabitSearchQuery, activeHabits]);
 
+  const selectedGoalDetail = useMemo(() => {
+    return goals.find((g) => g.id === selectedGoalId) || null;
+  }, [goals, selectedGoalId]);
+
   const selectedGoalFull = useMemo(() => {
     if (!selectedGoalDetail) return null;
     const habit = allHabits.find((h) => h.id === selectedGoalDetail.habitId);
@@ -180,15 +185,6 @@ function GoalsPage() {
       ...stats,
     };
   }, [selectedGoalDetail, checkIns, allHabits]);
-
-  // useEffect(() => {
-  //   if (selectedGoalDetail) {
-  //     const updatedGoal = goals.find((g) => g.id === selectedGoalDetail.id);
-  //     if (updatedGoal && updatedGoal !== selectedGoalDetail) {
-  //       setSelectedGoalDetail(updatedGoal);
-  //     }
-  //   }
-  // }, [goals, selectedGoalDetail]);
 
   const habitsWithoutGoal = useMemo(() => {
     const activeGoalHabitIds = new Set(
@@ -276,19 +272,21 @@ function GoalsPage() {
       ...formData,
       endDate: formData.endDate || "",
     };
-    createGoal(newGoal);
-    ToastService.success(t("goals.add_success"));
-    setModalOpen(false);
+    const created = createGoal(newGoal);
+    if (created) {
+      ToastService.success(t("goals.add_success"));
+      setModalOpen(false);
+    }
   };
 
   const handleSelectDetail = (goal: GoalWithDerived) => {
-    setSelectedGoalDetail(goal);
+    setSelectedGoalId(goal.id);
     setPanelOpen(true);
   };
 
   const handleCloseDetail = () => {
     setPanelOpen(false);
-    setTimeout(() => setSelectedGoalDetail(null), 450);
+    setTimeout(() => setSelectedGoalId(null), 450);
   };
 
   const handleDeleteGoal = (goalId: string) => {
@@ -304,9 +302,11 @@ function GoalsPage() {
 
   const handleEditSubmit = (formData: GoalFormData) => {
     if (editingGoal) {
-      updateGoal(editingGoal.id, formData);
-      ToastService.success(t("goals.edit_success"));
-      setEditingGoal(null);
+      const updated = updateGoal(editingGoal.id, formData);
+      if (updated) {
+        ToastService.success(t("goals.edit_success"));
+        setEditingGoal(null);
+      }
     }
   };
 
@@ -767,8 +767,8 @@ function GoalsPage() {
         goal={selectedGoalFull}
         habitName={
           selectedGoalFull
-            ? (allHabits.find((h) => h.id === selectedGoalFull.habitId)
-                ?.name ?? t("goals.hidden_habit"))
+            ? (allHabits.find((h) => h.id === selectedGoalFull.habitId)?.name ??
+              t("goals.hidden_habit"))
             : ""
         }
         isOpen={panelOpen}

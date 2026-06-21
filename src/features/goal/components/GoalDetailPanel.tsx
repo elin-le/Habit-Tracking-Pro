@@ -39,17 +39,22 @@ const GoalDetailPanel: React.FC<GoalDetailPanelProps> = ({
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  // Keep last valid goal in memory so content stays visible during slide-out
-  const [cached, setCached] = useState<any | null>(goal);
+  // Keep last valid goal in memory
+  const [cached, setCached] = useState<GoalWithDerived | null>(goal);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (goal) {
-      setCached(goal);
+    if (isOpen) {
       const id = setTimeout(() => setVisible(true), 16);
       return () => clearTimeout(id);
     } else {
       setVisible(false);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (goal) {
+      setCached(goal);
     }
   }, [goal]);
 

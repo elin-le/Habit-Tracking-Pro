@@ -33,25 +33,27 @@ import { toast } from "sonner";
 import { useCheckIns } from "../../hooks/useCheckIns";
 import type { Category } from "@/shared/types/Category";
 import { cn } from "@/shared/lib/utils";
+import { isExpectedToday } from "../../utils/missedHabitUtils";
+import type { HabitSchedule } from "@/shared/types/HabitSchedule";
 
 interface HabitCardProps {
   habit: Habit;
+  habitSchedules: HabitSchedule[];
   onUpdate: () => void;
   onUpdateStatus: (status: HabitStatus) => void;
   onDelete: () => void;
   categories: Category[];
-  isViewingToday: boolean;
   onSetGoal?: () => void;
   hasActiveGoal?: boolean;
 }
 
 export function HabitCard({
   habit,
+  habitSchedules,
   onUpdate,
   onUpdateStatus,
   onDelete,
   categories,
-  isViewingToday,
   onSetGoal,
   hasActiveGoal,
 }: HabitCardProps) {
@@ -70,10 +72,15 @@ export function HabitCard({
   const targetPerDay = Number(habit.targetPerDay ?? 1) || 1;
   const isCompleted = currentCount >= targetPerDay;
 
+  const expectedToday = useMemo(
+    () => isExpectedToday(habit, habitSchedules),
+    [habit, habitSchedules],
+  );
+
   const minusDisabled =
-    habit.status !== "ACTIVE" || currentCount <= 0 || !isViewingToday;
+    habit.status !== "ACTIVE" || currentCount <= 0 || !expectedToday;
   const plusDisabled =
-    habit.status !== "ACTIVE" || isCompleted || !isViewingToday;
+    habit.status !== "ACTIVE" || isCompleted || !expectedToday;
 
   return (
     <div
@@ -237,22 +244,31 @@ export function HabitCard({
                 const next = Math.max(0, currentCount - 1);
                 upsertCheckIn(habit.id, today, next);
                 toast.error(
-                  <div className="w-full text-left" style={{ minWidth: '220px', maxWidth: '100%' }}>
+                  <div
+                    className="w-full text-left"
+                    style={{ minWidth: "220px", maxWidth: "100%" }}
+                  >
                     <div className="flex justify-between items-center gap-2 w-full">
                       <span className="text-slate-800 text-sm truncate flex-1">
-                        {t("checkin.undo", { next: next, target: targetPerDay })}                      </span>
+                        {t("checkin.undo", {
+                          next: next,
+                          target: targetPerDay,
+                        })}{" "}
+                      </span>
                     </div>
 
-                    <div 
-                      className="overflow-hidden rounded-full bg-slate-100 mt-2" 
-                      style={{ width: '100%', height: '8px' }}
+                    <div
+                      className="overflow-hidden rounded-full bg-slate-100 mt-2"
+                      style={{ width: "100%", height: "8px" }}
                     >
                       <div
                         className="h-full bg-red-500 rounded-full transition-all duration-300"
-                        style={{ width: `${Math.min((next / targetPerDay) * 100, 100)}%` }}
+                        style={{
+                          width: `${Math.min((next / targetPerDay) * 100, 100)}%`,
+                        }}
                       />
                     </div>
-                  </div>
+                  </div>,
                 );
                 //onUpdate();
               }}
@@ -284,7 +300,10 @@ export function HabitCard({
                 //toast.success(`+1 ${habit.name}`, {description: `${next}/${targetPerDay} completed today`,});
                 // onUpdate();
                 toast.success(
-                  <div className="w-full text-left" style={{ minWidth: '220px', maxWidth: '100%' }}>
+                  <div
+                    className="w-full text-left"
+                    style={{ minWidth: "220px", maxWidth: "100%" }}
+                  >
                     {/* Dòng 1: Tên và Chỉ số tách biệt hoàn toàn */}
                     <div className="flex justify-between items-center gap-2 w-full">
                       <span className="font-bold text-slate-800 text-sm truncate flex-1">
@@ -295,18 +314,19 @@ export function HabitCard({
                       </span>
                     </div>
 
-                    <div 
-                      className="overflow-hidden rounded-full bg-slate-100 mt-2" 
-                      style={{ width: '100%', height: '8px' }}
+                    <div
+                      className="overflow-hidden rounded-full bg-slate-100 mt-2"
+                      style={{ width: "100%", height: "8px" }}
                     >
                       <div
                         className="h-full bg-green-500 rounded-full transition-all duration-300"
-                        style={{ width: `${Math.min((next / targetPerDay) * 100, 100)}%` }}
+                        style={{
+                          width: `${Math.min((next / targetPerDay) * 100, 100)}%`,
+                        }}
                       />
                     </div>
-                  </div>
+                  </div>,
                 );
-
               }}
             >
               <Plus size={13} />
