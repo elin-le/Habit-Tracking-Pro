@@ -22,3 +22,8 @@ export interface GoalProgressType {
     title: string;
     progress: number;
 }
+
+export interface WeeklyCategoryProgressType {
+    day: string;
+    [categoryName: string]: number | string;
+}

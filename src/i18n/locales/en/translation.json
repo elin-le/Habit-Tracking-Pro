@@ -315,6 +315,7 @@
     "longestStreak": "Longest Streak",
     "completionRate": "Completion rate over the past 7 days",
     "categoryOverview": "Category Overview",
+    "weeklyProgressByCategory": "Weekly Progress by Category",
     "goalProgress": "Goal Progress",
     "health": "Health",
     "learning": "Learning",

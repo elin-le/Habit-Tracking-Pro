@@ -1,14 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import SummaryCard from "../features/dashboard/components/SummaryCard";
 import HabitStatistics from "../features/dashboard/components/HabitStatistics";
 import CategoryOverview from "../features/dashboard/components/CategoryOverview";
 import GoalProgress from "../features/dashboard/components/GoalProgress";
+import WeeklyCategoryProgress from "../features/dashboard/components/WeeklyCategoryProgress";
 import { getDashboardData } from "../features/dashboard/services/DashboardService";
 import "../features/dashboard/Dashboard.css";
 import { HeatMap } from "@/shared/components/heatmap/HeatMap";
 import { buildHeatMapData } from "@/shared/components/heatmap/heatmap.util";
-import type { CheckIn } from "@/shared/types/CheckIn";
-import type { Habit } from "@/shared/types/Habit";
 import type { User } from "@/shared/types/User";
 import {
     STORAGE_KEY,
@@ -24,18 +23,17 @@ interface DashboardPageProps {
 const DashboardPage = ({
     userId,
 }: DashboardPageProps) => {
-    const [selectedCategory] =
-        useState("ALL");
-
+    const [selectedCategory] = useState("ALL");
     const { t } = useTranslation();
     const navigate = useNavigate();
 
-    const currentUser: User | null =
-        JSON.parse(
-            localStorage.getItem(
-                STORAGE_KEY.CURRENT_USER,
-            ) || "null",
-        );
+    const currentUser: User | null = useMemo(() => {
+        try {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "null");
+        } catch {
+            return null;
+        }
+    }, []);
 
     useEffect(() => {
         if (!currentUser) {
@@ -43,90 +41,43 @@ const DashboardPage = ({
         }
     }, [currentUser, navigate]);
 
-    const dashboardUserId =
-        userId || currentUser?.phone;
+    const dashboardUserId = userId || currentUser?.phone;
 
-    const {
-        summaryCards,
-        habitStatistics,
-        categoryOverview,
-        goalProgress,
-    } = getDashboardData(
-        dashboardUserId,
-        selectedCategory,
-    );
+    const dashboardData = useMemo(() => {
+        if (!dashboardUserId) return null;
+        return getDashboardData(dashboardUserId, selectedCategory);
+    }, [dashboardUserId, selectedCategory]);
 
-    const allHabits: Habit[] =
-        JSON.parse(
-            localStorage.getItem(
-                STORAGE_KEY.USER_HABITS,
-            ) || "[]",
-        );
+    const heatMapData = useMemo(() => {
+        if (!dashboardData?.checkins) return {};
+        return buildHeatMapData(dashboardData.checkins);
+    }, [dashboardData?.checkins]);
 
-    const userHabits =
-        allHabits.filter(
-            (habit) =>
-                habit.userId ===
-                dashboardUserId,
-        );
-
-    const habitIds = userHabits.map(
-        (habit) => habit.id,
-    );
-
-    const checkins = (
-        JSON.parse(
-            localStorage.getItem(
-                STORAGE_KEY.USER_CHECKINS,
-            ) || "[]",
-        ) as CheckIn[]
-    ).filter((checkIn) =>
-        habitIds.includes(
-            checkIn.habitId,
-        ),
-    );
+    if (!dashboardData) return null;
 
     return (
         <div className="dashboard-page">
             {/* Summary */}
             <section className="dashboard-summary">
-                <SummaryCard
-                    summaryCards={summaryCards}
-                />
+                <SummaryCard summaryCards={dashboardData.summaryCards} />
             </section>
 
-            {/* Charts */}
+            {/* Charts Grid */}
             <section className="dashboard-grid">
-                {/* Left */}
                 <div className="dashboard-grid__category">
-                    <CategoryOverview
-                        categories={
-                            categoryOverview
-                        }
-                    />
+                    <CategoryOverview categories={dashboardData.categoryOverview} />
                 </div>
 
-                {/* Right */}
                 <div className="dashboard-grid__right">
-                    {/* Completion Rate */}
                     <div className="dashboard-grid__statistics">
-                        <HabitStatistics
-                            statistics={
-                                habitStatistics
-                            }
-                        />
+                        <HabitStatistics statistics={dashboardData.habitStatistics} />
                     </div>
 
-                    {/* Frequency of Check-in */}
                     <div className="dashboard-grid__heatmap">
                         <HeatMap
-                            data={buildHeatMapData(
-                                checkins,
-                            )}
+                            data={heatMapData}
                             weeks={20}
-                            title={t(
-                                "heatmap.title",
-                            )}
+                            title={t("heatmap.title")}
                         />
                     </div>
                 </div>
@@ -134,9 +85,12 @@ const DashboardPage = ({
 
             {/* Goals */}
             <section className="dashboard-goals">
-                <GoalProgress
-                    goals={goalProgress}
-                />
+                <GoalProgress goals={dashboardData.goalProgress} />
+            </section>
+
+            {/* Weekly Progress by Category*/}
+            <section className="dashboard-weekly-category">
+                <WeeklyCategoryProgress data={dashboardData.weeklyCategoryProgress} />
             </section>
         </div>
     );
