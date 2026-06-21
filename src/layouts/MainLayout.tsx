@@ -212,15 +212,12 @@ export default function MainLayout() {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayKey = yesterday.toISOString().split("T")[0];
-    const todayKey = new Date().toISOString().split("T")[0];
-    const yesterdayDate = new Date(yesterdayKey);
-    const yesterdayDowName = DAY_OF_WEEK_MAP[yesterdayDate.getDay()];
+
 
     interface MissedEvent {
       habit: any;
       dateKey: string;
       formattedDate: string;
-      isYesterday: boolean;
     }
     const missedEvents: MissedEvent[] = [];
 
@@ -229,78 +226,68 @@ export default function MainLayout() {
       if (habit.status !== "ACTIVE") return; // Defensive check: Skip inactive habits
 
       const habitCheckins = checkIns.filter((c: any) => c.habitId === habit.id);
+      if (habitCheckins.length === 0) return; // Only fire missed habit if they have at least checked in once (not new habit)
+
       const targetPerDay =
         typeof habit.targetPerDay === "number" ? habit.targetPerDay : 1;
 
-      // Collect historical check-ins (excluding yesterday)
-      habitCheckins.forEach((c: any) => {        
-        if (c.checkedAt === yesterdayKey) return;
-        const isCompleted = c.completionCount >= targetPerDay;
-        if (!isCompleted) {
+      // Find the oldest check-in date
+      const oldestDateStr = habitCheckins.reduce(
+        (min, cur) => (cur.checkedAt < min ? cur.checkedAt : min),
+        habitCheckins[0].checkedAt
+      );
+      const startParts = oldestDateStr.split("-").map(Number);
+      const endParts = yesterdayKey.split("-").map(Number);
+      const start = new Date(startParts[0], startParts[1] - 1, startParts[2]);
+      const end = new Date(endParts[0], endParts[1] - 1, endParts[2]);
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const date = String(d.getDate()).padStart(2, "0");
+        const dKey = `${year}-${month}-${date}`;
+        const dowName = DAY_OF_WEEK_MAP[d.getDay()];
+        const dCheckIn = habitCheckins.find((c: any) => c.checkedAt === dKey);
+        const dCount = dCheckIn ? dCheckIn.completionCount : 0;
+        const isCompleted = dCount >= targetPerDay;
+        const isScheduled =
+          habit.frequencyType === "DAILY" ||
+          schedules.some(
+            (s: any) => s.habitId === habit.id && s.dayOfWeek === dowName,
+          );
+        if (isScheduled && !isCompleted) {
           missedEvents.push({
             habit,
-            dateKey: c.checkedAt,
-            formattedDate: formatDate(c.checkedAt),
-            isYesterday: false,
+            dateKey: dKey,
+            formattedDate: formatDate(dKey),
           });
         }
-      });
 
-      // Collect yesterday check-in (whether exists or not)
-      const yesterdayCheckIn = habitCheckins.find((c: any) => c.checkedAt === yesterdayKey);
-      const yesterdayCount = yesterdayCheckIn ? yesterdayCheckIn.completionCount : 0;
-      const isCompletedYesterday = yesterdayCount >= targetPerDay;
-      // Check if the habit is scheduled for yesterday
-      const isScheduledYesterday =
-        habit.frequencyType === "DAILY" ||
-        schedules.some(
-          (s: any) => s.habitId === habit.id && s.dayOfWeek === yesterdayDowName,
-        );
-      // Only fire missed habit if they have at least checked in once (not new habit),
-      // they were scheduled to perform it yesterday, and they missed it yesterday.
-      if (habitCheckins.length > 0 && isScheduledYesterday && !isCompletedYesterday) {
-        missedEvents.push({
-          habit,
-          dateKey: yesterdayKey,
-          formattedDate: formatDate(yesterdayKey),
-          isYesterday: true,
-        });
       }
     });
     // Sắp xếp các sự kiện bị bỏ lỡ theo thời gian tăng dần (cũ nhất đến mới nhất)
-    // Để khi gọi addNotification (prepend), các ngày mới nhất (như ngày hôm qua) sẽ được chèn lên đầu
+    // Để khi gọi addNotification (prepend), các ngày mới nhất sẽ được chèn lên đầu
     missedEvents.sort((a, b) => a.dateKey.localeCompare(b.dateKey));
     // Thực hiện tạo các thông báo theo thứ tự đã sắp xếp
     missedEvents.forEach((event) => {
-      const { habit, formattedDate, isYesterday } = event;
-      const currentNotifs = getFreshNotifications();
+      const { habit, formattedDate } = event;
+      const currentNotifs = getFreshNotifications();     
       const notifExists = currentNotifs.some((n: any) => {
         return (
           n.relatedEntityId === habit.id &&
           n.type === "MISSED_HABIT" &&
-          (n.params?.missedDate === formattedDate || (!n.params?.missedDate && isYesterday && n.createdAt.startsWith(todayKey)))
+          n.params?.missedDate === formattedDate
+
         );
       });
       if (!notifExists) {
-        if (isYesterday) {
-          addNotification(
-            "MISSED_HABIT",
-            "notifications.missed_habit.title",
-            "notifications.missed_habit.message",
-            { habitName: habit.name, missedDate: formattedDate },
-            habit.id,
-            "HABIT",
-          );
-        } else {
-          addNotification(
-            "MISSED_HABIT",
-            "notifications.missed_habit.title",
-            "notifications.missed_habit.message_date",
-            { habitName: habit.name, missedDate: formattedDate },
-            habit.id,
-            "HABIT",
-          );
-        }
+        addNotification(
+          "MISSED_HABIT",
+          "notifications.missed_habit.title",
+          "notifications.missed_habit.message_date",
+          { habitName: habit.name, missedDate: formattedDate },
+          habit.id,
+          "HABIT",
+        );
       }
     });
   }, [currentUser?.phone, notifications, addNotification, storageTrigger]);
