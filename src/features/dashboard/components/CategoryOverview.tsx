@@ -1,3 +1,4 @@
+import { memo, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
     PieChart,
@@ -21,10 +22,17 @@ const COLORS = [
     "#F59E0B",
 ];
 
-const CategoryOverview = ({
+const CategoryOverview = memo(({
     categories,
 }: CategoryOverviewProps) => {
     const { t } = useTranslation();
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     if (!categories.length) {
         return (
@@ -63,11 +71,8 @@ const CategoryOverview = ({
             </h2>
 
             <div className="category-overview">
-                <div className="category-chart">
-                    <ResponsiveContainer
-                        width="100%"
-                        height="100%"
-                    >
+                <div className="category-chart" style={{ width: '100%', minWidth: 0 }}>
+                    <ResponsiveContainer width="100%" height={isMobile ? 260 : 350}>
                         <PieChart>
                             <Pie
                                 data={chartData}
@@ -102,14 +107,9 @@ const CategoryOverview = ({
                             contentStyle={{
                                 padding: "6px 8px",
                                 fontSize: "12px",
-                            }}
-                            itemStyle={{
-                                padding: 0,
-                                margin: 0,
-                            }}
-                            labelStyle={{
-                                margin: 0,
-                                padding: 0,
+                                borderRadius: "8px",
+                                border: "none",
+                                boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
                             }}
                         />
                         </PieChart>
@@ -151,6 +151,6 @@ const CategoryOverview = ({
             </div>
         </div>
     );
-};
+});
 
 export default CategoryOverview;

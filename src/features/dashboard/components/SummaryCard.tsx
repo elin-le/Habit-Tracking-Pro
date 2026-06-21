@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import type { SummaryCardType } from "../../../shared/types/Dashboard";
 
@@ -5,7 +6,7 @@ interface SummaryCardProps {
     summaryCards: SummaryCardType[];
 }
 
-const SummaryCard = ({
+const SummaryCard = memo(({
     summaryCards,
 }: SummaryCardProps) => {
     const { t } = useTranslation();
@@ -43,6 +44,6 @@ const SummaryCard = ({
             })}
         </div>
     );
-};
+});
 
 export default SummaryCard;

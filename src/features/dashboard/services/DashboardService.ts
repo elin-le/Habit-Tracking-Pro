@@ -16,6 +16,7 @@ import type {
     HabitStatisticsType,
     CategoryOverviewType,
     GoalProgressType,
+    WeeklyCategoryProgressType,
 } from "../../../shared/types/Dashboard";
 
 export type DashboardData = {
@@ -23,6 +24,8 @@ export type DashboardData = {
     habitStatistics: HabitStatisticsType[];
     categoryOverview: CategoryOverviewType[];
     goalProgress: GoalProgressType[];
+    weeklyCategoryProgress: WeeklyCategoryProgressType[];
+    checkins: CheckIn[];
 };
 
 const DAY_SHORT = [
@@ -68,18 +71,6 @@ function readHabits(userId?: string): Habit[] {
     }
 }
 
-// function readCheckIns(): CheckIn[] {
-//     try {
-//         const raw = localStorage.getItem(
-//             STORAGE_KEY.USER_CHECKINS,
-//         );
-
-//         return raw ? JSON.parse(raw) : [];
-//     } catch {
-//         return [];
-//     }
-// }
-
 function readCategories(): Category[] {
     try {
         const raw = localStorage.getItem(
@@ -122,7 +113,6 @@ function isHabitCompletedOnDate(
 }
 
 function buildSummaryCards(
-    // habits: Habit[],
     activeHabits: Habit[],
     checkIns: CheckIn[],
 ): SummaryCardType[] {
@@ -134,8 +124,24 @@ function buildSummaryCards(
                 habit,
                 checkIns,
                 todayKey,
-            ),
+              ),
     ).length;
+
+    const atRiskCount = activeHabits.filter((habit) => {
+        const habitCheckIns = checkIns.filter(
+            (c) => c.habitId === habit.id,
+        );
+        const currentStreak = getCurrentStreak(
+            habitCheckIns,
+            Number(habit.targetPerDay) || 1,
+        );
+        const isCompletedToday = isHabitCompletedOnDate(
+            habit,
+            checkIns,
+            todayKey,
+        );
+        return currentStreak > 0 && !isCompletedToday;
+    }).length;
 
     const currentStreak = activeHabits.reduce(
         (max, habit) => {
@@ -188,6 +194,11 @@ function buildSummaryCards(
             id: 2,
             title: "dashboard.activeHabits",
             value: activeHabits.length,
+        },
+        {
+            id: 5,
+            title: "dashboard.atRiskHabits",
+            value: atRiskCount,
         },
         {
             id: 3,
@@ -271,6 +282,45 @@ function buildCategoryOverview(
         );
 }
 
+function buildWeeklyCategoryProgress(
+    activeHabits: Habit[],
+    categories: Category[],
+    checkIns: CheckIn[]
+): WeeklyCategoryProgressType[] {
+    const result: WeeklyCategoryProgressType[] = [];
+    const activeCategories = categories.filter(cat => 
+        activeHabits.some(h => h.categoryId === cat.id)
+    );
+
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const dateKey = getDateKey(date);
+        
+        const dayEntry: WeeklyCategoryProgressType = {
+            day: DAY_SHORT[date.getDay()],
+        };
+
+        activeCategories.forEach(category => {
+            const habitsInCategory = activeHabits.filter(h => h.categoryId === category.id);
+            if (habitsInCategory.length === 0) {
+                dayEntry[category.name] = 0;
+                return;
+            }
+
+            const completedCount = habitsInCategory.filter(habit => 
+                isHabitCompletedOnDate(habit, checkIns, dateKey)
+            ).length;
+
+            dayEntry[category.name] = Math.round((completedCount / habitsInCategory.length) * 100);
+        });
+
+        result.push(dayEntry);
+    }
+
+    return result;
+}
+
 function buildGoalProgress(
     goals: GoalWithDerived[],
     habits: Habit[],
@@ -334,7 +384,6 @@ export function computeDashboardData(
     return {
         summaryCards:
             buildSummaryCards(
-                // habits,
                 filteredHabits,
                 checkIns,
             ),
@@ -351,11 +400,19 @@ export function computeDashboardData(
                 categories,
             ),
 
+        weeklyCategoryProgress:
+            buildWeeklyCategoryProgress(
+                activeHabits,
+                categories,
+                checkIns
+            ),
+
         goalProgress:
             buildGoalProgress(
                 filteredGoals,
                 habits,
             ),
+        checkins: checkIns,
     };
 }
 
@@ -395,6 +452,7 @@ export function getDashboardData(
         selectedCategory,
     );
 }
+
 function readCheckInsByHabits(
     habits: Habit[],
 ): CheckIn[] {
