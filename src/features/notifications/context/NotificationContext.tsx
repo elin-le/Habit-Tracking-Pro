@@ -26,12 +26,12 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
               n.params = { habitName: n.params?.habitName || 'habit_form.Health' };
             } else if (n.type === 'MISSED_HABIT') {
               n.title = 'notifications.missed_habit.title';
-              if (n.message !== 'notifications.missed_habit.message' && n.message !== 'notifications.missed_habit.message_date') {
-                n.message = 'notifications.missed_habit.message';
+              if (n.message !== 'notifications.missed_habit.message_date') {
+                n.message = 'notifications.missed_habit.message_date';
               }
               n.params = { 
                 habitName: n.params?.habitName || 'habit_form.Mindfulness',
-                missedDate: n.params?.missedDate ??''
+                missedDate: n.params?.missedDate ?? ''
               };
          } else if (n.type === 'STREAK_RISK') {
               n.title = 'notifications.streak_risk.title';
