@@ -252,7 +252,6 @@
     "view_detail": "View details",
     "checkin_history": "Check-in history",
     "checkin_detail": "Check-in details",
-    "no_checkin": "No check-ins yet",
     "total_checkins": "times",
     "risk_safe": "Safe",
     "risk_warning": "Warning",
@@ -328,10 +327,11 @@
   },
   "checkin": {
     "history": "Check-in History",
-    "no": "Empty",
+    "no": "No check-in records",
     "not_finished": "Not finished",
     "completed": "Completed",
-    "undo": "Back to {{next}}/{{target}}. Let's smash it later!"
+    "undo": "Back to {{next}}/{{target}}. Let's smash it later!",
+    "view": "View check-in history by date"
   },
   "setting": {
     "setting": "Setting",

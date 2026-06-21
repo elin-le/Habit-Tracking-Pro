@@ -346,7 +346,7 @@ export default function MainLayout() {
               refreshGoals: userGoals.refreshGoals,
 
               // Checkin
-              userCheckIns: userCheckIns,
+              checkIns: userCheckIns,
             }}
           />
         </main>

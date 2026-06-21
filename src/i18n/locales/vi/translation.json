@@ -333,7 +333,8 @@
     "not_finished": "Chưa hoàn thành",
     "completed": "Đạt mục tiêu",
     "days": "Ngày",
-    "undo": "Trở lại mốc {{next}}/{{target}}. Cố gắng tiếp nhé!"
+    "undo": "Trở lại mốc {{next}}/{{target}}. Cố gắng tiếp nhé!",
+    "view": "Xem lịch sử check-in theo ngày"
   },
   "setting": {
     "setting": "Cài đặt",

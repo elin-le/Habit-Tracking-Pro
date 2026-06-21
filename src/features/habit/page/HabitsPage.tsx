@@ -12,6 +12,7 @@ import { Pagination } from "../../../shared/components/common/Pagination";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import type { Habit, HabitStatus, Priority } from "../../../shared/types/Habit";
+import type { CheckIn } from "../../../shared/types/CheckIn"; // 🛠️ Thêm type CheckIn
 import type {
   DaysOfWeek,
   HabitSchedule,
@@ -29,9 +30,13 @@ import GoalForm, {
 import { Modal } from "../../../shared/components/ui/Modal";
 import type { Goal, GoalWithDerived } from "../../../shared/types/Goal";
 import { ToastService } from "../../../routes/services/toastService";
+import "../../dashboard/Dashboard.css"; 
+import DailyCheckIns from "../components/DailyCheckIns"
+
 
 type LayoutContext = {
   habits: Habit[];
+  checkIns?: CheckIn[];
   goals: GoalWithDerived[];
   createHabit: (habit: Habit) => void;
   updateHabit: (habit: Habit) => void;
@@ -51,6 +56,7 @@ export function HabitsPage() {
   const { t } = useTranslation();
   const {
     habits,
+    checkIns = [], 
     goals,
     showAddForm,
     habitSchedules,
@@ -70,6 +76,7 @@ export function HabitsPage() {
   const currentUser: User | null = JSON.parse(
     localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "null",
   );
+
 
   const [showFilter, setShowFilter] = useState(false);
   const [activeFilterCount, setActiveFilterCount] = useState(0);
@@ -285,6 +292,7 @@ export function HabitsPage() {
         </div>
       )}
 
+      
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
@@ -292,6 +300,12 @@ export function HabitsPage() {
         handlePageChange={handlePageChange}
       />
 
+    <DailyCheckIns
+      habits={habits}
+      checkIns={checkIns}
+      categories={categories}
+      currentUserId={currentUser?.phone}
+    />
       {showAddForm && (
         <HabitForm
           onClose={() => setShowAddForm(false)}
