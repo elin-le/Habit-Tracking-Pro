@@ -45,6 +45,7 @@ interface HabitCardProps {
   categories: Category[];
   onSetGoal?: () => void;
   hasActiveGoal?: boolean;
+  isViewingToday: boolean;
 }
 
 export function HabitCard({
@@ -56,6 +57,7 @@ export function HabitCard({
   categories,
   onSetGoal,
   hasActiveGoal,
+  isViewingToday,
 }: HabitCardProps) {
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -77,10 +79,12 @@ export function HabitCard({
     [habit, habitSchedules],
   );
 
+  const canCheckInNow = expectedToday && isViewingToday;
+
   const minusDisabled =
-    habit.status !== "ACTIVE" || currentCount <= 0 || !expectedToday;
+    habit.status !== "ACTIVE" || currentCount <= 0 || !canCheckInNow;
   const plusDisabled =
-    habit.status !== "ACTIVE" || isCompleted || !expectedToday;
+    habit.status !== "ACTIVE" || isCompleted || !canCheckInNow;
 
   return (
     <div

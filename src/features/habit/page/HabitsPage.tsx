@@ -30,9 +30,8 @@ import GoalForm, {
 import { Modal } from "../../../shared/components/ui/Modal";
 import type { Goal, GoalWithDerived } from "../../../shared/types/Goal";
 import { ToastService } from "../../../routes/services/toastService";
-import "../../dashboard/Dashboard.css"; 
-import DailyCheckIns from "../components/DailyCheckIns"
-
+import "../../dashboard/Dashboard.css";
+import DailyCheckIns from "../components/DailyCheckIns";
 
 type LayoutContext = {
   habits: Habit[];
@@ -56,7 +55,7 @@ export function HabitsPage() {
   const { t } = useTranslation();
   const {
     habits,
-    checkIns = [], 
+    checkIns = [],
     userGoals = [],
     showAddForm,
     habitSchedules,
@@ -77,7 +76,6 @@ export function HabitsPage() {
     localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "null",
   );
 
-
   const [showFilter, setShowFilter] = useState(false);
   const [activeFilterCount, setActiveFilterCount] = useState(0);
 
@@ -95,6 +93,10 @@ export function HabitsPage() {
   const [frequencyFilter, setFrequencyFilter] = useState<DaysOfWeek | null>(
     DAY_OF_WEEK_MAP[new Date().getDay()],
   );
+
+  const todayDow = DAY_OF_WEEK_MAP[new Date().getDay()];
+  const isViewingToday =
+    frequencyFilter === null || frequencyFilter === todayDow;
 
   const handleClearAll = () => {
     setFilterCategory(null);
@@ -287,12 +289,12 @@ export function HabitsPage() {
                     g.progress.status === "IN_PROGRESS"),
               )}
               categories={categories}
+              isViewingToday={isViewingToday}
             />
           ))}
         </div>
       )}
 
-      
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
@@ -300,12 +302,12 @@ export function HabitsPage() {
         handlePageChange={handlePageChange}
       />
 
-    <DailyCheckIns
-      habits={habits}
-      checkIns={checkIns}
-      categories={categories}
-      currentUserId={currentUser?.phone}
-    />
+      <DailyCheckIns
+        habits={habits}
+        checkIns={checkIns}
+        categories={categories}
+        currentUserId={currentUser?.phone}
+      />
       {showAddForm && (
         <HabitForm
           onClose={() => setShowAddForm(false)}
