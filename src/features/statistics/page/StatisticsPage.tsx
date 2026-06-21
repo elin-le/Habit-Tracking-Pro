@@ -18,13 +18,13 @@ import { ROUTES, STORAGE_KEY } from "@/shared/constants/appConstants";
 import { exportJson } from "@/shared/utils/exportJson";
 import { toast } from "sonner";
 
-type LayoutContext = { habits: Habit[]; userGoals: Goal[]; userCheckIns: CheckIn[] };
+type LayoutContext = { habits: Habit[]; userGoals: Goal[]; checkIns: CheckIn[] };
 const STATS_PER_PAGE = 6;
 
 export default function StatisticsPage() {
   const { t } = useTranslation();
   const { categories } = useCategories();
-  const { habits, userGoals, userCheckIns } = useOutletContext<LayoutContext>();
+  const { habits, userGoals, checkIns: userCheckIns = [] } = useOutletContext<LayoutContext>();
   const navigate = useNavigate();
 
   const currentUser: User | null = JSON.parse(localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "null");
