@@ -37,15 +37,12 @@ type LayoutContext = {
   habits: Habit[];
   checkIns?: CheckIn[];
   userGoals: GoalWithDerived[];
-  createHabit: (habit: Habit) => void;
   updateHabit: (habit: Habit) => void;
   deleteHabit: (habitId: string) => void;
   habitSchedules: HabitSchedule[];
-  createHabitSchedules: (s: HabitSchedule[]) => void;
   replaceHabitSchedules: (habitId: string, s: HabitSchedule[]) => void;
   deleteHabitSchedulesByHabitId: (habitId: string) => void;
   categories: Category[];
-  showAddForm: boolean;
   setShowAddForm: (v: boolean) => void;
   deleteGoalsByHabitId: (habitId: string) => void;
   createGoal: (goalData: Omit<Goal, "id">) => Goal;
@@ -57,11 +54,8 @@ export function HabitsPage() {
     habits,
     checkIns = [],
     userGoals = [],
-    showAddForm,
     habitSchedules,
     categories,
-    createHabit,
-    createHabitSchedules,
     setShowAddForm,
     updateHabit,
     replaceHabitSchedules,
@@ -308,14 +302,6 @@ export function HabitsPage() {
         categories={categories}
         currentUserId={currentUser?.phone}
       />
-      {showAddForm && (
-        <HabitForm
-          onClose={() => setShowAddForm(false)}
-          onSubmit={createHabit}
-          onSubmitSchedules={createHabitSchedules}
-          categories={categories}
-        />
-      )}
 
       {updatingHabit && (
         <HabitForm
