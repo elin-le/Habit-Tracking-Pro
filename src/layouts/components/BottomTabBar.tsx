@@ -1,12 +1,12 @@
 import { useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { NotificationContext } from "../../features/notifications/context/NotificationContext";
+import {ROUTES} from "@/shared/constants/appConstants"
 
 const TABS = [
   {
     value: "home",
     label: "Home",
-    path: "/dashboard",
+    path: ROUTES.DASHBOARD,
     icon: (active: boolean) => (
       <svg
         width="24"
@@ -26,7 +26,7 @@ const TABS = [
   {
     value: "goals",
     label: "Goals",
-    path: "/dashboard/goals",
+    path: ROUTES.GOALS,
     icon: (active: boolean) => (
       <svg
         width="24"
@@ -47,7 +47,7 @@ const TABS = [
   {
     value: "habits",
     label: "Habits",
-    path: "/dashboard/habits",
+    path: ROUTES.HABITS,
     icon: (active: boolean) => (
       <svg
         width="24"
@@ -67,23 +67,25 @@ const TABS = [
     ),
   },
   {
-    value: "notifications",
-    label: "Alerts",
-    path: "/dashboard/notifications",
-    icon: (active: boolean) => (
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={active ? "2.2" : "1.7"}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
-        <path d="M13.73 21a2 2 0 01-3.46 0" />
-      </svg>
+  value: "community",
+  label: "Community",
+  path: ROUTES.COMMUNITY,
+  icon: (active: boolean) => (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={active ? "2.2" : "1.7"}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M16 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+      <circle cx="10" cy="7" r="3" />
+      <path d="M22 21v-2a4 4 0 00-3-3.87" />
+      <path d="M16 3.13a4 4 0 010 7.75" />
+    </svg>
     ),
   },
   {
@@ -110,7 +112,6 @@ const TABS = [
 export default function BottomTabBar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { unreadCount } = useContext(NotificationContext);
 
   return (
     <nav
@@ -153,14 +154,6 @@ export default function BottomTabBar() {
               >
                 {tab.icon(active)}
 
-                {tab.value === "notifications" && unreadCount > 0 && (
-                  <span
-                    className="absolute -top-1 -right-1 text-white text-[10px] font-bold min-w-[19px] h-[19px] rounded-full flex items-center justify-center px-1"
-                    style={{ background: "#ef4444", boxShadow: "0 0 0 2px var(--surface)" }}
-                  >
-                    {unreadCount > 9 ? "9+" : unreadCount}
-                  </span>
-                )}
               </span>
 
               <span

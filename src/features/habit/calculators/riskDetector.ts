@@ -4,21 +4,17 @@ export type HabitRisk =
     | "AT_RISK";
 
 export const getHabitRisk = (
-    completionRate: number,
-    currentStreak: number,
-    completedToday: boolean
+  completionRate: number,
+  currentStreak: number,
+  completedToday: boolean
 ): HabitRisk => {
+  if (currentStreak > 0 && !completedToday) {
+    return "AT_RISK";
+  }
 
-    if (
-        currentStreak > 0 &&
-        !completedToday
-    ) {
-        return "AT_RISK";
-    }
+  if (!completedToday && completionRate < 80) {
+    return "WARNING";
+  }
 
-    if (completionRate < 80) {
-        return "WARNING";
-    }
-
-    return "SAFE";
+  return "SAFE";
 };
