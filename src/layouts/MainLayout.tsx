@@ -307,7 +307,7 @@ export default function MainLayout() {
           createHabitSchedules={habitSchedule.createHabitSchedules}
         />
 
-        <main className="flex-1 p-6 overflow-auto">
+        <main className="flex-1 p-6 overflow-auto pb-16">
           <Outlet
             context={{
               // Habit
