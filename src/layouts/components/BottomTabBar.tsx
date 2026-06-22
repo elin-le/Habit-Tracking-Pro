@@ -25,7 +25,7 @@ const TABS = [
   {
     value: "goals",
     label: "Goals",
-    path: ROUTES.GOALS,
+    path: "/dashboard/goals",
     icon: (active: boolean) => (
       <svg
         width="24"
@@ -46,7 +46,7 @@ const TABS = [
   {
     value: "habits",
     label: "Habits",
-    path: ROUTES.HABITS,
+    path: "/dashboard/habits",
     icon: (active: boolean) => (
       <svg
         width="24"
@@ -68,7 +68,7 @@ const TABS = [
   {
   value: "community",
   label: "Community",
-  path: ROUTES.COMMUNITY,
+  path: "/dashboard/community",
   icon: (active: boolean) => (
     <svg
       width="24"
