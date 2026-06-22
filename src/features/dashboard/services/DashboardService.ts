@@ -203,12 +203,12 @@ function buildSummaryCards(
         {
             id: 3,
             title: "dashboard.currentStreak",
-            value: `${currentStreak} Days`,
+            value: `${currentStreak} `,        
         },
         {
             id: 4,
             title: "dashboard.longestStreak",
-            value: `${longestStreak} Days`,
+            value: `${longestStreak} `,
         },
     ];
 }
