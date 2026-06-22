@@ -1,24 +1,24 @@
 import { useMemo, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useOutletContext, useNavigate } from "react-router-dom";
-import { TrendingUp, BarChart3, Activity, AlertTriangle, Download, SlidersHorizontal, ChevronDown, ChevronUp } from "lucide-react";
+import { TrendingUp, BarChart3, Activity, Trophy, Download, SlidersHorizontal, ChevronDown, ChevronUp } from "lucide-react";
 import { useHabitStats } from "../../../shared/hooks/useHabitStats";
 import { useCategories } from "../../../shared/hooks/useCategory";
 import { usePagination } from "../../../shared/hooks/usePagination";
 import { Pagination } from "../../../shared/components/common/Pagination";
-import type { HabitStat, RiskLevel } from "../../../shared/types/Statistics";
+import type { HabitStat } from "../../../shared/types/Statistics";
 import type { Habit, Priority } from "../../../shared/types/Habit";
 import { StatisticsFilter } from "../components/StatisticsFilter";
 import { OverviewCard } from "../components/OverviewCard";
 import { HabitStatCard } from "../components/HabitStatCard";
-import type { Goal } from "@/shared/types/Goal";
+import type { GoalWithDerived } from "@/shared/types/Goal";
 import type { CheckIn } from "@/shared/types/CheckIn";
 import type { User } from "@/shared/types/User";
 import { ROUTES, STORAGE_KEY } from "@/shared/constants/appConstants";
 import { exportJson } from "@/shared/utils/exportJson";
 import { toast } from "sonner";
 
-type LayoutContext = { habits: Habit[]; userGoals: Goal[]; checkIns: CheckIn[] };
+type LayoutContext = { habits: Habit[]; userGoals: GoalWithDerived[]; checkIns: CheckIn[] };
 const STATS_PER_PAGE = 6;
 
 export default function StatisticsPage() {
@@ -30,11 +30,10 @@ export default function StatisticsPage() {
   const currentUser: User | null = JSON.parse(localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "null");
   useEffect(() => { if (!currentUser) navigate(ROUTES.AUTH, { replace: true }); }, []);
 
-  const stats = useHabitStats(habits, userCheckIns, categories);
+  const stats = useHabitStats(habits, userCheckIns, categories, userGoals);
 
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
   const [filterPriority, setFilterPriority] = useState<Priority | null>(null);
-  const [filterRisk, setFilterRisk] = useState<RiskLevel | null>(null);
   const [showFilter, setShowFilter] = useState(false);
 
   const handleExport = () => {
@@ -45,21 +44,20 @@ export default function StatisticsPage() {
   const total = stats.length;
   const completedToday = stats.filter((s) => s.todayRate === 100).length;
   const completedTodayPct = total === 0 ? 0 : Math.round((completedToday / total) * 100);
+  const bestRunAll = stats.reduce((max, s) => Math.max(max, s.bestRun), 0);
   const activeHabits = stats.length;
-  const atRisk = stats.filter((s) => s.riskLevel === "AT_RISK").length;
 
   const visibleStats = useMemo(() => stats.filter((s) => {
     const catOk = !filterCategory || s.categoryId === filterCategory;
     const priOk = !filterPriority || s.priority === filterPriority;
-    const riskOk = !filterRisk || s.riskLevel === filterRisk;
-    return catOk && priOk && riskOk;
-  }), [stats, filterCategory, filterPriority, filterRisk]);
+    return catOk && priOk;
+  }), [stats, filterCategory, filterPriority]);
 
   const { paginatedItems, currentPage, totalPages, handlePageChange, getPageNumbers } =
     usePagination<HabitStat>(visibleStats, "", () => true, STATS_PER_PAGE);
 
-  const activeFilterCount = (filterCategory ? 1 : 0) + (filterPriority ? 1 : 0) + (filterRisk ? 1 : 0);
-  const handleClearAll = () => { setFilterCategory(null); setFilterPriority(null); setFilterRisk(null); };
+    const activeFilterCount = (filterCategory ? 1 : 0) + (filterPriority ? 1 : 0);
+    const handleClearAll = () => { setFilterCategory(null); setFilterPriority(null); };
 
   if (stats.length === 0) {
     return (<div className="flex flex-col gap-6 pb-24 md:pb-8 text-[var(--text)]"><PageHeading /><EmptyState /></div>);
@@ -76,7 +74,7 @@ export default function StatisticsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <OverviewCard icon={<TrendingUp size={20} />} accent="text-emerald-600 bg-emerald-50" label={t("statistics.completed_today")} value={completedTodayPct} suffix="%" />
         <OverviewCard icon={<Activity size={20} />} accent="text-indigo-600 bg-indigo-50" label={t("statistics.active_habits")} value={activeHabits} />
-        <OverviewCard icon={<AlertTriangle size={20} />} accent="text-rose-600 bg-rose-50" label={t("statistics.at_risk")} value={atRisk} />
+        <OverviewCard icon={<Trophy size={20} />} accent="text-amber-600 bg-amber-50" label={t("statistics.best_run_all")} value={bestRunAll} suffix={` ${t("statistics.days")}`} />
       </div>
       <div>
         <button onClick={() => setShowFilter((v) => !v)} className="flex items-center gap-2 rounded-xl border border-[var(--primary)]/20 px-4 py-2 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--primary)]/8 cursor-pointer">
@@ -84,7 +82,7 @@ export default function StatisticsPage() {
           {activeFilterCount > 0 && (<span className="rounded-full bg-[var(--primary)] px-1.5 text-[10px] font-bold text-white">{activeFilterCount}</span>)}
           {showFilter ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
         </button>
-        {showFilter && (<div className="mt-3"><StatisticsFilter categories={categories} selectedCategory={filterCategory} onCategoryChange={setFilterCategory} selectedPriority={filterPriority} onPriorityChange={setFilterPriority} selectedRisk={filterRisk} onRiskChange={setFilterRisk} onClearAll={handleClearAll} /></div>)}
+        {showFilter && (<div className="mt-3"><StatisticsFilter categories={categories} selectedCategory={filterCategory} onCategoryChange={setFilterCategory} selectedPriority={filterPriority} onPriorityChange={setFilterPriority} onClearAll={handleClearAll} /></div>)}
       </div>
       <h2 className="text-base font-bold">{t("statistics.per_habit")}</h2>
       {visibleStats.length === 0 ? (

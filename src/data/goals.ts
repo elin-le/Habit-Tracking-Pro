@@ -373,4 +373,12 @@ export const mockGoals: Goal[] = [
     startedDate: "2026-06-01",
     endDate: "2026-06-30",
   },
+  /* DEMO STAT*/
+  { id: "stat-g1", habitId: "stat-h1", targetType: "TOTAL_COMPLETIONS", targetValue: 30, startedDate: "2026-06-01", endDate: "2026-06-30" },
+  { id: "stat-g4", habitId: "stat-h4", targetType: "STREAK", targetValue: 20, startedDate: "2026-06-12", endDate: "2026-07-11" },
+  { id: "stat-g5", habitId: "stat-h5", targetType: "STREAK", targetValue: 30, startedDate: "2026-06-03", endDate: "2026-06-28" },
+  { id: "stat-g6", habitId: "stat-h6", targetType: "TOTAL_COMPLETIONS", targetValue: 60, startedDate: "2026-06-03", endDate: "2026-06-26" },
+  { id: "stat-g8", habitId: "stat-h8", targetType: "STREAK", targetValue: 10, startedDate: "2026-06-03", endDate: "2026-06-28" },
+  { id: "stat-g9", habitId: "stat-h9", targetType: "TOTAL_COMPLETIONS", targetValue: 40, startedDate: "2026-06-26", endDate: "2026-07-20" },
+
 ];

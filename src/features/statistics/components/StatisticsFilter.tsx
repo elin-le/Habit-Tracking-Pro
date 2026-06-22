@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { FilterChip } from "../../../shared/components/common/FilterChip";
 import type { Priority } from "../../../shared/types/Habit";
 import type { Category } from "../../../shared/types/Category";
-import type { RiskLevel } from "../../../shared/types/Statistics";
 
 interface Props {
   categories: Category[];
@@ -11,25 +10,18 @@ interface Props {
   onCategoryChange: (id: string | null) => void;
   selectedPriority: Priority | null;
   onPriorityChange: (p: Priority | null) => void;
-  selectedRisk: RiskLevel | null;
-  onRiskChange: (r: RiskLevel | null) => void;
   onClearAll: () => void;
 }
-
-/* Bộ lọc Statistics: Danh mục + Mức ưu tiên + Trạng thái + Xóa bộ lọc */
 export function StatisticsFilter({
   categories,
   selectedCategory,
   onCategoryChange,
   selectedPriority,
   onPriorityChange,
-  selectedRisk,
-  onRiskChange,
   onClearAll,
 }: Props) {
   const { t } = useTranslation();
-  const activeCount =
-    (selectedCategory ? 1 : 0) + (selectedPriority ? 1 : 0) + (selectedRisk ? 1 : 0);
+  const activeCount = (selectedCategory ? 1 : 0) + (selectedPriority ? 1 : 0);
 
   return (
     <div className="rounded-2xl border border-[var(--primary)]/15 bg-[var(--surface)] p-5">
@@ -75,17 +67,6 @@ export function StatisticsFilter({
             <FilterChip active={selectedPriority === "LOW"} onClick={() => onPriorityChange("LOW")}>{t("habit_filter.pri-1")}</FilterChip>
             <FilterChip active={selectedPriority === "MEDIUM"} onClick={() => onPriorityChange("MEDIUM")}>{t("habit_filter.pri-2")}</FilterChip>
             <FilterChip active={selectedPriority === "HIGH"} onClick={() => onPriorityChange("HIGH")}>{t("habit_filter.pri-3")}</FilterChip>
-          </div>
-        </div>
-
-        {/* Trạng thái (theo nguy cơ đứt chuỗi) */}
-        <div>
-          <p className="mb-2 text-sm font-medium">{t("habit_filter.status")}</p>
-          <div className="flex flex-wrap gap-2">
-            <FilterChip active={!selectedRisk} onClick={() => onRiskChange(null)}>{t("habit_filter.cat-0")}</FilterChip>
-            <FilterChip active={selectedRisk === "SAFE"} onClick={() => onRiskChange("SAFE")}>{t("statistics.risk_safe")}</FilterChip>
-            <FilterChip active={selectedRisk === "WARNING"} onClick={() => onRiskChange("WARNING")}>{t("statistics.risk_warning")}</FilterChip>
-            <FilterChip active={selectedRisk === "AT_RISK"} onClick={() => onRiskChange("AT_RISK")}>{t("statistics.risk_at_risk")}</FilterChip>
           </div>
         </div>
       </div>
