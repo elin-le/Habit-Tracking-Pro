@@ -1,6 +1,8 @@
 import {
   MoreVertical,
   CheckCircle,
+  CircleDashed,
+  Clock4,
   Calendar,
   Plus,
   Minus,
@@ -31,21 +33,31 @@ import { toast } from "sonner";
 import { useCheckIns } from "../../hooks/useCheckIns";
 import type { Category } from "@/shared/types/Category";
 import { cn } from "@/shared/lib/utils";
+import { isExpectedToday } from "../../utils/missedHabitUtils";
+import type { HabitSchedule } from "@/shared/types/HabitSchedule";
 
 interface HabitCardProps {
   habit: Habit;
+  habitSchedules: HabitSchedule[];
   onUpdate: () => void;
   onUpdateStatus: (status: HabitStatus) => void;
   onDelete: () => void;
   categories: Category[];
+  onSetGoal?: () => void;
+  hasActiveGoal?: boolean;
+  isViewingToday: boolean;
 }
 
 export function HabitCard({
   habit,
+  habitSchedules,
   onUpdate,
   onUpdateStatus,
   onDelete,
   categories,
+  onSetGoal,
+  hasActiveGoal,
+  isViewingToday,
 }: HabitCardProps) {
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -58,14 +70,22 @@ export function HabitCard({
   const today = useMemo(() => new Date().toISOString().split("T")[0], []);
   const { getCheckIn, upsertCheckIn } = useCheckIns();
   const checkIn = getCheckIn(habit.id, today);
-  const currentCount = checkIn?.completionCount ?? 0;
+  //const currentCount = checkIn?.completionCount ?? 0;
+  const currentCount = isViewingToday? (checkIn?.completionCount ?? 0) : 0;
   const targetPerDay = Number(habit.targetPerDay ?? 1) || 1;
   const isCompleted = currentCount >= targetPerDay;
 
-  
+  const expectedToday = useMemo(
+    () => isExpectedToday(habit, habitSchedules),
+    [habit, habitSchedules],
+  );
 
-  const minusDisabled = habit.status !== "ACTIVE" || currentCount <= 0;
-  const plusDisabled = habit.status !== "ACTIVE" || isCompleted;
+  const canCheckInNow = expectedToday && isViewingToday;
+
+  const minusDisabled =
+    habit.status !== "ACTIVE" || currentCount <= 0 || !canCheckInNow;
+  const plusDisabled =
+    habit.status !== "ACTIVE" || isCompleted || !canCheckInNow;
 
   return (
     <div
@@ -180,9 +200,22 @@ export function HabitCard({
           <div className="min-w-0 flex-1">
             <div
               className="flex items-center gap-1.5 whitespace-nowrap text-sm font-medium"
-              style={{ color: isCompleted ? "#22c55e" : "#f59e0b" }}
+              style={{
+                color: isCompleted
+                  ? "#22c55e"
+                  : currentCount === 0
+                    ? "#94a3b8"
+                    : "#f59e0b",
+              }}
             >
-              <CheckCircle size={14} className="shrink-0" />
+              {" "}
+              {isCompleted ? (
+                <CheckCircle size={14} className="shrink-0" />
+              ) : currentCount === 0 ? (
+                <CircleDashed size={14} className="shrink-0" />
+              ) : (
+                <Clock4 size={14} className="shrink-0" />
+              )}
               <span className="truncate">
                 {isCompleted
                   ? t("habit_card.status-1")
@@ -215,7 +248,33 @@ export function HabitCard({
                 e.stopPropagation();
                 const next = Math.max(0, currentCount - 1);
                 upsertCheckIn(habit.id, today, next);
-                toast.success(t("checkin.toast_update", { name: habit.name, count: next }));
+                toast.error(
+                  <div
+                    className="w-full text-left"
+                    style={{ minWidth: "220px", maxWidth: "100%" }}
+                  >
+                    <div className="flex justify-between items-center gap-2 w-full">
+                      <span className="text-slate-800 text-sm truncate flex-1">
+                        {t("checkin.undo", {
+                          next: next,
+                          target: targetPerDay,
+                        })}{" "}
+                      </span>
+                    </div>
+
+                    <div
+                      className="overflow-hidden rounded-full bg-slate-100 mt-2"
+                      style={{ width: "100%", height: "8px" }}
+                    >
+                      <div
+                        className="h-full bg-red-500 rounded-full transition-all duration-300"
+                        style={{
+                          width: `${Math.min((next / targetPerDay) * 100, 100)}%`,
+                        }}
+                      />
+                    </div>
+                  </div>,
+                );
                 //onUpdate();
               }}
             >
@@ -238,10 +297,41 @@ export function HabitCard({
               }}
               onClick={(e) => {
                 e.stopPropagation();
-                const next = Math.min(currentCount + 1, Number(targetPerDay) || 1);
+                const next = Math.min(
+                  currentCount + 1,
+                  Number(targetPerDay) || 1,
+                );
                 upsertCheckIn(habit.id, today, next);
-                toast.success(t("checkin.toast_update", { name: habit.name, count: next }));
+                //toast.success(`+1 ${habit.name}`, {description: `${next}/${targetPerDay} completed today`,});
                 // onUpdate();
+                toast.success(
+                  <div
+                    className="w-full text-left"
+                    style={{ minWidth: "220px", maxWidth: "100%" }}
+                  >
+                    {/* Dòng 1: Tên và Chỉ số tách biệt hoàn toàn */}
+                    <div className="flex justify-between items-center gap-2 w-full">
+                      <span className="font-bold text-slate-800 text-sm truncate flex-1">
+                        {habit.name}
+                      </span>
+                      <span className="font-bold text-green-600 text-sm shrink-0">
+                        {next}/{targetPerDay}
+                      </span>
+                    </div>
+
+                    <div
+                      className="overflow-hidden rounded-full bg-slate-100 mt-2"
+                      style={{ width: "100%", height: "8px" }}
+                    >
+                      <div
+                        className="h-full bg-green-500 rounded-full transition-all duration-300"
+                        style={{
+                          width: `${Math.min((next / targetPerDay) * 100, 100)}%`,
+                        }}
+                      />
+                    </div>
+                  </div>,
+                );
               }}
             >
               <Plus size={13} />
@@ -305,6 +395,11 @@ export function HabitCard({
             setMenuOpen(false);
             setDeleteDialogOpen(true);
           }}
+          onSetGoal={() => {
+            setMenuOpen(false);
+            onSetGoal?.();
+          }}
+          hasActiveGoal={hasActiveGoal}
         />
       )}
 

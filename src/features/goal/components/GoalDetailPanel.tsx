@@ -39,17 +39,22 @@ const GoalDetailPanel: React.FC<GoalDetailPanelProps> = ({
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  // Keep last valid goal in memory so content stays visible during slide-out
-  const [cached, setCached] = useState<any | null>(goal);
+  // Keep last valid goal in memory
+  const [cached, setCached] = useState<GoalWithDerived | null>(goal);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (goal) {
-      setCached(goal);
+    if (isOpen) {
       const id = setTimeout(() => setVisible(true), 16);
       return () => clearTimeout(id);
     } else {
       setVisible(false);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (goal) {
+      setCached(goal);
     }
   }, [goal]);
 
@@ -152,13 +157,17 @@ const GoalDetailPanel: React.FC<GoalDetailPanelProps> = ({
               {t("goals.detail_title")}
             </span>
             <h2
-              className="text-xl font-bold mt-1 line-clamp-1 goal-detail-title"
-              onClick={() => {
-                onClose();
-                navigate(`/dashboard/habits/${display.habitId}/history`);
-              }}
+              className="text-xl font-bold mt-1 line-clamp-1"
             >
-              {habitName}
+              <span
+                className="goal-detail-habit-badge"
+                style={{ "--badge-color": barColor } as React.CSSProperties}
+                onClick={() => {
+                  onClose();
+                  navigate(`/dashboard/habits/${display.habitId}/history`);
+                }}>
+                {habitName}
+              </span>
             </h2>
           </div>
           <button

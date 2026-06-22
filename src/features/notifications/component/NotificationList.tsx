@@ -2,14 +2,27 @@ import { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NotificationContext } from '../context/NotificationContext';
 import type { AppNotification } from '../types';
+import { NotificationTime } from './NotificationTime';
 
-export const NotificationList = ({ filter = 'ALL' }: { filter?: string }) => {
-  const { t } = useTranslation();
+export const NotificationList = ({
+  typeFilter = 'ALL',
+  readFilter = 'ALL'
+}: {
+  typeFilter?: string;
+  readFilter?: string;
+}) => {
+    const { t } = useTranslation();
   const { notifications, markAsRead, markAllAsRead } = useContext(NotificationContext);
 
-  const filteredNotifications = filter === 'ALL'
-    ? notifications
-    : notifications.filter((n: any) => n.type === filter);
+  const filteredNotifications = notifications.filter((notif: any) => {
+    const matchesType = typeFilter === 'ALL' || notif.type === typeFilter;
+    const matchesRead = readFilter === 'ALL'
+      ? true
+      : readFilter === 'UNREAD'
+        ? !notif.isRead
+        : notif.isRead;
+    return matchesType && matchesRead;
+  });
 
   if (filteredNotifications.length === 0) {
     return (
@@ -77,7 +90,7 @@ export const NotificationList = ({ filter = 'ALL' }: { filter?: string }) => {
                 })}
               </p>
               <span className="mt-2 block text-xs font-medium opacity-70" style={{ color: 'var(--text)' }}>
-                {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                <NotificationTime createdAt={notif.createdAt} />
               </span>
             </div>
 

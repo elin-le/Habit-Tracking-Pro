@@ -18,7 +18,7 @@ export function Pagination({
   const { t } = useTranslation();
   return (
     <nav
-      className="mt-8 flex flex-col items-center gap-2"
+      className="mt-8 flex flex-col items-center gap-2 mb-10"
       aria-label="Pagination"
     >
       <div className="flex items-center gap-1">

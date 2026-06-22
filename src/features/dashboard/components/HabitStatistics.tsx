@@ -1,3 +1,4 @@
+import { memo, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
     ResponsiveContainer,
@@ -15,10 +16,17 @@ interface HabitStatisticsProps {
     statistics: HabitStatisticsType[];
 }
 
-const HabitStatistics = ({
+const HabitStatistics = memo(({
     statistics,
 }: HabitStatisticsProps) => {
     const { t } = useTranslation();
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     if (!statistics.length) {
         return (
@@ -40,11 +48,8 @@ const HabitStatistics = ({
                 {t("dashboard.completionRate")}
             </h2>
 
-            <div className="completion-chart">
-                <ResponsiveContainer
-                    width="100%"
-                    height="100%"
-                >
+            <div className="completion-chart" style={{ width: '100%', minWidth: 0 }}>
+                <ResponsiveContainer width="100%" height={isMobile ? 220 : 270}>
                     <LineChart
                         data={statistics}
                         margin={{
@@ -56,41 +61,45 @@ const HabitStatistics = ({
                     >
                         <CartesianGrid
                             strokeDasharray="3 3"
+                            vertical={false}
+                            stroke="#e2e8f0"
                         />
 
                         <XAxis
                             dataKey="day"
-                            tick={{ fontSize: 12 }}
+                            tick={{ fontSize: 10, fill: "#94a3b8" }}
                             axisLine={false}
                             tickLine={false}
                         />
 
                         <YAxis
-                            tick={{ fontSize: 12 }}
+                            tick={{ fontSize: 10, fill: "#94a3b8" }}
                             axisLine={false}
                             tickLine={false}
                             domain={[0, 100]}
                         />
-
                         <Tooltip
-                            formatter={(value) => [
-                                `${value}%`,
-                                t(
-                                    "dashboard.completionRate",
-                                ),
-                            ]}
+                            contentStyle={{
+                                padding: "6px 10px",
+                                fontSize: "11px",
+                                borderRadius: "8px",
+                                border: "none",
+                                boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+                            }}
                         />
-
                         <Line
                             type="monotone"
                             dataKey="rate"
                             stroke="#8b5cf6"
                             strokeWidth={2}
                             dot={{
-                                r: 4,
+                                r: 3,
+                                fill: "#8b5cf6",
+                                strokeWidth: 2,
+                                stroke: "#fff"
                             }}
                             activeDot={{
-                                r: 6,
+                                r: 5,
                             }}
                         />
                     </LineChart>
@@ -98,6 +107,6 @@ const HabitStatistics = ({
             </div>
         </div>
     );
-};
+});
 
 export default HabitStatistics;

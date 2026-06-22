@@ -1,11 +1,10 @@
-import {  SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 import { FilterChip } from "../common/FilterChip";
 import { DAY_OF_WEEK_MAP, DAYS } from "@/shared/constants/appConstants";
 import { useTranslation } from "react-i18next";
-import { enUS, vi } from "date-fns/locale";
 import type { HabitStatus, Priority } from "@/shared/types/Habit";
 import type { DaysOfWeek } from "@/shared/types/HabitSchedule";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Category } from "@/shared/types/Category";
 
 interface HabitFilterProps {
@@ -19,6 +18,8 @@ interface HabitFilterProps {
   frequencyFilter: DaysOfWeek | null;
   onFrequencyChange: (v: DaysOfWeek | null) => void;
   onClearAll: () => void;
+  activeFilterCount: number;
+  setActiveFilterCount: (count: number) => void;
 }
 
 export function HabitFilter({
@@ -32,8 +33,10 @@ export function HabitFilter({
   frequencyFilter,
   onFrequencyChange,
   onClearAll,
+  activeFilterCount,
+  setActiveFilterCount,
 }: HabitFilterProps) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const [calendarDate, setCalendarDate] = useState<Date | undefined>();
 
@@ -42,11 +45,16 @@ export function HabitFilter({
     setCalendarDate(undefined); // bỏ chọn calendar khi chọn weekday chip
     onFrequencyChange(frequencyFilter === dow ? null : dow);
   };
-  const activeFilterCount =
-    (selectedCategory ? 1 : 0) +
-    (selectedPriority ? 1 : 0) +
-    (selectedStatus === "ACTIVE" ? 0 : 1) +
-    (frequencyFilter === DAY_OF_WEEK_MAP[new Date().getDay()] ? 0 : 1);
+
+  useEffect(() => {
+    const count =
+      (selectedCategory ? 1 : 0) +
+      (selectedPriority ? 1 : 0) +
+      (selectedStatus === "ACTIVE" ? 0 : 1) +
+      (frequencyFilter === DAY_OF_WEEK_MAP[new Date().getDay()] ? 0 : 1);
+
+    setActiveFilterCount(count);
+  }, [selectedCategory, selectedPriority, selectedStatus, frequencyFilter, setActiveFilterCount]);
 
   return (
     <div

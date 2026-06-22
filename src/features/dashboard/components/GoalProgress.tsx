@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import { useTranslation } from "react-i18next";
 
 import type { GoalProgressType } from "../../../shared/types/Dashboard";
@@ -7,7 +7,7 @@ interface GoalProgressProps {
     goals: GoalProgressType[];
 }
 
-const GoalProgress = ({
+const GoalProgress = memo(({
     goals,
 }: GoalProgressProps) => {
     const { t } = useTranslation();
@@ -96,6 +96,6 @@ const GoalProgress = ({
             )}
         </div>
     );
-};
+});
 
 export default GoalProgress;

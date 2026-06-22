@@ -124,7 +124,6 @@ export const getLongestStreak = (
     for (let i = 1; i < completedDates.length; i++) {
         const prev = new Date(completedDates[i - 1]);
         const curr = new Date(completedDates[i]);
-
         const diffDays = Math.round(
             (curr.getTime() - prev.getTime()) /
             (1000 * 60 * 60 * 24)

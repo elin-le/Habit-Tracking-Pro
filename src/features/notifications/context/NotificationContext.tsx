@@ -1,15 +1,60 @@
 // src/features/notifications/context/NotificationContext.tsx
-import { createContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useState, type ReactNode } from 'react';
 import type { AppNotification } from '../types';
-import { useTranslation } from 'react-i18next';
-import { ToastService } from '../../../routes/services/toastService';
 
 
 export const NotificationContext = createContext<any>(null);
 
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
-  const [notifications, setNotifications] = useState<AppNotification[]>([]);
-  const { t } = useTranslation();
+  const [notifications, setNotifications] = useState<AppNotification[]>(() => {
+    const saved = localStorage.getItem('notifications');
+    if (saved) {
+      try {
+        let loadedNotifications: AppNotification[] = JSON.parse(saved);
+        let isDirty = false;
+        loadedNotifications = loadedNotifications.map(n => {
+          const hasMissingParams = (n.type === 'GOAL_80' || n.type === 'GOAL_ACHIEVED' || n.type === 'MISSED_HABIT' || n.type === 'STREAK_RISK') && !n.params;
+          if (typeof n.message === 'string' && (n.message.includes('{{') || !n.message.startsWith('notifications.') || hasMissingParams)) {
+            isDirty = true;
+            if (n.type === 'GOAL_80') {
+              n.title = 'notifications.goal_80.title';
+              n.message = 'notifications.goal_80.message';
+              n.params = { habitName: n.params?.habitName || 'habit_form.Study' };
+            } else if (n.type === 'GOAL_ACHIEVED') {
+              n.title = 'notifications.goal_achieved.title';
+              n.message = 'notifications.goal_achieved.message';
+              n.params = { habitName: n.params?.habitName || 'habit_form.Health' };
+            } else if (n.type === 'MISSED_HABIT') {
+              n.title = 'notifications.missed_habit.title';
+              if (n.message !== 'notifications.missed_habit.message_date') {
+                n.message = 'notifications.missed_habit.message_date';
+              }
+              n.params = { 
+                habitName: n.params?.habitName || 'habit_form.Mindfulness',
+                missedDate: n.params?.missedDate ?? ''
+              };
+         } else if (n.type === 'STREAK_RISK') {
+              n.title = 'notifications.streak_risk.title';
+              n.message = 'notifications.streak_risk.message';
+              n.params = { 
+                habitName: n.params?.habitName || 'habit_form.Work', 
+                streakCount: typeof n.params?.streakCount === 'number' ? n.params.streakCount : 5 
+              };
+            }
+          }
+          return n;
+        });
+        if (isDirty) {
+          localStorage.setItem('notifications', JSON.stringify(loadedNotifications));
+        }
+        return loadedNotifications;
+      } catch (e) {
+        console.error('Failed to parse saved notifications', e);
+      }
+    }
+    return [];
+  });
+
 
   const addNotification = (
     type: AppNotification['type'],
@@ -20,7 +65,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     relatedEntityType: AppNotification['relatedEntityType']
   ) => {
     const newNotif: AppNotification = {
-      id: `notif-${crypto.randomUUID()}`,
+      id: `notif-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
       title: titleKey,
       message: messageKey,
       type,
@@ -31,73 +76,21 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       params,
     };
 
-    setNotifications(prev => {
-      const updated = [newNotif, ...prev];
-      localStorage.setItem('notifications', JSON.stringify(updated));
-      return updated;
-    });
-
-    const translatedMessage = t(messageKey, params);
-    if (type === 'GOAL_ACHIEVED') {
-      ToastService.achievement(translatedMessage);
-    } else if (type === 'STREAK_RISK') {
-      ToastService.warning(translatedMessage);
-    } else if (type === 'MISSED_HABIT') {
-      ToastService.reminder(translatedMessage);
-    } else {
-      ToastService.info(translatedMessage);
+    const saved = localStorage.getItem('notifications');
+    let currentList: AppNotification[] = [];
+    if (saved) {
+      try {
+        currentList = JSON.parse(saved);
+      } catch {
+        currentList = [];
+      }
     }
+    const updated = [newNotif, ...currentList];
+    localStorage.setItem('notifications', JSON.stringify(updated));
+    setNotifications(updated);
   };
 
 
-  // Lấy dữ liệu từ localStorage hoặc dùng mockData 
-  useEffect(() => {
-    const saved = localStorage.getItem('notifications');
-    let loadedNotifications: AppNotification[] = [];
-    if (saved) {
-      try {
-        loadedNotifications = JSON.parse(saved);
-        let isDirty = false;
-        loadedNotifications = loadedNotifications.map(n => {
-          const hasMissingParams = (n.type === 'GOAL_80' || n.type === 'GOAL_ACHIEVED' || n.type === 'MISSED_HABIT' || n.type === 'STREAK_RISK') && !n.params;
-          if (typeof n.message === 'string' && (n.message.includes('{{') || !n.message.startsWith('notifications.') || hasMissingParams)) {
-            isDirty = true;
-            if (n.type === 'GOAL_80') {
-              n.title = 'notifications.goal_80.title';
-              n.message = 'notifications.goal_80.message';
-              n.params = { habitName: 'habit_form.Study' };
-            } else if (n.type === 'GOAL_ACHIEVED') {
-              n.title = 'notifications.goal_achieved.title';
-              n.message = 'notifications.goal_achieved.message';
-              n.params = { habitName: 'habit_form.Health' };
-            } else if (n.type === 'MISSED_HABIT') {
-              n.title = 'notifications.missed_habit.title';
-              n.message = 'notifications.missed_habit.message';
-              n.params = { habitName: 'habit_form.Mindfulness' };
-            } else if (n.type === 'STREAK_RISK') {
-              n.title = 'notifications.streak_risk.title';
-              n.message = 'notifications.streak_risk.message';
-              n.params = { habitName: 'habit_form.Work', streakCount: 5 };
-            }
-          }
-          return n;
-        });
-        setNotifications(loadedNotifications);
-        if (isDirty) {
-          localStorage.setItem('notifications', JSON.stringify(loadedNotifications));
-        }
-      } catch (e) {
-        console.error('Failed to parse saved notifications', e);
-        loadedNotifications = [];
-        setNotifications([]);
-      }
-    } else {
-      loadedNotifications = [];
-      setNotifications([]);
-    }
-
-
-  }, []);
 
   // Hàm đánh dấu 1 thông báo đã đọc
   const markAsRead = (id: string) => {

@@ -128,10 +128,34 @@ export const HeatMap = ({ data, weeks = 12, title = "Activity" }: Props) => {
     }, [columns]);
 
     return (
-        <div className="w-full rounded-xl border p-3 sm:p-4" style={{
-            backgroundColor: "var(--surface-color)",
-            borderColor: "var(--border-color, rgb(228 228 231))",
-        }}>
+        <div
+            className="
+                w-full
+                rounded-[20px]
+                border-2
+                p-6
+                transition-all
+                duration-300
+                hover:-translate-y-1
+            "
+            style={{
+                background: "var(--surface-color)",
+                color: "var(--text-primary)",
+                borderColor: "rgba(124,58,237,0.15)",
+                boxShadow:
+                    "0 4px 12px rgba(124,58,237,.05), 0 12px 30px rgba(124,58,237,.05)",
+            }}
+            onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "rgba(168,85,247,.35)";
+                e.currentTarget.style.boxShadow =
+                    "0 8px 20px rgba(124,58,237,.15), 0 16px 40px rgba(124,58,237,.08)";
+            }}
+            onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "rgba(124,58,237,.15)";
+                e.currentTarget.style.boxShadow =
+                    "0 4px 12px rgba(124,58,237,.05), 0 12px 30px rgba(124,58,237,.05)";
+            }}
+        >
             <div className="mb-2 flex items-center justify-between gap-2">
                 <h3 className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
                     {title}
@@ -145,7 +169,7 @@ export const HeatMap = ({ data, weeks = 12, title = "Activity" }: Props) => {
             </div>
 
             <div ref={scrollRef} className="-mx-1 overflow-x-auto px-1 pb-1">
-                <div className="inline-flex min-w-max flex-col gap-1">
+                <div className="flex w-full flex-col gap-2">
                     <div className="flex pl-5 sm:pl-6" aria-hidden="true">
                         {columns.map((_, i) => {
                             const label = monthLabels.find((m) => m.index === i)?.label;
@@ -154,13 +178,13 @@ export const HeatMap = ({ data, weeks = 12, title = "Activity" }: Props) => {
                                 <div
                                     key={i}
                                     className="
-                    w-[18px]
-                    sm:w-[24px]
-                    shrink-0
-                    text-[10px]
-                    text-zinc-400
-                    dark:text-zinc-500
-                "
+                                    w-[18px]
+                                    sm:w-[24px]
+                                    shrink-0
+                                    text-[10px]
+                                    text-zinc-400
+                                    dark:text-zinc-500
+                                "
                                 >
                                     {label}
                                 </div>

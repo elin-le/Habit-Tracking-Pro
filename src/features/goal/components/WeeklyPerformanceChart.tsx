@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import "../Goals.css";
 
 interface WeeklyPerformanceChartProps {
-  weeklyHistory: any[];
+  weeklyHistory?: { day: string; value: number }[];
   maxBar: number;
   barColor: string;
 }

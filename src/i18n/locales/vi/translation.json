@@ -166,6 +166,7 @@
     "subtitle": "Mỗi lần hoàn thành đều giúp bạn tiến xa hơn"
   },
   "goals": {
+    "active_goal_exists": "Habit này đã có mục tiêu đang được thực hiện. Vui lòng hoàn thành hoặc lưu trữ mục tiêu cũ trước.",
     "title": "Mục tiêu",
     "subtitle": "Quản lý và theo dõi tiến độ các mục tiêu của bạn",
     "tracking": "Đang theo dõi",
@@ -221,6 +222,7 @@
     "create_goal": "Tạo mục tiêu",
     "error_target_required": "Nhập mục tiêu lớn hơn 0",
     "error_end_before_start": "Ngày kết thúc phải sau ngày bắt đầu",
+    "error_end_before_today": "Ngày kết thúc phải là ngày trong tương lai",
     "empty_title": "Không tìm thấy mục tiêu",
     "empty_hint": "Thêm mục tiêu cho một thói quen bên dưới để bắt đầu",
     "empty_filter_hint": "Không có mục tiêu nào khớp với bộ lọc hiện tại",
@@ -240,19 +242,26 @@
     "active_habits": "Thói quen đang duy trì",
     "at_risk": "Sắp đứt chuỗi",
     "per_habit": "Chi tiết thói quen",
+    "today_rate": "Hôm nay",
     "current_streak": "Chuỗi hiện tại",
     "longest_streak": "Chuỗi kỷ lục",
     "total_completions": "Tổng lượt hoàn thành",
     "completion_rate": "Tỷ lệ hoàn thành",
+    "goal_rate": "Tỷ lệ đạt mục tiêu",
     "last_7_days": "Thống kê 7 ngày qua",
     "days": "ngày",
+    "view_detail": "Xem chi tiết",
+    "checkin_history": "Lịch sử check-in",
+    "checkin_detail": "Chi tiết lịch sử",
+    "no_checkin": "Chưa có check-in",
+    "total_checkins": "lần",
     "risk_safe": "An toàn",
     "risk_warning": "Cần chú ý",
     "risk_at_risk": "Nguy cơ đứt chuỗi",
+    "no_match": "Không có thói quen khớp bộ lọc",
     "empty": "Chưa có dữ liệu để thống kê",
     "empty_hint": "Tạo thói quen và check-in mỗi ngày để xem thống kê tại đây",
     "empty_action": "Tạo thói quen ngay",
-    "statistics.no_match": "Không có thói quen khớp bộ lọc",
     "btn_export": "Xuất dữ liệu",
     "ex_noti1": "Xuất dữ liệu thành công",
     "ex_noti2": "Xuất dữ liệu thất bại"
@@ -265,6 +274,15 @@
     "markAllRead": "Đánh dấu tất cả đã đọc",
     "readBtn": "Đã đọc",
     "viewMore": "View all",
+    "filters": {
+      "title": "Bộ lọc thông báo",
+      "typeLabel": "Loại thông báo",
+      "statusLabel": "Trạng thái",
+      "statusAll": "Tất cả",
+      "unread": "Chưa đọc",
+      "read": "Đã đọc",
+      "typeAll": "Tất cả"
+    },
     "demoPanel": {
       "title": "Kích hoạt thông báo nhanh",
       "subtitle": "Chọn các cột mốc bên dưới để gửi cảnh báo và thông báo tiến độ",
@@ -274,20 +292,21 @@
       "btnStreakRisk": "Nguy cơ đứt chuỗi"
     },
     "goal_80": {
-      "title": "Sắp đạt mục tiêu!",
+      "title": "Mục tiêu đạt 80%",
       "message": "Tuyệt vời! Bạn đã hoàn thành 80% mục tiêu {{habitName}}."
     },
     "goal_achieved": {
-      "title": "Đã hoàn thành mục tiêu!",
+      "title": "Mục tiêu đã đạt",
       "message": "Chúc mừng! Bạn đã xuất sắc hoàn thành mục tiêu {{habitName}}."
     },
     "missed_habit": {
       "title": "Bỏ lỡ thói quen",
-      "message": "Bạn đã bỏ lỡ thói quen {{habitName}} ngày hôm qua. Cố gắng hôm nay nhé!"
+      "message": "Bạn đã bỏ lỡ thói quen {{habitName}} ngày hôm qua. Cố gắng hôm nay nhé!",
+      "message_date": "Bạn đã bỏ lỡ thói quen {{habitName}} ngày {{missedDate}}."
     },
     "streak_risk": {
       "title": "Nguy cơ đứt chuỗi",
-      "message": "Cẩn thận! Bạn sắp làm đứt chuỗi {{habitName}} {{streakCount}} ngày rồi."
+      "message": "Cần thận! Bạn sắp làm đứt chuỗi {{habitName}} {{streakCount}} ngày rồi."
     }
   },
   "dashboard": {
@@ -298,6 +317,7 @@
     "longestStreak": "Chuỗi dài nhất",
     "completionRate": "Tỷ lệ hoàn thành trong 7 ngày qua",
     "categoryOverview": "Tổng quan danh mục",
+    "weeklyProgressByCategory": "Tiến độ hàng tuần theo danh mục",
     "goalProgress": "Tiến độ mục tiêu",
     "health": "Sức khỏe",
     "learning": "Học tập",
@@ -305,7 +325,8 @@
     "days": "Days",
     "showMore": "Hiển thị thêm",
     "showLess": "Thu gọn",
-    "noGoals": "Không có goals nào đang hoạt động"
+    "noGoals": "Không có goals nào đang hoạt động",
+    "noData": "Không có danh mục nào"
   },
   "checkin": {
     "history": "Lịch sử check-in",
@@ -313,7 +334,8 @@
     "not_finished": "Chưa hoàn thành",
     "completed": "Đạt mục tiêu",
     "days": "Ngày",
-    "toast_update": "Đã thực hiện {{name}} {{count}} lần "
+    "undo": "Trở lại mốc {{next}}/{{target}}. Cố gắng tiếp nhé!",
+    "view": "Xem lịch sử check-in theo ngày"
   },
   "setting": {
     "setting": "Cài đặt",
