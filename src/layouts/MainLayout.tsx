@@ -18,6 +18,7 @@ import {
   getTotalCompletionProgress,
 } from "../features/habit/calculators/GoalCalculator";
 import { getHabitStats } from "../features/statistics/services/StatisticsService";
+import { HabitForm } from "@/shared/components/forms/HabitForm";
 
 export default function MainLayout() {
   const currentUser = JSON.parse(
@@ -32,18 +33,18 @@ export default function MainLayout() {
   const categoryData = useCategories();
 
   const checkInData = useCheckIns();
-  
+
   // Filter checkIns theo habits của current user
   const userHabitIds = useMemo(
     () => habitData.habits.map((h) => h.id),
     [habitData.habits],
   );
-  
+
   const userCheckIns = useMemo(
     () => checkInData.checkIns.filter((c) => userHabitIds.includes(c.habitId)),
     [checkInData.checkIns, userHabitIds],
   );
-  
+
   const userGoals = useGoals(habitData.habits, userCheckIns);
 
   const deleteGoalsByHabitId = useCallback(
@@ -96,7 +97,6 @@ export default function MainLayout() {
     const rawCheckins = localStorage.getItem(STORAGE_KEY.USER_CHECKINS);
     const rawSchedules = localStorage.getItem(STORAGE_KEY.USER_HABIT_SCHEDULES);
     const rawCategories = localStorage.getItem(STORAGE_KEY.CATEGORYS);
-
 
     if (!rawHabits || !rawGoals || !rawCheckins) return;
 
@@ -181,7 +181,6 @@ export default function MainLayout() {
     const stats = getHabitStats(habits, checkIns, categories);
     stats.forEach((stat: any) => {
       if (stat.riskLevel === "AT_RISK") {
-
         const todayKey = new Date().toISOString().split("T")[0];
         const currentNotifs = getFreshNotifications();
         const todayNotifExists = currentNotifs.some(
@@ -197,7 +196,7 @@ export default function MainLayout() {
             "notifications.streak_risk.message",
             { habitName: stat.name, streakCount: stat.currentStreak },
             stat.id,
-            "HABIT",      
+            "HABIT",
           );
         }
       }
@@ -213,14 +212,12 @@ export default function MainLayout() {
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayKey = yesterday.toISOString().split("T")[0];
 
-
     interface MissedEvent {
       habit: any;
       dateKey: string;
       formattedDate: string;
     }
     const missedEvents: MissedEvent[] = [];
-
 
     habits.forEach((habit: any) => {
       if (habit.status !== "ACTIVE") return; // Defensive check: Skip inactive habits
@@ -234,7 +231,7 @@ export default function MainLayout() {
       // Find the oldest check-in date
       const oldestDateStr = habitCheckins.reduce(
         (min, cur) => (cur.checkedAt < min ? cur.checkedAt : min),
-        habitCheckins[0].checkedAt
+        habitCheckins[0].checkedAt,
       );
       const startParts = oldestDateStr.split("-").map(Number);
       const endParts = yesterdayKey.split("-").map(Number);
@@ -261,7 +258,6 @@ export default function MainLayout() {
             formattedDate: formatDate(dKey),
           });
         }
-
       }
     });
     // Sắp xếp các sự kiện bị bỏ lỡ theo thời gian tăng dần (cũ nhất đến mới nhất)
@@ -270,13 +266,12 @@ export default function MainLayout() {
     // Thực hiện tạo các thông báo theo thứ tự đã sắp xếp
     missedEvents.forEach((event) => {
       const { habit, formattedDate } = event;
-      const currentNotifs = getFreshNotifications();     
+      const currentNotifs = getFreshNotifications();
       const notifExists = currentNotifs.some((n: any) => {
         return (
           n.relatedEntityId === habit.id &&
           n.type === "MISSED_HABIT" &&
           n.params?.missedDate === formattedDate
-
         );
       });
       if (!notifExists) {
@@ -341,7 +336,9 @@ export default function MainLayout() {
         <button
           className="md:hidden fixed bottom-20 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-transform active:scale-95 cursor-pointer mb-2"
           style={{ background: "var(--primary)", color: "#fff" }}
-          onClick={() => setShowAddForm(true)}
+          onClick={() => {
+            setShowAddForm(true);
+          }}
           aria-label="Tạo thói quen mới"
         >
           <svg
@@ -358,6 +355,15 @@ export default function MainLayout() {
         </button>
 
         <BottomTabBar />
+
+        {showAddForm && (
+          <HabitForm
+            onClose={() => setShowAddForm(false)}
+            onSubmit={habitData.createHabit}
+            onSubmitSchedules={habitSchedule.createHabitSchedules}
+            categories={categoryData.categories}
+          />
+        )}
       </div>
     </div>
   );

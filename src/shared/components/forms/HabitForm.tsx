@@ -18,6 +18,7 @@ import { Modal } from "../ui/Modal";
 import { toast } from "sonner";
 import type { Category } from "@/shared/types/Category";
 import type { User } from "@/shared/types/User";
+import { useLocation, useNavigate } from "react-router-dom";
 
 // Style dùng chung cho input/select/textarea
 const inputStyle: React.CSSProperties = {
@@ -50,6 +51,9 @@ export function HabitForm({
     localStorage.getItem(STORAGE_KEY.CURRENT_USER) || "{}",
   ) as User;
   const { t } = useTranslation();
+
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const isPaused = initial?.status === "PAUSED";
 
@@ -423,6 +427,9 @@ export function HabitForm({
           <Button
             onClick={() => {
               handleSubmit();
+              if (!location.pathname.includes("/habits")) {
+                navigate("/dashboard/habits");
+              }
             }}
             className="cursor-pointer"
           >
