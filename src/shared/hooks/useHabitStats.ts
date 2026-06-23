@@ -3,14 +3,16 @@ import { getHabitStats } from "../../features/statistics/services/StatisticsServ
 import type { Habit } from "../types/Habit";
 import type { CheckIn } from "../types/CheckIn";
 import type { Category } from "../types/Category";
+import type { GoalWithDerived } from "../types/Goal";
 
 export const useHabitStats = (
   habits: Habit[],
   checkIns: CheckIn[],
-  categories: Category[]
+  categories: Category[],
+  goals: GoalWithDerived[] = []
 ) => {
   return useMemo(
-    () => getHabitStats(habits ?? [], checkIns ?? [], categories ?? []),
-    [habits, checkIns, categories]
+    () => getHabitStats(habits ?? [], checkIns ?? [], categories ?? [], goals ?? []),
+    [habits, checkIns, categories, goals]
   );
 };

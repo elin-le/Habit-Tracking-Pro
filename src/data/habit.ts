@@ -20,7 +20,6 @@ export const mockHabits: Habit[] = [
   // THANH NGOC (0888091940) — SUPER ACTIVE — 28 habits
   // Mix: many DAILY + DAY_OF_WEEK, multiple categories, multiple statuses
   // ══════════════════════════════════════════════════════════════
-
   // --- Health (10) ---
   { id: "habit-ngoc-1",  name: "Drink 2L of water",          frequencyType: "DAILY",       targetPerDay: 8, status: "ACTIVE",   priority: "HIGH",   categoryId: "cat_health",      userId: "0888091940" },
   { id: "habit-ngoc-2",  name: "Morning jogging",            frequencyType: "DAY_OF_WEEK", targetPerDay: 1, status: "ACTIVE",   priority: "HIGH",   categoryId: "cat_health",      userId: "0888091940" },
@@ -140,4 +139,16 @@ export const mockHabits: Habit[] = [
   { id: "habit-ngan-1", name: "Drink water",                 frequencyType: "DAILY",       targetPerDay: 6, status: "ACTIVE",   priority: "HIGH",   categoryId: "cat_health",      userId: "0819248090" },
   { id: "habit-ngan-2", name: "Morning stretching",          frequencyType: "DAY_OF_WEEK", targetPerDay: 1, status: "ACTIVE",   priority: "MEDIUM", categoryId: "cat_health",      userId: "0819248090" },
   { id: "habit-ngan-3", name: "Read for 30 mins",            frequencyType: "DAILY",       targetPerDay: 1, status: "ACTIVE",   priority: "MEDIUM", categoryId: "cat_study",       userId: "0819248090" },
+
+  /* DEMO STAT */
+  { id: "stat-h1", name: "[T] Today COMPLETED + goal on-track", frequencyType: "DAILY", targetPerDay: 8, status: "ACTIVE", priority: "HIGH", categoryId: "cat_health", userId: "0888091940" },
+  { id: "stat-h4", name: "[G] STREAK goal on-track", frequencyType: "DAILY", targetPerDay: 1, status: "ACTIVE", priority: "HIGH", categoryId: "cat_study", userId: "0888091940" },
+  { id: "stat-h5", name: "[G] STREAK goal AT-RISK", frequencyType: "DAILY", targetPerDay: 1, status: "ACTIVE", priority: "HIGH", categoryId: "cat_study", userId: "0888091940" },
+  { id: "stat-h6", name: "[G] TOTAL goal AT-RISK", frequencyType: "DAILY", targetPerDay: 1, status: "ACTIVE", priority: "MEDIUM", categoryId: "cat_work", userId: "0888091940" },
+  { id: "stat-h8", name: "[G] Goal COMPLETED", frequencyType: "DAILY", targetPerDay: 1, status: "ACTIVE", priority: "MEDIUM", categoryId: "cat_mindfulness", userId: "0888091940" },
+  { id: "stat-h9", name: "[G] Goal NOT-STARTED", frequencyType: "DAILY", targetPerDay: 1, status: "ACTIVE", priority: "LOW", categoryId: "cat_other", userId: "0888091940" },
+  { id: "stat-h11", name: "[N] No goal - broken streak", frequencyType: "DAILY", targetPerDay: 1, status: "ACTIVE", priority: "LOW", categoryId: "cat_other", userId: "0888091940" },
+  { id: "stat-h13", name: "[E] Zero check-ins", frequencyType: "DAILY", targetPerDay: 1, status: "ACTIVE", priority: "LOW", categoryId: "cat_study", userId: "0888091940" },
+  { id: "stat-h14", name: "[E] Perfect 7/7", frequencyType: "DAILY", targetPerDay: 3, status: "ACTIVE", priority: "HIGH", categoryId: "cat_health", userId: "0888091940" },
+  { id: "stat-h15", name: "[E] PAUSED (hidden)", frequencyType: "DAILY", targetPerDay: 1, status: "PAUSED", priority: "LOW", categoryId: "cat_other", userId: "0888091940" },
 ];

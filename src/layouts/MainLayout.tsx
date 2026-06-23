@@ -16,8 +16,10 @@ import { NotificationContext } from "../features/notifications/context/Notificat
 import {
   getStreakProgress,
   getTotalCompletionProgress,
+  getCurrentStreak,
+  getDailySummary,
 } from "../features/habit/calculators/GoalCalculator";
-import { getHabitStats } from "../features/statistics/services/StatisticsService";
+import { getHabitRisk } from "../features/habit/calculators/riskDetector";
 import { HabitForm } from "@/shared/components/forms/HabitForm";
 
 export default function MainLayout() {
@@ -96,7 +98,6 @@ export default function MainLayout() {
     const rawGoals = localStorage.getItem(STORAGE_KEY.USER_GOALS);
     const rawCheckins = localStorage.getItem(STORAGE_KEY.USER_CHECKINS);
     const rawSchedules = localStorage.getItem(STORAGE_KEY.USER_HABIT_SCHEDULES);
-    const rawCategories = localStorage.getItem(STORAGE_KEY.CATEGORYS);
 
     if (!rawHabits || !rawGoals || !rawCheckins) return;
 
@@ -107,7 +108,6 @@ export default function MainLayout() {
     const goals = JSON.parse(rawGoals) as any[];
     const checkIns = JSON.parse(rawCheckins) as any[];
     const schedules = rawSchedules ? (JSON.parse(rawSchedules) as any[]) : [];
-    const categories = rawCategories ? JSON.parse(rawCategories) : [];
 
     // Helper to get notifications list directly from localStorage to avoid stale state and race conditions
     const getFreshNotifications = () => {
@@ -178,29 +178,44 @@ export default function MainLayout() {
     });
 
     // 2. Streak Risk
-    const stats = getHabitStats(habits, checkIns, categories);
-    stats.forEach((stat: any) => {
-      if (stat.riskLevel === "AT_RISK") {
-        const todayKey = new Date().toISOString().split("T")[0];
-        const currentNotifs = getFreshNotifications();
-        const todayNotifExists = currentNotifs.some(
-          (n: any) =>
-            n.relatedEntityId === stat.id &&
-            n.type === "STREAK_RISK" &&
-            n.createdAt.startsWith(todayKey),
-        );
-        if (!todayNotifExists) {
-          addNotification(
-            "STREAK_RISK",
-            "notifications.streak_risk.title",
-            "notifications.streak_risk.message",
-            { habitName: stat.name, streakCount: stat.currentStreak },
-            stat.id,
-            "HABIT",
+    const todayKey = new Date().toISOString().split("T")[0];
+    habits
+      .filter((h: any) => h.status === "ACTIVE")
+      .forEach((habit: any) => {
+        const target = Math.max(1, Number(habit.targetPerDay) || 1);
+        const habitCheckIns = checkIns.filter((c: any) => c.habitId === habit.id);
+        const summary = getDailySummary(habitCheckIns, target);
+        const completedToday = summary[todayKey]?.completed ?? false;
+        const currentStreak = getCurrentStreak(habitCheckIns, target);
+        const completedInLast7 = Array.from({ length: 7 }).filter((_, i) => {
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          const k = d.toISOString().split("T")[0];
+          return (summary[k]?.count ?? 0) >= target;
+        }).length;
+        const completionRate = Math.round((completedInLast7 / 7) * 100);
+        const riskLevel = getHabitRisk(completionRate, currentStreak, completedToday);
+
+        if (riskLevel === "AT_RISK") {
+          const currentNotifs = getFreshNotifications();
+          const todayNotifExists = currentNotifs.some(
+            (n: any) =>
+              n.relatedEntityId === habit.id &&
+              n.type === "STREAK_RISK" &&
+              n.createdAt.startsWith(todayKey),
           );
+          if (!todayNotifExists) {
+            addNotification(
+              "STREAK_RISK",
+              "notifications.streak_risk.title",
+              "notifications.streak_risk.message",
+              { habitName: habit.name, streakCount: currentStreak },
+              habit.id,
+              "HABIT",
+            );
+          }
         }
-      }
-    });
+      });
 
     // 3. Missed Habit
     const formatDate = (dateStr: string) => {
