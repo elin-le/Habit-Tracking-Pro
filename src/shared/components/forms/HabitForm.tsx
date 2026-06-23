@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import type { Category } from "@/shared/types/Category";
 import type { User } from "@/shared/types/User";
 import { useLocation, useNavigate } from "react-router-dom";
+import { generateId } from "@/shared/utils/generateId";
 
 // Style dùng chung cho input/select/textarea
 const inputStyle: React.CSSProperties = {
@@ -103,18 +104,18 @@ export function HabitForm({
     );
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (): boolean => {
     const nameError = validateName(form.name);
     const targetError = validateTargetPerDay(form.targetPerDay);
 
     setNameError(nameError);
     setTargetPerDayError(targetError);
 
-    if (nameError || targetError) return;
+    if (nameError || targetError) return false; // ✅ trả false khi lỗi
 
     const newHabit: Habit = {
       ...form,
-      id: initial?.id ?? crypto.randomUUID(),
+      id: initial?.id ?? generateId(),
       userId: initial?.userId ?? currentUser.phone,
     };
 
@@ -122,11 +123,10 @@ export function HabitForm({
 
     if (form.frequencyType === "DAY_OF_WEEK" && activeDays.length > 0) {
       const schedules: HabitSchedule[] = activeDays.map((dayIndex) => ({
-        id: crypto.randomUUID(),
+        id: generateId(),
         habitId: newHabit.id,
-        dayOfWeek: DAY_OF_WEEK_MAP[dayIndex], // map number -> string
+        dayOfWeek: DAY_OF_WEEK_MAP[dayIndex],
       }));
-
       onSubmitSchedules(schedules);
     } else {
       onSubmitSchedules([]);
@@ -139,6 +139,7 @@ export function HabitForm({
     }
 
     onClose();
+    return true; // ✅ trả true khi thành công
   };
 
   return (
@@ -426,9 +427,9 @@ export function HabitForm({
           </Button>
           <Button
             onClick={() => {
-              handleSubmit();
-              if (!location.pathname.includes("/habits")) {
-                navigate("/dashboard/habits");
+              const success = handleSubmit();
+              if (success && !location.pathname.includes("/habits")) {
+                navigate("/dashboard/habits"); // ✅ chỉ navigate khi submit thành công
               }
             }}
             className="cursor-pointer"
